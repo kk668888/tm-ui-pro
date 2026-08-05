@@ -1,13 +1,26 @@
 {
   "name": "tm-ui-new",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "pnpm --filter @tm/docs dev",
+    "build": "pnpm --filter @tm/ui build",
+    "test": "pnpm --filter @tm/ui test",
+    "lint": "eslint --ext .ts,.vue packages",
+    "format": "prettier --write \"packages/**/*.{ts,vue}\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@11.13.0"
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vue-tsc": "^2.1.0",
+    "vitest": "^4.1.10",
+    "@vue/test-utils": "^2.4.0",
+    "jsdom": "^24.0.0",
+    "prettier": "^3.3.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-vue": "^10.0.0",
+    "@vue/eslint-config-typescript": "^14.0.0",
+    "@vue/eslint-config-prettier": "^10.0.0"
+  },
+  "packageManager": "pnpm@11.13.1"
 }

@@ -1,0 +1,32 @@
+// tsconfig.base.json —— 子包 tsconfig 通过 extends 继承此基线配置
+// 注意：此文件为 JSONC（jsonc-parser / TS 编译器均支持 // 注释）
+{
+  "compilerOptions": {
+    // 目标 ES 标准：使用最新 ES 以支持现代语法
+    "target": "ESNext",
+    // 模块系统：ESM（配合 package.json 的 type: module）
+    "module": "ESNext",
+    // 模块解析策略：Bundler 模式，适配现代打包工具（Vite/rollup）
+    "moduleResolution": "Bundler",
+    // 严格模式：开启所有严格类型检查
+    "strict": true,
+    // JSX 处理：保留原样，交由 Vue SFC 编译器（@vue/compiler-sfc）处理
+    "jsx": "preserve",
+    // 生成 source map，便于调试
+    "sourceMap": true,
+    // 允许 import json 文件
+    "resolveJsonModule": true,
+    // 互操作兼容：允许对 CommonJS 模块 default import
+    "esModuleInterop": true,
+    // 类型库：ESNext（标准 API）+ DOM（浏览器 API）+ DOM.Iterable（迭代器）
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    // 跳过 .d.ts 类型检查（提升构建速度，常见第三方类型有噪声）
+    "skipLibCheck": true,
+    // 生成 .d.ts 类型声明文件（组件库需要发布类型）
+    "declaration": true,
+    // 隔离模块：每个文件独立编译，强制 type-only import 用 import type
+    "isolatedModules": true,
+    // class 字段使用 Object.defineProperty 语义（符合 TC39 规范）
+    "useDefineForClassFields": true
+  }
+}

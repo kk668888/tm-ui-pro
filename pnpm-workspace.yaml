@@ -1,0 +1,8 @@
+# pnpm-workspace.yaml
+# Monorepo 工作区声明：声明哪些目录下的子包参与 workspace 协议
+# 后续 task 将创建：
+#   - packages/ui：@tm/ui 组件库（核心库，零应用依赖）
+#   - apps/docs：@tm/docs 文档站（基于 VitePress）
+packages:
+  - 'packages/*'
+  - 'apps/*'
