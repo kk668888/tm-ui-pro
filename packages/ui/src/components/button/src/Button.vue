@@ -38,9 +38,9 @@ const { onClick } = useDebounceClick(props, emit)
 
 // ★ 扩展属性剥离：从 props 中解构出 debounce/confirm，剩余 rest 即 ant 认识的原生属性
 // 这样内部 AButton 不会收到 ant 不识别的 props 而产生 console warning
+// 解构出的扩展属性用不到，重命名为 _d/_c 下划线前缀以标记「故意未使用」
 const antProps = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { debounce, confirm, ...rest } = props
+  const { debounce: _d, confirm: _c, ...rest } = props
   return rest
 })
 

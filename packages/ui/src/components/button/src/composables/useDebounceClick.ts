@@ -3,7 +3,8 @@
 // 设计要点：
 // 1. 未配置 debounce（0 / undefined）时零开销透传，保持 ant 原生点击响应
 // 2. 配置后采用「尾部节流」语义——连续点击只会在最后一次点击后 debounce ms 触发一次
-// 3. 通过闭包持有 timer，组件卸载时由 JS GC 自动回收（无需 onUnmounted 显式清理）
+// 3. onBeforeUnmount 显式清掉 timer，避免组件卸载后异步任务仍触发 emit（内存/逻辑安全）
+import { onBeforeUnmount } from 'vue'
 import type { TmButtonProps } from '../props'
 
 // MouseEvent 取自 DOM 全局类型（lib: DOM 已包含），无需从 vue import
@@ -18,6 +19,8 @@ export interface UseDebounceClickReturn {
 
 /**
  * 创建一个防抖点击处理器
+ *
+ * 必须在组件 setup 期间调用（内部依赖 onBeforeUnmount 注册卸载钩子）。
  *
  * @param props 只读取 debounce 字段，避免响应式依赖扩散
  * @param emit  TmButton 的 click emit 函数
@@ -37,6 +40,14 @@ export function useDebounceClick(
     clearTimeout(timer)
     timer = setTimeout(() => emit('click', ev), props.debounce)
   }
+
+  // 组件卸载前清掉待触发 timer：防止已卸载组件仍 emit click（避免业务侧「幽灵点击」）
+  onBeforeUnmount(() => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = undefined
+    }
+  })
 
   return { onClick }
 }
