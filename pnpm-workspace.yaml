@@ -6,3 +6,7 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+# allowBuilds：显式声明哪些包允许执行 install 期间的 build script
+# core-js 的 postinstall 仅为兼容性提示，本仓库不需要，设为 false 以消除 warning
+allowBuilds:
+  core-js: false
