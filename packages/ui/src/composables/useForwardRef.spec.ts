@@ -17,4 +17,16 @@ describe('useForwardRef', () => {
     const { exposed } = useForwardRef<any>()
     expect(exposed.anyMethod).toBeUndefined()
   })
+
+  it('has 拦截器：内部实例存在的 key 返回 true（Vue 3.5+ exposeProxy 兼容）', () => {
+    // 回归背景：Vue 3.5+ 的 exposeProxy 在 get 时先校验 `key in target`，
+    // 若 useForwardRef 只实现 get、不实现 has，父组件 ref 拿不到 focus/blur 等方法
+    const { innerRef, exposed } = useForwardRef<any>()
+    // 挂载前：内部实例为 null，has 应返回 false
+    expect('focus' in exposed).toBe(false)
+    // 挂载后：方法存在返回 true，不存在返回 false
+    innerRef.value = { focus: () => 'focused' }
+    expect('focus' in exposed).toBe(true)
+    expect('nonExistent' in exposed).toBe(false)
+  })
 })
