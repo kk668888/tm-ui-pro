@@ -1,0 +1,35 @@
+{
+  "name": "@tm/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "dependencies": {
+    "@tm/ui": "workspace:*",
+    "vue": "^3.5.0",
+    "ant-design-vue": "^4.2.6",
+    "@ant-design/icons-vue": "^7.0.0",
+    "vxe-table": "4.20.7",
+    "vxe-pc-ui": "4.16.21",
+    "@vxe-ui/core": "4.4.18",
+    "pinia": "^2.2.0",
+    "vue-router": "^4.4.0",
+    "axios": "^1.7.0",
+    "echarts": "^6.0.0",
+    "vue-echarts": "^8.0.1",
+    "dayjs": "^1.11.13",
+    "jsencrypt": "^3.5.4",
+    "markdown-it": "^14.0.0",
+    "highlight.js": "^11.0.0",
+    "xe-utils": "^4.0.11"
+  },
+  "devDependencies": {
+    "vitepress": "^1.5.0",
+    "tailwindcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3"
+  }
+}

@@ -6,7 +6,13 @@
 packages:
   - 'packages/*'
   - 'apps/*'
-# allowBuilds：显式声明哪些包允许执行 install 期间的 build script
-# core-js 的 postinstall 仅为兼容性提示，本仓库不需要，设为 false 以消除 warning
+# allowBuilds：pnpm 11 的 install 期 build script 审批表（true 允许执行，false 显式忽略）
+# pnpm 11 默认 strictDepBuilds=true，未在此显式声明的包会触发 ERR_PNPM_IGNORED_BUILDS
+# 阻断 `pnpm --filter` 子包脚本的预检；故将以下包显式标记为 false：
+# - core-js：postinstall 仅为兼容性提示，无需执行
+# - esbuild：在 Windows/Linux/macOS 均通过 optionalDependencies 投放预编译二进制，无需 build script
+# - vue-demi：postinstall 用于切换 Vue 2/3 入口；本项目固定 Vue 3.5，运行时由 peer 自动解析
 allowBuilds:
   core-js: false
+  esbuild: false
+  vue-demi: false

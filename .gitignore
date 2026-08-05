@@ -7,5 +7,8 @@ lib
 coverage
 .vitepress/cache
 .vitepress/dist
+# VitePress 子包产物（apps/docs 等），需匹配任意目录深度
+**/.vitepress/cache/
+**/.vitepress/dist/
 # SDD 工具的 scratch 目录，不可入库
 .superpowers
