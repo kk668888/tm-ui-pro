@@ -114,18 +114,27 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^6.0.8
         version: 6.0.8(vite@8.2.0(@types/node@22.20.1)(jiti@2.7.0))(vue@3.5.40(typescript@5.9.3))
+      '@vue/test-utils':
+        specifier: ^2.4.0
+        version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.40)(vue@3.5.40(typescript@5.9.3))
       '@vxe-ui/core':
         specifier: 4.4.18
         version: 4.4.18(vue@3.5.40(typescript@5.9.3))
       ant-design-vue:
         specifier: ^4.2.6
         version: 4.2.6(vue@3.5.40(typescript@5.9.3))
+      jsdom:
+        specifier: ^24.0.0
+        version: 24.1.3
       vite:
         specifier: ^8.1.5
         version: 8.2.0(@types/node@22.20.1)(jiti@2.7.0)
       vite-plugin-dts:
         specifier: ^4.5.0
         version: 4.5.4(@types/node@22.20.1)(rollup@4.62.4)(typescript@5.9.3)(vite@8.2.0(@types/node@22.20.1)(jiti@2.7.0))
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@22.20.1)(jsdom@24.1.3)(vite@8.2.0(@types/node@22.20.1)(jiti@2.7.0))
       vue:
         specifier: ^3.5.0
         version: 3.5.40(typescript@5.9.3)
