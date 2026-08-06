@@ -1,6 +1,11 @@
 // packages/ui/src/index.ts
 // 组件库总出口：在此聚合所有 Tm 组件的注册与类型导出
 import type { App } from 'vue'
+// 按需 Resolver 工厂（unplugin-vue-components）：业务方零配置自动导入 <TmXxx>
+// 子入口决策（brief Bug 2 方案 A）：TmResolver 走主入口导出，不声明独立 ./resolver 子入口——
+// 它是 Tree Shaking 友好的配置函数（非大模块），与 index 一起打包，es/index.js 自然含其导出，
+// 避免 T12 vite entry 回填新增 resolver 入口。Task 14 exports 据此不声明 ./resolver。
+export { TmResolver } from './resolver'
 import { TmButton } from './components/button'
 import { TmInput } from './components/input'
 import { TmSelect } from './components/select'
