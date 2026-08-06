@@ -10,7 +10,7 @@
   6. 结构扩展：confirm 模式下用 Popconfirm 包裹
 -->
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import { Button as AButton, Popconfirm } from 'ant-design-vue'
 import type { TmButtonProps } from './props'
 import { tmButtonDefaults } from './defaults'
@@ -35,6 +35,11 @@ const $attrs = useAttrs()
 
 // 行为扩展：防抖点击（未配置时零开销透传）
 const { onClick } = useDebounceClick(props, emit)
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 // ★ 扩展属性剥离：从 props 中解构出 debounce/confirm，剩余 rest 即 ant 认识的原生属性
 // 这样内部 AButton 不会收到 ant 不识别的 props 而产生 console warning
@@ -61,7 +66,7 @@ const forwardBindings = computed(() => ({
         slot 全透传：用 Object.keys($slots) 迭代字符串键
         （避免 v-for="(_, name) in $slots" 触发 vue-tsc TS7022 circular inference）
       -->
-      <template v-for="name in Object.keys($slots)" #[name]="slotData">
+      <template v-for="name in slotNames" :key="name" #[name]="slotData">
         <slot :name="name" v-bind="slotData ?? {}" />
       </template>
     </AButton>
@@ -69,7 +74,7 @@ const forwardBindings = computed(() => ({
 
   <!-- 无 confirm：原生能力仍 100% 透传 -->
   <AButton v-else v-bind="forwardBindings" @click="onClick">
-    <template v-for="name in Object.keys($slots)" #[name]="slotData">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AButton>

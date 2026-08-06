@@ -12,7 +12,7 @@
   注：纯薄封装，不新增公司扩展键（与 Button/Input/Select 不同）
 -->
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import { Form as AForm, type FormProps, type FormInstance } from 'ant-design-vue'
 import { useForwardRef } from '../../../composables/useForwardRef'
 import { tmFormDefaults } from './defaults'
@@ -43,6 +43,11 @@ const props = withDefaults(defineProps<FormProps>(), {
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象（class/style/id/data-*等）
 const $attrs = useAttrs()
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 /**
  * 方法透传：父组件通过 ref 可调用 validate/validateFields/resetFields/clearValidate 等任意 ant Form 实例方法
@@ -86,7 +91,7 @@ provideForm({})
       动态透传全部插槽：default 等
       用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
     -->
-    <template v-for="name in Object.keys($slots)" #[name]="slotData">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AForm>

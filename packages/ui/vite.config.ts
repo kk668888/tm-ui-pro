@@ -25,6 +25,7 @@ import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readFileSync, writeFileSync } from 'node:fs'
 
 // ESM 下显式构造 __dirname，避免 Windows + ESM 边界的潜在不一致（brief Bug 6）
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -50,6 +51,11 @@ export default defineConfig({
       outDir: 'es',
       // cleanVueFileName：把 .vue.d.ts 简化为 .d.ts（vite-plugin-dts 4.5.x API 已核实）
       cleanVueFileName: true,
+      // staticImport：把 emit 出的 dynamic import() 类型表达式（如 `import('vue').DefineComponent`）
+      // 转换为 static import（`import { DefineComponent } from 'vue'`），让 TS 在 dts 中用包名而非
+      // 物理路径。配合 pathsToAliases（默认 true）进一步把 tsconfig paths 反向替换为包名。
+      // T14 收口 1a：消除 dts 中残留的 `import('../../../node_modules/X')` 相对路径，保证可移植。
+      staticImport: true,
       // 显式指定 tsconfig 路径，确保 dts 用 packages/ui/tsconfig.json 解析（brief Bug 4）
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
       // 仅对业务源码生成类型；剔除测试、demo、全局 setup 等非发布文件
@@ -67,11 +73,92 @@ export default defineConfig({
       compilerOptions: {
         paths: {
           'vue-types': [resolve(__dirname, 'node_modules/vue-types')],
+          'vue-types/*': [resolve(__dirname, 'node_modules/vue-types/*')],
           'scroll-into-view-if-needed': [
             resolve(__dirname, 'node_modules/scroll-into-view-if-needed'),
           ],
+          'scroll-into-view-if-needed/*': [
+            resolve(__dirname, 'node_modules/scroll-into-view-if-needed/*'),
+          ],
           'vxe-pc-ui': [resolve(__dirname, 'node_modules/vxe-pc-ui')],
+          'vxe-pc-ui/*': [resolve(__dirname, 'node_modules/vxe-pc-ui/*')],
         },
+      },
+      // afterBuild 后处理：把 emit 残留的相对 node_modules 路径 normalize 为包名。
+      //
+      // 背景与决策（T14 收口 1a）：
+      // 即使配置 paths `/*` 通配符 + staticImport + pathsToAliases，vite-plugin-dts 4.5.x 仍会把
+      // ant-design-vue 传递依赖（vue-types / scroll-into-view-if-needed）的 inline 类型表达式 emit 为
+      // `import { VueTypeDef } from '../../../node_modules/vue-types/dist'`（相对路径）——这是 TS 声明
+      // emit 的「类型溯源」固性行为：当类型是从其他模块的导出推断而来（源码未显式 import），
+      // TS 用类型的物理定义位置（vue-types/dist/index.d.ts）而非包名。
+      //
+      // 残留影响评估：vue-types 与 scroll-into-view-if-needed 均为 ant-design-vue 的 dependencies
+      // （已核实 ant-design-vue package.json），而 ant-design-vue 是本包 peerDependencies——业务方
+      // 必装 ant-design-vue，必然传递安装 vue-types / scroll-into-view-if-needed，残留路径**实际可解析**。
+      // 但为了「0 残留」的彻底可移植性（避免 pnpm strict 隔离 / npm hoist 异常下的解析失败），
+      // 这里统一把 `relative/node_modules/PKG/sub` 替换为 `PKG/sub`（Node ESM 标准模块标识符）。
+      //
+      // 实现：遍历 afterBuild 入参 emittedFiles（Map<path, content>），命中 node_modules 的文件
+      // 直接读盘 → 正则替换 → 写盘。正则只匹配 import 语句中的相对 node_modules 路径，
+      // 保留包名（含 @scope）与子路径，符合 Node ESM resolution。
+      afterBuild: (emittedFiles) => {
+        // 第一步：消除相对 node_modules 路径。
+        // 正则解释：
+        //   (?:\.\.\/)+               —— 1 个或多个 `../`（emit 出的相对前缀）
+        //   node_modules\/            —— 字面量
+        //   (@?[^'"]+?)               —— 包名（@scope 可选，非引号字符非贪婪）
+        // 保留 `@scope/name[/sub...]` 作为模块标识符。
+        // 注：仅替换 import/export 语句中的路径字符串，避免误伤注释/字符串字面量。
+        const normalizeRelNodeModules = (content: string): string =>
+          content
+            .replace(
+              /from\s+(['"])(?:\.\.\/)+node_modules\/([^'"]+)\1/g,
+              (_m, q, pkg) => `from ${q}${pkg}${q}`,
+            )
+            .replace(
+              /import\((['"])(?:\.\.\/)+node_modules\/([^'"]+)\1\)/g,
+              (_m, q, pkg) => `import(${q}${pkg}${q})`,
+            )
+
+        // 第二步：把 ant-design-vue / vxe-table 传递依赖的子路径归一化到包根。
+        // 已核实三者的 package.json `types`/`typings` 字段均指向与子路径相同的 dts 入口：
+        //   - vue-types:                        types: dist/index.d.ts       （dist/index.d.ts 等价于包根）
+        //   - scroll-into-view-if-needed:        typings: ./typings/index.d.ts（包根 exports['.'] 的 types 也指向此文件）
+        //   - vxe-pc-ui:                         typings: types/index.d.ts    （types/index.d.ts 等价于包根）
+        // 故 `PKG/sub` 与 `PKG` 在类型层面完全等价；归一化到包根避免子路径在 Node16/Bundler 严格模式 +
+        // exports 字段限制下被拒（scroll-into-view-if-needed 的 exports 仅暴露 '.'）。
+        const SUBPATH_TO_ROOT: Array<[RegExp, string]> = [
+          [/^vue-types\/dist$/, 'vue-types'],
+          [/^scroll-into-view-if-needed\/typings$/, 'scroll-into-view-if-needed'],
+          [/^vxe-pc-ui\/types$/, 'vxe-pc-ui'],
+        ]
+        const normalizeSubpathToRoot = (content: string): string =>
+          content
+            .replace(
+              /from\s+(['"])([^'"]+)\1/g,
+              (_m, q, pkg) => {
+                const target = SUBPATH_TO_ROOT.find(([re]) => re.test(pkg))
+                return target ? `from ${q}${target[1]}${q}` : _m
+              },
+            )
+            .replace(
+              /import\((['"])([^'"]+)\1\)/g,
+              (_m, q, pkg) => {
+                const target = SUBPATH_TO_ROOT.find(([re]) => re.test(pkg))
+                return target ? `import(${q}${target[1]}${q})` : _m
+              },
+            )
+
+        for (const filePath of emittedFiles.keys()) {
+          // 仅处理 .d.ts 文件（emittedFiles 可能含其它产物）
+          if (!filePath.endsWith('.d.ts')) continue
+          const original = readFileSync(filePath, 'utf8')
+          const normalized = normalizeSubpathToRoot(normalizeRelNodeModules(original))
+          if (normalized !== original) {
+            writeFileSync(filePath, normalized, 'utf8')
+          }
+        }
       },
     }),
   ],

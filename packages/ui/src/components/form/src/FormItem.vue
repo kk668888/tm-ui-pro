@@ -11,7 +11,7 @@
   resetField 等通常由 ant Form 内部调度，业务侧极少直接调用），故不使用 useForwardRef
 -->
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import { FormItem as AFormItem, type FormItemProps } from 'ant-design-vue'
 import { useFormContext } from './composables/useFormContext'
 
@@ -33,6 +33,11 @@ const props = defineProps<FormItemProps>()
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
 const $attrs = useAttrs()
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 // 注入祖先 TmForm 提供的联动上下文（v1 占位）。
 // 返回值当前未使用——调用本身确保 inject 通道已就绪，后续扩展 FormContext 时可直接消费。
@@ -56,7 +61,7 @@ const forwardBindings = computed(() => ({
       动态透传全部插槽：default 等
       用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
     -->
-    <template v-for="name in Object.keys($slots)" #[name]="slotData">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AFormItem>

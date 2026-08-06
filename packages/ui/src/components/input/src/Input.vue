@@ -12,7 +12,7 @@
   6. 公司默认值：allowClear / size 兜底，业务可覆盖
 -->
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import { Input as AInput } from 'ant-design-vue'
 import type { TmInputProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
@@ -56,6 +56,11 @@ const emit = defineEmits<{
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象（class/style/id/data-*等）
 const $attrs = useAttrs()
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 /**
  * 方法透传：父组件通过 ref 可调用 focus/blur/select 等任意 ant Input 实例方法
@@ -131,7 +136,7 @@ const inner = computed<string | number | undefined>({
       动态透传全部插槽：prefix/suffix/addonBefore/addonAfter 等
       用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
     -->
-    <template v-for="name in Object.keys($slots)" #[name]="slotData">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AInput>

@@ -14,7 +14,7 @@
   7. 公司默认值：showSearch / allowClear 兜底；filterOption 按 remote 模式自适应
 -->
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, useSlots } from 'vue'
 import { Select as ASelect, type SelectProps } from 'ant-design-vue'
 import type { TmSelectProps } from './props'
 import { tmSelectDefaults } from './defaults'
@@ -58,6 +58,11 @@ const emit = defineEmits<{
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
 const $attrs = useAttrs()
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 /**
  * 方法透传：父组件通过 ref 可调用 focus/blur/scrollTo 等任意 ant Select 实例方法
@@ -168,7 +173,7 @@ const onSearch = (query: string): void => {
       动态透传全部插槽：default/placeholder/notFoundContent/clearIcon/...
       用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
     -->
-    <template v-for="name in Object.keys($slots)" #[name]="slotData">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </ASelect>

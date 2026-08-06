@@ -16,7 +16,7 @@
 -->
 <script setup lang="ts">
 // 所有 import 必须在 <script setup> 顶部（plan-bug #5 修正：plan 把 onMounted 写在 script 中途）
-import { computed, onMounted, useAttrs } from 'vue'
+import { computed, onMounted, useAttrs, useSlots } from 'vue'
 import { VxeGrid, type VxeGridInstance } from 'vxe-table'
 import type { TmTableProps } from './props'
 import { tmTableDefaults } from './defaults'
@@ -49,6 +49,11 @@ const props = withDefaults(defineProps<TmTableProps>(), {
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
 const $attrs = useAttrs()
+
+// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
+// 不再触发 TS7022 circular inference（T14 收口 2）。
+// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+const slotNames = Object.keys(useSlots()) as string[]
 
 /**
  * 方法透传：父组件通过 ref 可调用 commit / revertData / clearData / getCheckboxRecords 等 vxe 实例方法
@@ -134,7 +139,7 @@ onMounted(() => {
         动态透传全部插槽：empty / toolbar / top / bottom / form / ...
         用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
       -->
-      <template v-for="name in Object.keys($slots)" #[name]="slotData">
+      <template v-for="name in slotNames" :key="name" #[name]="slotData">
         <slot :name="name" v-bind="slotData ?? {}" />
       </template>
     </VxeGrid>

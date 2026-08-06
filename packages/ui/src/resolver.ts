@@ -5,7 +5,7 @@
 //   import Components from 'unplugin-vue-components/vite'
 //   import { TmResolver } from '@tm/ui'
 //   export default defineConfig({
-//     plugins: [Components({ resolvers: [TmResolver] })],
+//     plugins: [Components({ resolvers: [TmResolver()] })],
 //   })
 //
 // 设计要点：
@@ -18,24 +18,48 @@
 //    比白名单静默 undefined 更早暴露错误（brief Bug 5 决策：保留 plan 逻辑）。
 // 5. kebab 转换：作为「组件名 → 入口路径」的标准映射保留，未来若 TmSelect 等独立子入口，
 //    可直接 `kebab === 'select'` 扩展，无需重构（brief Bug 1 决策：保留扩展预留）。
-// unplugin-vue-components 的 ComponentResolver 是 union（函数式 | 对象式），
-// 这里固定返回对象式 ComponentResolverObject（含 type + resolve）：
-// 1. 让 TS 在调用侧（如测试）直接知道 .resolve 方法存在，无需 type assertion；
-// 2. ComponentResolverObject 是 ComponentResolver 的子类型，业务方 `resolvers: [TmResolver]` 仍兼容；
-// 3. API 文档更明确——本 Resolver 永远是 object-form。
-import type { ComponentResolverObject } from 'unplugin-vue-components'
+// 6. dts portability（T14 收口 1b）：不直接 `import type { ComponentResolverObject }`
+//    —— 实测 vite-plugin-dts 4.5.x emit 时会把「用作返回类型注解的 type-only import」降级为
+//    value import（`import { ComponentResolverObject } from 'unplugin-vue-components'`），
+//    经 es/index.d.ts 的 `export { TmResolver } from './resolver'` 静态 re-export，
+//    会在消费方 skipLibCheck:false 下报 `Cannot find module 'unplugin-vue-components'`。
+//    改用本地结构性等价类型 TmComponentResolverObject（脱钩传递依赖）：
+//    a. 与 unplugin-vue-components 的 ComponentResolverObject 结构等价（type + resolve）；
+//    b. resolve 返回类型用最小形状 { name; from }，兼容 ComponentResolveResult
+//       （ComponentInfo 的必填字段仅 from，name 是 optional，结构子类型兼容）；
+//    c. 业务方 `Components({resolvers:[TmResolver()]})` 在结构子类型规则下仍接受——
+//       消费方自行装 unplugin-vue-components（用 Components 的前提），类型解析在消费侧完成。
+
+/**
+ * 本地结构性等价类型（脱钩 unplugin-vue-components 强制依赖，保证 dts 可移植）
+ *
+ * 与 unplugin-vue-components 的 ComponentResolverObject 等价：
+ *   interface ComponentResolverObject {
+ *     type: 'component' | 'directive'
+ *     resolve: (name: string) => ComponentResolveResult
+ *   }
+ *
+ * TmResolver() 永远返回 type:'component'，resolve 返回 { name, from } | undefined。
+ */
+interface TmComponentResolverObject {
+  /** Resolver 类型：本工厂固定为 'component'（与 unplugin-vue-components 的对象式 Resolver 一致） */
+  type: 'component' | 'directive'
+  /** 解析函数：组件名 → { name, from }（命中则返回，否则 undefined 交还其它 resolver） */
+  resolve: (name: string) => { name: string; from: string } | undefined
+}
 
 /**
  * @tm/ui 按需导入 Resolver 工厂
  *
- * @returns unplugin-vue-components 标准 ComponentResolverObject，业务方配 `resolvers: [TmResolver]` 即可
+ * @returns 结构性兼容 unplugin-vue-components ComponentResolverObject 的对象，
+ *          业务方配 `resolvers: [TmResolver()]` 即可
  *
  * 映射约定：
  *   - TmButton / TmInput / TmSelect / TmForm / TmFormItem / TmConfigProvider / ... → from '@tm/ui'
  *   - TmTable → from '@tm/ui/table'（vxe 子入口，体积隔离）
  *   - 非 Tm 前缀 / 仅 'Tm' 前缀无组件名 → undefined（不处理）
  */
-export function TmResolver(): ComponentResolverObject {
+export function TmResolver(): TmComponentResolverObject {
   return {
     type: 'component',
     resolve: (name: string) => {
