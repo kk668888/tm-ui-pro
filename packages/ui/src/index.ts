@@ -11,6 +11,7 @@ import { TmInput } from './components/input'
 import { TmSelect } from './components/select'
 import { TmForm, TmFormItem } from './components/form'
 import { TmTable } from './components/table'
+import { TmConfigProvider } from './config-provider'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -26,6 +27,7 @@ export const install = (app: App): void => {
   app.use(TmForm as unknown as { install: (app: App) => void })
   app.use(TmFormItem as unknown as { install: (app: App) => void })
   app.use(TmTable as unknown as { install: (app: App) => void })
+  app.use(TmConfigProvider as unknown as { install: (app: App) => void })
 }
 
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@tm/ui'
@@ -34,6 +36,7 @@ export { TmInput } from './components/input'
 export { TmSelect } from './components/select'
 export { TmForm, TmFormItem } from './components/form'
 export { TmTable } from './components/table'
+export { TmConfigProvider } from './config-provider'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
