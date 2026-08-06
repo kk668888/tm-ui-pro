@@ -7,8 +7,9 @@
 // 4. 方法透传：useForwardRef 暴露 focus/blur/select，真实影响 DOM activeElement
 // 5. 扩展属性剥离：modelValue 不下发到内部 ant Input（避免 ant 警告/误用）
 // 6. $attrs + slots 全透传
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import TmInput from '../src/Input.vue'
 
 describe('TmInput', () => {
@@ -77,6 +78,46 @@ describe('TmInput', () => {
     const inner = wrapper.findComponent({ name: 'AInput' })
     expect(inner.props('modelValue')).toBeUndefined()
     expect(inner.props('value')).toBe('abc')
+  })
+
+  it('onChange 回调真实透传：剥离修复后 @change 回调能到达内部 AInput 并触发', async () => {
+    // 回归 Important #1：早期 antProps 错误剥离了 onChange/onInput，
+    // ant-design-vue 把 onChange 定义为可选 listener prop，Vue 因此把
+    // <TmInput @change="foo"> 路由到 props.onChange（而非 $attrs），剥离后回调永远到不了
+    // 内部 AInput——静默失败无报错。该测试锁定 onChange 真实透传 + 回调被实际调用
+    const changeSpy = vi.fn()
+    const wrapper = mount(TmInput, {
+      props: { onChange: changeSpy as unknown as (e: Event) => void },
+    })
+    const inner = wrapper.findComponent({ name: 'AInput' })
+    expect(inner.exists()).toBe(true)
+    // 步骤 1：onChange 真实下发到内部 AInput 的 props（剥离修复后应存在）
+    expect(inner.props('onChange')).toBe(changeSpy)
+    // 步骤 2：模拟 ant Input 触发 change 事件，断言业务回调被实际调用（非空断言）
+    // 通过内部 AInput 实例 $emit 触发，Vue 会查找 AInput vnode.props 上的 onChange 调用
+    ;(inner.vm as unknown as { $emit: (event: string, ...args: unknown[]) => void }).$emit(
+      'change',
+      { target: { value: 'new' } },
+    )
+    await nextTick()
+    expect(changeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('onInput 回调同样真实透传并触发（与 onChange 同源剥离问题）', async () => {
+    // 回归 Important #1：onInput 与 onChange 同属通知事件，与 v-model:value 不冲突，
+    // 必须保留透传。该测试覆盖 onInput 分支，确保修复完整
+    const inputSpy = vi.fn()
+    const wrapper = mount(TmInput, {
+      props: { onInput: inputSpy as unknown as (e: Event) => void },
+    })
+    const inner = wrapper.findComponent({ name: 'AInput' })
+    expect(inner.props('onInput')).toBe(inputSpy)
+    ;(inner.vm as unknown as { $emit: (event: string, ...args: unknown[]) => void }).$emit(
+      'input',
+      { target: { value: 'new' } },
+    )
+    await nextTick()
+    expect(inputSpy).toHaveBeenCalledTimes(1)
   })
 
   it('透传 $attrs 到根元素（data-testid）', () => {

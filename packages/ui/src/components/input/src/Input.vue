@@ -67,13 +67,18 @@ const { innerRef, exposed } = useForwardRef<InputInstance>()
 defineExpose(exposed)
 
 /**
- * 扩展属性剥离：从 props 中剔除 modelValue（业务侧 v-model 字段，ant 不识别）
- * 同时剔除 value / defaultValue / onUpdate:value / onChange / onInput，
- * 因为这些与 v-model:value="inner" 受控写法冲突，必须由 computed inner 单点写入。
+ * 扩展属性剥离：仅剔除与 v-model:value="inner" 受控写法冲突的通道字段
+ * - modelValue：业务侧 v-model 字段，ant 不识别，必须剔除避免 ant 警告
+ * - value / defaultValue / onUpdate:value：v-model:value 单点写入的数值通道，
+ *   若同时透传会与下方 computed inner 的 get/set 冲突，必须由 inner 单点写入
  *
- * 注：剔除后剩下的 onPressEnter / onKeydown / onFocus / onBlur 等 listener prop，
- * 即使值为 undefined 也会经 forwardBindings 透传到 AInput，但 Vue 在 setFullProps
- * 阶段对 undefined 值不写入 props，无副作用。
+ * 关键：onChange / onInput 【不剥离】。两者是 ant Input 的「通知事件」（event），
+ * 仅用于向业务回调「值已变化」，不是数值写入通道，与 v-model:value 不冲突。
+ * ant-design-vue 把 onChange/onInput 定义为可选 listener prop，Vue 因此把
+ * <TmInput @change="foo"> 路由到 props.onChange（而非 $attrs）。一旦剥离，
+ * 业务回调将永远到不了内部 AInput —— 静默失败无报错，必须保留透传。
+ *
+ * 解构出的剥离项重命名为 _ 前缀以标记「故意未使用」（与 TmButton 剥离约定一致）
  */
 const antProps = computed(() => {
   const {
@@ -81,23 +86,16 @@ const antProps = computed(() => {
     value: _v,
     defaultValue: _dv,
     'onUpdate:value': _ouv,
-    onChange: _oc,
-    onInput: _oi,
     ...rest
   } = props
-  void _mv
-  void _v
-  void _dv
-  void _ouv
-  void _oc
-  void _oi
   return rest
 })
 
 /**
- * 合并透传对象：$attrs（class/style/id/外部监听器/data-* 等）+ antProps（已剥离 modelValue）
+ * 合并透传对象：$attrs（class/style/id/外部监听器/data-* 等）+ antProps（已剥离 v-model 冲突项）
  * Vue 模板不支持同一元素写两个 v-bind，因此预先合并为单个对象
- * 顺序：antProps 覆盖 $attrs（业务 props 优先级高于外部透传，避免业务误覆盖）
+ * 顺序：antProps 覆盖 $attrs——同名时受控 props 优先，保证 v-model 桥接不被外部 attrs 覆盖
+ * （$attrs 与 props 同源于父组件，正常使用很少重叠；该优先级仅作受控写法的兜底保护）
  */
 const forwardBindings = computed(() => ({
   ...$attrs,
@@ -108,9 +106,12 @@ const forwardBindings = computed(() => ({
  * v-model 双向桥接：用 computed get/set 实现 ant v-model:value 与业务 v-model(modelValue) 的转换
  * - get：父组件传入的 modelValue → 写入 AInput 的 value（parent→child）
  * - set：AInput 通过 v-model:value 触发 set → emit update:modelValue（child→parent）
+ *
+ * 显式标注为 `string | number | undefined`：modelValue 类型含 undefined（未传/置空），
+ * 不应用 cast 掩盖，让类型如实反映 ant Input 接收到 undefined 时的真实行为
  */
-const inner = computed<string | number>({
-  get: () => props.modelValue as string | number,
+const inner = computed<string | number | undefined>({
+  get: () => props.modelValue,
   set: (v: string | number) => emit('update:modelValue', v),
 })
 </script>

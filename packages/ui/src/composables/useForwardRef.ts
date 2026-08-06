@@ -67,6 +67,9 @@ export function useForwardRef<T extends ComponentPublicInstance = ComponentPubli
       if (typeof key === 'symbol') return false
       if (typeof key === 'string') {
         if (key.startsWith('__v_')) return false
+        // 权衡：这里对 `_` 前缀一刀切全部排除（隐藏所有 _xxx 成员）。
+        // 对当前 ant-design-vue 组件无影响（其公共方法无 `_` 前缀）。
+        // 未来若需 forward 含 `_` 前缀公共方法的自定义组件，需重新评估该规则。
         if (key.startsWith('$') || key.startsWith('_')) return false
       }
       const inst = innerRef.value as unknown as Record<string | symbol, unknown> | null
