@@ -9,10 +9,14 @@
 // 6. remote 远程搜索：触发 @search 调用 remote 填充 options 并复位 loading
 // 7. onSearch 回调透传：通知事件不剥离（回归剥离边界判据）
 // 8. $attrs + slots 全透传
+// 9. 竞态防护（race condition）：快速连续输入下乱序响应被 token 守卫丢弃（锁定最复杂并发逻辑）
+// 10. loading 合并（remote）：业务 loading 与远程 loading 合并保留，远程完成不被覆盖
+// 11. filterOption edge case：options + remote 同存时默认 false（服务端过滤模式锁定）
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import TmSelect from '../src/Select.vue'
+import type { TmSelectOption } from '../src/props'
 
 /**
  * 等待微任务 + Vue 重新渲染。
@@ -56,6 +60,19 @@ describe('TmSelect', () => {
       props: { filterOption: true, remote: vi.fn().mockResolvedValue([]) },
     })
     expect(override.findComponent({ name: 'ASelect' }).props('filterOption')).toBe(true)
+  })
+
+  it('filterOption edge case：业务同时传 options + remote 时默认 false（服务端过滤模式）', () => {
+    // 锁定 Select.vue 的 filterOption 自适应：props.filterOption ?? (props.remote ? false : true)
+    // 业务同时配置 options 与 remote 时，mergedOptions 走 remoteOptions 分支（远程优先），
+    // filterOption 默认 false——避免本地 ant 内置过滤与服务端过滤逻辑冲突。
+    const wrapper = mount(TmSelect, {
+      props: {
+        options: [{ label: '本地兜底', value: 'local' }],
+        remote: vi.fn().mockResolvedValue([]),
+      },
+    })
+    expect(wrapper.findComponent({ name: 'ASelect' }).props('filterOption')).toBe(false)
   })
 
   it('v-model：内部 ASelect 触发 update:value 同步到业务 update:modelValue（child→parent）', async () => {
@@ -114,6 +131,55 @@ describe('TmSelect', () => {
     expect(inner.props('loading')).toBe(false)
   })
 
+  it('竞态防护（race condition）：快速连续输入下旧响应晚到被丢弃，新 token 结果最终落定', async () => {
+    // 本测锁定 useRemoteSearch 的 token 守卫（packages/ui/src/components/select/src/composables/useRemoteSearch.ts）：
+    // 每次 search 自增 lastToken，仅 token === lastToken（最新请求）的写入与 loading 复位才生效，
+    // 避免用户快速连续输入时旧响应覆盖新响应（A 先发、A 后到 → 旧结果污染）。
+    //
+    // 设计：用可控 promise 手动决定 resolve 顺序，模拟「B 先到、A 后到」的乱序场景。
+    let resolveA!: (v: TmSelectOption[]) => void
+    let resolveB!: (v: TmSelectOption[]) => void
+    const promiseA = new Promise<TmSelectOption[]>((r) => (resolveA = r))
+    const promiseB = new Promise<TmSelectOption[]>((r) => (resolveB = r))
+    // remote 第 1 次（query='A'）→ promiseA；第 2 次（query='B'）→ promiseB
+    const remote = vi
+      .fn()
+      .mockReturnValueOnce(promiseA)
+      .mockReturnValueOnce(promiseB)
+
+    const wrapper = mount(TmSelect, { props: { remote } })
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+
+    // 1) 并发触发两次 search：A 先发得到 tokenA，B 立即跟上使 lastToken 自增到 tokenB（A 作废）
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      'A',
+    )
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      'B',
+    )
+
+    // 同步阶段：两次 remote 都已发起，参数与 query 一一对应（取数链路按序打通）
+    expect(remote).toHaveBeenCalledTimes(2)
+    expect(remote).toHaveBeenNthCalledWith(1, 'A')
+    expect(remote).toHaveBeenNthCalledWith(2, 'B')
+
+    // 2) B 先 resolve（tokenB === lastToken）：写入 B 的结果，loading 复位为 false
+    resolveB([{ label: '香蕉', value: 'banana' }])
+    await flush()
+    expect(inner.props('options')).toEqual([{ label: '香蕉', value: 'banana' }])
+    expect(inner.props('loading')).toBe(false)
+
+    // 3) A 后 resolve（tokenA !== lastToken）：乱序响应被丢弃
+    //    - options 不被 A 覆盖（仍保持 B 的结果）
+    //    - loading 不被过期请求的 finally 误清（守卫同时保护 loading 复位通道）
+    resolveA([{ label: '苹果', value: 'apple' }])
+    await flush()
+    expect(inner.props('options')).toEqual([{ label: '香蕉', value: 'banana' }])
+    expect(inner.props('loading')).toBe(false)
+  })
+
   it('remote 未配置时触发 @search 不调用 remote、不影响业务 options', async () => {
     const remote = vi.fn().mockResolvedValue([])
     const wrapper = mount(TmSelect, {
@@ -134,6 +200,35 @@ describe('TmSelect', () => {
     // 非 remote 模式下 loading 完全由业务控制（useRemoteSearch 不会介入）
     const wrapper = mount(TmSelect, { props: { loading: true } })
     expect(wrapper.findComponent({ name: 'ASelect' }).props('loading')).toBe(true)
+  })
+
+  it('loading 合并：业务 loading 与远程 loading 同时为 true 时合并保留（远程完成不被覆盖）', async () => {
+    // 锁定 Select.vue 的 loading 合并逻辑：Boolean(props.loading) || loadingState.value
+    // 业务侧通过 loading prop 显式置 true 时，即便远程请求 in flight / 完成，
+    // 合并后始终为 true（业务 loading 不被远程 loading 复位覆盖）。
+    let resolveRemote!: (v: TmSelectOption[]) => void
+    const remote = vi
+      .fn()
+      .mockReturnValue(new Promise<TmSelectOption[]>((r) => (resolveRemote = r)))
+    const wrapper = mount(TmSelect, { props: { remote, loading: true } })
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+
+    // 业务 loading 单独已为 true（合并前基线）
+    expect(inner.props('loading')).toBe(true)
+
+    // 触发远程搜索：loadingState 翻 true，与业务 loading 合并后仍为 true
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      'x',
+    )
+    await nextTick()
+    expect(inner.props('loading')).toBe(true)
+
+    // 远程完成：loadingState 复位 false，但业务 loading 仍 true → 合并后保持 true（不被覆盖）
+    resolveRemote([{ label: 'X', value: 'x' }])
+    await flush()
+    expect(inner.props('loading')).toBe(true)
+    expect(inner.props('options')).toEqual([{ label: 'X', value: 'x' }])
   })
 
   it('onSearch 回调真实透传：业务监听 @search 能到达内部 ASelect 并被实际调用', async () => {
