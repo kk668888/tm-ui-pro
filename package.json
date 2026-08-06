@@ -8,19 +8,24 @@
     "build": "pnpm --filter @tm/ui build",
     "test": "pnpm --filter @tm/ui test",
     "lint": "eslint --ext .ts,.vue packages",
-    "format": "prettier --write \"packages/**/*.{ts,vue}\""
+    "format": "prettier --write \"packages/**/*.{ts,vue}\"",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "vue-tsc": "^2.1.0",
-    "vitest": "^4.1.10",
+    "@changesets/changelog-git": "^0.2.1",
+    "@changesets/cli": "^2.31.1",
+    "@vue/eslint-config-prettier": "^10.0.0",
+    "@vue/eslint-config-typescript": "^14.0.0",
     "@vue/test-utils": "^2.4.0",
-    "jsdom": "^24.0.0",
-    "prettier": "^3.3.0",
     "eslint": "^10.0.0",
     "eslint-plugin-vue": "^10.0.0",
-    "@vue/eslint-config-typescript": "^14.0.0",
-    "@vue/eslint-config-prettier": "^10.0.0"
+    "jsdom": "^24.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^2.1.0"
   },
   "packageManager": "pnpm@11.13.1"
 }
