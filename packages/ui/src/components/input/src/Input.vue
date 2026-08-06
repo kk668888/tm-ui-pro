@@ -44,6 +44,12 @@ const props = withDefaults(defineProps<TmInputProps>(), {
   // 公司默认值兜底；业务显式传入同名 prop 时自动覆盖
   allowClear: tmInputDefaults.allowClear,
   size: tmInputDefaults.size,
+  // bordered: 关键默认（2026-08-06）——TmInputProps 继承 antd InputProps，
+  // Vue 3 类型化 defineProps 会把 bordered 生成 Boolean 运行时 prop（未传默认 false），
+  // 覆盖 antd 内部的 `bordered = true` 解构兜底，导致输入框渲染成 borderless 无边框。
+  // 必须在 withDefaults 显式兜底为 true（仅写进 tmInputDefaults 不生效，
+  // withDefaults 只对列出的键应用默认值）；业务显式传 bordered=false 仍可覆盖。
+  bordered: tmInputDefaults.bordered,
 })
 
 /**

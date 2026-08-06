@@ -46,6 +46,12 @@ const props = withDefaults(defineProps<TmSelectProps>(), {
   // 公司默认值兜底；业务显式传入同名 prop 时自动覆盖
   showSearch: tmSelectDefaults.showSearch,
   allowClear: tmSelectDefaults.allowClear,
+  // bordered: 关键默认（2026-08-06）——根因与 TmInput 完全一致：
+  // 类型化 defineProps 把 bordered 生成 Boolean 运行时 prop（未传默认 false），
+  // 覆盖 antd 的 `bordered = true` 解构兜底，导致选择器渲染成 borderless 无边框。
+  // 必须在 withDefaults 显式兜底为 true（仅写进 tmSelectDefaults 不生效）；
+  // 业务显式传 bordered=false 仍可覆盖。
+  bordered: tmSelectDefaults.bordered,
 })
 
 /**

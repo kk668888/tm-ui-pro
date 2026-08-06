@@ -31,6 +31,9 @@ import { install as tmInstall } from '@tm/ui'
 
 // 自定义 demo 容器组件
 import DemoBlock from './components/DemoBlock.vue'
+// 自定义 Layout：用 ant cssinjs StyleProvider(hash-priority="high") 包裹默认主题，
+// 修复 antd 4 默认 :where() 低优先级样式被 VitePress 主题 reset 覆盖的问题（2026-08-06）
+import Layout from './Layout.vue'
 
 // 全量样式：ant reset + vxe 主题（vxe-pc-ui 必须 + vxe-table 必须）
 import 'ant-design-vue/dist/reset.css'
@@ -45,6 +48,9 @@ import 'vxe-table/lib/style.css'
  */
 const theme: Theme = {
   extends: DefaultTheme,
+  // 覆盖默认 Layout：StyleProvider(hash-priority="high") 提升 antd 组件样式优先级，
+  // 否则 antd 4 的 :where() 低优先级样式会被 VitePress 主题 reset 的 input{border:0;padding:0} 覆盖
+  Layout,
   enhanceApp({ app }) {
     // 1) ant-design-vue：demo 内可能用到 a-button / a-form / a-input 等基础 ant 组件
     app.use(Antd)

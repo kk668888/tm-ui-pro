@@ -44,6 +44,15 @@ describe('TmSelect', () => {
     expect(inner.props('allowClear')).toBe(true)
   })
 
+  it('公司默认 bordered=true（回归：Vue 类型化 defineProps 的 Boolean 默认陷阱）', () => {
+    // 回归 2026-08-06：与 TmInput 同源。defineProps<TmSelectProps>() 类型推断把 bordered
+    // 生成为 Boolean 运行时 prop，未传时 Vue 默认 false，覆盖 antd 的 `bordered = true`
+    // 解构兜底，导致选择器被渲染成 borderless（无边框、背景透明）。
+    // withDefaults 显式兜底 bordered: true，此测试锁定默认值防回归。
+    const wrapper = mount(TmSelect)
+    expect(wrapper.findComponent({ name: 'ASelect' }).props('bordered')).toBe(true)
+  })
+
   it('filterOption 自适应：本地模式默认 true / 远程模式默认 false（业务显式覆盖始终生效）', () => {
     // 本地模式默认启用 ant 内置过滤（输入即过滤选项）
     const local = mount(TmSelect)

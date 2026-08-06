@@ -27,6 +27,17 @@ describe('TmInput', () => {
     expect(inner.props('size')).toBe('middle')
   })
 
+  it('公司默认 bordered=true（回归：Vue 类型化 defineProps 的 Boolean 默认陷阱）', () => {
+    // 回归 2026-08-06：TmInputProps 继承 antd InputProps，Vue 3 的 defineProps<T>() 类型推断
+    // 会把 bordered 生成为 Boolean 运行时 prop，未传时默认 false，覆盖 antd 内部的
+    // `bordered = true` 解构兜底，导致输入框被渲染成 borderless（无边框、背景透明）。
+    // 必须在 withDefaults 显式兜底 bordered: true，此测试锁定默认值防回归。
+    const wrapper = mount(TmInput)
+    const inner = wrapper.findComponent({ name: 'AInput' })
+    expect(inner.exists()).toBe(true)
+    expect(inner.props('bordered')).toBe(true)
+  })
+
   it('v-model：用户输入触发 update:modelValue（child→parent）', async () => {
     const wrapper = mount(TmInput, { props: { modelValue: '' } })
     await wrapper.find('input').setValue('hello')
