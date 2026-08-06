@@ -39,6 +39,8 @@ import Layout from './Layout.vue'
 import 'ant-design-vue/dist/reset.css'
 import 'vxe-pc-ui/lib/style.css'
 import 'vxe-table/lib/style.css'
+// 文档站布局微调：主内容区左右两侧只保留 100px 间距（2026-08-06）
+import './custom.css'
 
 /**
  * 自定义主题：扩展 VitePress 默认主题

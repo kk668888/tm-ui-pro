@@ -12,3 +12,6 @@ coverage
 **/.vitepress/dist/
 # SDD 工具的 scratch 目录，不可入库
 .superpowers
+# AI 工具的本机配置（Claude/Agent 工作流定义），不入库
+.claude
+.agents
