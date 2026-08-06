@@ -39,8 +39,12 @@ const props = withDefaults(defineProps<TmTableProps>(), {
   border: tmTableDefaults.border,
   stripe: tmTableDefaults.stripe,
   showOverflow: tmTableDefaults.showOverflow,
-  pagerConfig: () => ({ ...tmTableDefaults.pagerConfig }),
-  request: undefined,
+  // pagerConfig 工厂：每实例独立对象，且显式 spread pageSizes 让 readonly tuple（来自
+  // tmTableDefaults 的 as const）还原为 vxe PagerConfig 要求的可变数组类型（vue-tsc 修复）。
+  pagerConfig: () => ({
+    pageSize: tmTableDefaults.pagerConfig.pageSize,
+    pageSizes: [...tmTableDefaults.pagerConfig.pageSizes],
+  }),
 })
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
@@ -126,8 +130,11 @@ onMounted(() => {
   <div class="tm-table">
     <!-- v-bind="forwardBindings" 单点承载 $attrs + 已剥离扩展键的 vxe 原生 props -->
     <VxeGrid ref="innerRef" v-bind="forwardBindings">
-      <!-- 动态透传全部插槽：empty / toolbar / top / bottom / form / ... -->
-      <template v-for="(_, name) in $slots" #[name]="slotData">
+      <!--
+        动态透传全部插槽：empty / toolbar / top / bottom / form / ...
+        用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
+      -->
+      <template v-for="name in Object.keys($slots)" #[name]="slotData">
         <slot :name="name" v-bind="slotData ?? {}" />
       </template>
     </VxeGrid>

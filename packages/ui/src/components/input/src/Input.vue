@@ -107,12 +107,17 @@ const forwardBindings = computed(() => ({
  * - get：父组件传入的 modelValue → 写入 AInput 的 value（parent→child）
  * - set：AInput 通过 v-model:value 触发 set → emit update:modelValue（child→parent）
  *
- * 显式标注为 `string | number | undefined`：modelValue 类型含 undefined（未传/置空），
- * 不应用 cast 掩盖，让类型如实反映 ant Input 接收到 undefined 时的真实行为
+ * 类型说明（vue-tsc 修复）：
+ * - 类型参数显式标注 `string | number | undefined`：modelValue 类型含 undefined（未传/置空），
+ *   如实反映 ant Input 接收到 undefined 时的真实行为，不应用 cast 掩盖。
+ * - setter 参数同样声明 `string | number | undefined`：与类型参数一致，
+ *   满足 WritableComputedOptions 的 setter 签名（参数类型必须包含 undefined）。
+ * - 写入 emit 时用 `v ?? ''` 归一化：当 vxe/ant 在 clear 等场景传入 undefined 时，
+ *   落到业务侧的 update:modelValue 仍是 string，保持 TmInputExtProps.modelValue 的对外契约不变。
  */
 const inner = computed<string | number | undefined>({
   get: () => props.modelValue,
-  set: (v: string | number) => emit('update:modelValue', v),
+  set: (v: string | number | undefined) => emit('update:modelValue', v ?? ''),
 })
 </script>
 
@@ -122,8 +127,11 @@ const inner = computed<string | number | undefined>({
     v-model:value="inner" 单点完成 value 写入与 update:value 监听（标准 Vue 受控写法）
   -->
   <AInput ref="innerRef" v-bind="forwardBindings" v-model:value="inner">
-    <!-- 动态透传全部插槽：prefix/suffix/addonBefore/addonAfter 等 -->
-    <template v-for="(_, name) in $slots" #[name]="slotData">
+    <!--
+      动态透传全部插槽：prefix/suffix/addonBefore/addonAfter 等
+      用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
+    -->
+    <template v-for="name in Object.keys($slots)" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AInput>

@@ -57,7 +57,11 @@ const forwardBindings = computed(() => ({
   <!-- 结构扩展：confirm 模式下用 Popconfirm 包裹；@confirm 透传到 onClick 走防抖链路 -->
   <Popconfirm v-if="props.confirm" :title="props.confirm" @confirm="(e) => onClick(e as MouseEvent)">
     <AButton v-bind="forwardBindings">
-      <template v-for="(_, name) in $slots" #[name]="slotData">
+      <!--
+        slot 全透传：用 Object.keys($slots) 迭代字符串键
+        （避免 v-for="(_, name) in $slots" 触发 vue-tsc TS7022 circular inference）
+      -->
+      <template v-for="name in Object.keys($slots)" #[name]="slotData">
         <slot :name="name" v-bind="slotData ?? {}" />
       </template>
     </AButton>
@@ -65,7 +69,7 @@ const forwardBindings = computed(() => ({
 
   <!-- 无 confirm：原生能力仍 100% 透传 -->
   <AButton v-else v-bind="forwardBindings" @click="onClick">
-    <template v-for="(_, name) in $slots" #[name]="slotData">
+    <template v-for="name in Object.keys($slots)" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </AButton>

@@ -14,42 +14,15 @@
 // 8. 远程模式（Bug 4）：内部 VxeGrid emit page-change → onPageChange → request 再调
 // 9. 方法透传：commit() 经 useForwardRef 真实转发到内部 VxeGrid.commit
 // 10. $attrs / slots 全透传
-import { beforeAll, describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
 import TmTable from '../src/Table.vue'
 
 /**
- * jsdom 环境补丁：
- * - matchMedia：vxe 内部 ResponsiveObserve（与 ant Form 同款）依赖
- * - ResizeObserver：vxe 表格虚拟渲染依赖（jsdom 未实现）
- * 缺失则 vxe 挂载抛 TypeError。
+ * 注：原 Task 11 在此文件局部 stub 的 window.matchMedia / window.ResizeObserver
+ * 已在 Task 12 提升为全局 setupFiles（packages/ui/src/test/setup.ts），所有 spec 共享，无需局部补丁。
  */
-beforeAll(() => {
-  if (!window.matchMedia) {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: (query: string): MediaQueryList =>
-        ({
-          matches: false,
-          media: query,
-          onchange: null,
-          addListener: () => {},
-          removeListener: () => {},
-          addEventListener: () => {},
-          removeEventListener: () => {},
-          dispatchEvent: () => false,
-        }) as unknown as MediaQueryList,
-    })
-  }
-  if (!(window as { ResizeObserver?: unknown }).ResizeObserver) {
-    ;(window as { ResizeObserver?: unknown }).ResizeObserver = class {
-      observe(): void {}
-      unobserve(): void {}
-      disconnect(): void {}
-    }
-  }
-})
 
 /**
  * 等待微任务 + Vue 重新渲染。

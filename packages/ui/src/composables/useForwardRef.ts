@@ -36,15 +36,23 @@ export interface UseForwardRefReturn<T> {
  *    若仅实现 get，则 exposeProxy 永远走 fallback 分支，导致父组件 ref 拿不到方法。
  *    通过 has 拦截器声明「内部实例存在的 key 都视为已暴露」，才能让 defineExpose(exposed) 真正生效
  *
+ * 泛型约束说明（vue-tsc 修复）：
+ * 不写 `T extends ComponentPublicInstance`——ant-design-vue 的 SFC 实例类型
+ * `InstanceType<typeof ASelect>` 是 CreateComponentPublicInstanceWithMixins<...>，
+ * 其 $options.setup/slots 字段与 ComponentPublicInstance 严格签名不兼容（vue-tsc 会报错）。
+ * 由于内部仅通过 Proxy 动态访问 key，无需 TS 实例类型约束，去掉约束让任意 SFC 实例类型均可透传。
+ *
  * @returns {@link UseForwardRefReturn}
  */
-export function useForwardRef<T extends ComponentPublicInstance = ComponentPublicInstance>(): UseForwardRefReturn<T> {
+export function useForwardRef<T = ComponentPublicInstance>(): UseForwardRefReturn<T> {
   // 内部组件实例的 ref，初始为 null；template 挂载后由 Vue 自动填充
   const innerRef = ref<T | null>(null) as Ref<T | null>
 
   // Proxy 拦截所有属性读取与 `key in target` 判断，运行时转发到最新内部实例
   // 注意：get 不抛错，inst 为 null 时返回 undefined，保证挂载前调用安全
-  const exposed = new Proxy({} as T, {
+  // 构造 Proxy 时强转为 object（T 仅为类型占位，运行时是空对象 target），
+  // 再把整个 Proxy 的类型断言回 T，对调用方保持 useForwardRef<T>() 的类型契约
+  const exposed = new Proxy({} as object, {
     get: (_target, key: string | symbol) => {
       // 将实例断言为可索引的记录类型，便于按 key 动态访问
       const inst = innerRef.value as unknown as Record<string | symbol, unknown> | null
@@ -79,5 +87,5 @@ export function useForwardRef<T extends ComponentPublicInstance = ComponentPubli
     },
   })
 
-  return { innerRef, exposed }
+  return { innerRef, exposed: exposed as unknown as T }
 }

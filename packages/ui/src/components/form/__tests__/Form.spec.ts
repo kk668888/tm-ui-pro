@@ -13,7 +13,7 @@
 // 7. FormItem props 透传：label / name / rules 真实下发到内部 AFormItem
 // 8. FormItem 独立使用：无 TmForm 祖先时 useFormContext 返回 undefined 也不影响渲染
 // 9. $attrs 与 slots 全透传（Form 与 FormItem 各覆盖）
-import { beforeAll, describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createApp, h, nextTick, reactive } from 'vue'
 import { TmForm, TmFormItem } from '../index'
@@ -22,29 +22,9 @@ import plugin, { install } from '../../../index'
 import TmInput from '../../input/src/Input.vue'
 
 /**
- * jsdom 环境补丁：window.matchMedia 缺失会导致 ant Form 内部 ResponsiveObserve（经 grid/Row
- * 触发的响应式断点监听）抛 TypeError，Form/FormItem 一旦带 label 布局就会失败。
- * 此处补齐最小可用的 matchMedia stub（返回 matches:false 的 MediaQueryList），
- * 保证 ant Form/FormItem 在 jsdom 下能完成挂载与校验链路。
+ * 注：原 Task 10 在此文件局部 stub 的 window.matchMedia 已在 Task 12 提升为全局
+ * setupFiles（packages/ui/src/test/setup.ts），所有 spec 共享，无需局部补丁。
  */
-beforeAll(() => {
-  if (!window.matchMedia) {
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: (query: string): MediaQueryList =>
-        ({
-          matches: false,
-          media: query,
-          onchange: null,
-          addListener: () => {},
-          removeListener: () => {},
-          addEventListener: () => {},
-          removeEventListener: () => {},
-          dispatchEvent: () => false,
-        }) as unknown as MediaQueryList,
-    })
-  }
-})
 
 /**
  * 构造「TmForm + TmFormItem(name+rules) + TmInput」最小可校验表单。

@@ -4,7 +4,12 @@
     "rootDir": "src",
     "outDir": "es",
     "baseUrl": ".",
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "vue-types": ["./node_modules/vue-types"],
+      "scroll-into-view-if-needed": ["./node_modules/scroll-into-view-if-needed"],
+      "vxe-pc-ui": ["./node_modules/vxe-pc-ui"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.spec.ts"]
 }

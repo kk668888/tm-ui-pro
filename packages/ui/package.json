@@ -18,33 +18,43 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "sideEffects": ["**/*.css"],
-  "files": ["es", "lib", "dist"],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "es",
+    "lib",
+    "dist"
+  ],
   "scripts": {
     "build": "vite build",
     "test": "vitest run"
   },
   "peerDependencies": {
-    "vue": "^3.5.0",
-    "ant-design-vue": "^4.2.6",
     "@ant-design/icons-vue": "^7.0.0",
-    "vxe-table": "4.20.7",
+    "@vxe-ui/core": "4.4.18",
+    "ant-design-vue": "^4.2.6",
+    "vue": "^3.5.0",
     "vxe-pc-ui": "4.16.21",
-    "@vxe-ui/core": "4.4.18"
+    "vxe-table": "4.20.7"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.8",
+    "@ant-design/icons-vue": "^7.0.0",
     "@types/node": "^22.0.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.10",
+    "@vue/test-utils": "^2.4.0",
+    "@vxe-ui/core": "4.4.18",
+    "ant-design-vue": "^4.2.6",
+    "jsdom": "^24.0.0",
+    "scroll-into-view-if-needed": "^2.2.31",
     "vite": "^8.1.5",
     "vite-plugin-dts": "^4.5.0",
-    "vue": "^3.5.0",
-    "ant-design-vue": "^4.2.6",
-    "@ant-design/icons-vue": "^7.0.0",
-    "vxe-table": "4.20.7",
-    "vxe-pc-ui": "4.16.21",
-    "@vxe-ui/core": "4.4.18",
     "vitest": "^4.1.10",
-    "@vue/test-utils": "^2.4.0",
-    "jsdom": "^24.0.0"
+    "vue": "^3.5.0",
+    "vue-tsc": "^2.2.12",
+    "vue-types": "^3.0.2",
+    "vxe-pc-ui": "4.16.21",
+    "vxe-table": "4.20.7"
   }
 }

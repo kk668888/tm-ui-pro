@@ -164,8 +164,11 @@ const onSearch = (query: string): void => {
     @search="onSearch" 内部驱动远程取数；业务的 @search 监听器经 forwardBindings 透传，由 mergeProps 合并共存
   -->
   <ASelect ref="innerRef" v-bind="forwardBindings" v-model:value="inner" @search="onSearch">
-    <!-- 动态透传全部插槽：default/placeholder/notFoundContent/clearIcon/... -->
-    <template v-for="(_, name) in $slots" #[name]="slotData">
+    <!--
+      动态透传全部插槽：default/placeholder/notFoundContent/clearIcon/...
+      用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
+    -->
+    <template v-for="name in Object.keys($slots)" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>
   </ASelect>
