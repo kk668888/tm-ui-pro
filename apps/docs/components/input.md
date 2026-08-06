@@ -42,7 +42,7 @@ import InputDemo from '../../../packages/ui/src/components/input/demos/basic.vue
 
 业务侧通过 `ref` 可调用以下 ant Input 实例方法（经 `useForwardRef` 透传）：
 
-- `focus()` / `blur()` / `select()` / `setSelectionRange()` / `input()` 等。
+- `focus()` / `blur()` / `select()` / `setSelectionRange()` 等方法，以及 `input` 属性（原生 DOM input 元素引用）等。
 
 ### TmInput Types
 

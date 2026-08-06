@@ -55,9 +55,11 @@ export interface TmTableResult<T = Record<string, unknown>> {
 
 业务侧通过 `ref` 可调用以下 vxe-grid 实例方法（经 `useForwardRef` 透传，方法保真转发）：
 
-- `commit(data)` / `revertData()` / `clearData()` — 数据提交 / 回滚 / 清空
+- `revertData()` / `clearData()` / `updateData(data)` — 数据回滚 / 清空 / 覆盖更新
 - `getCheckboxRecords()` — 获取勾选行
 - `loadColumn(columns)` / `loadData(data)` — 动态加载列 / 数据
+- `getRecordset()` / `undo()` / `redo()` — 编辑记录集 / 撤销 / 重做
+- `commitProxy(code)` — vxe 工具栏「保存」回调（触发提交代理，业务侧通常在内部持久化数据；非普通数据提交方法）
 - 其余 vxe-grid 实例方法全部透传。
 
 ```ts
@@ -93,7 +95,7 @@ import type { TmTableProps as TmTableProps2 } from '@tm/ui/table'
   4. **race condition 防护**：内部 token 守卫，快速翻页下乱序响应被丢弃，UI 始终显示最新请求结果
 - **静态模式**：未传 `request` 时，TmTable 退化为透明转发，业务 `data` prop 直接绑定 vxe-grid。
 - **方法透传**：`useForwardRef` + `defineExpose(exposed)` 把 vxe-grid 实例方法逐个转发，不 spread Proxy（保证 `commit` / `getCheckboxRecords` 等方法签名零损耗）。
-- **视觉默认**：`tmTableDefaults` 设置 `border: true` / `stripe: true` / `showOverflow: true` / `pageSize: 10` / `pageSizes: [10, 20, 50, 100]`，业务侧可通过同名 prop 覆盖。
+- **视觉默认**：`tmTableDefaults` 设置 `border: true` / `stripe: true` / `showOverflow: true` / `pageSize: 10` / `pageSizes: [10, 20, 50]`，业务侧可通过同名 prop 覆盖。
 
 ## 注意事项
 
