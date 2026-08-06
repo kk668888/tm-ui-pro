@@ -19,6 +19,7 @@ import { Select as ASelect, type SelectProps } from 'ant-design-vue'
 import type { TmSelectProps } from './props'
 import { tmSelectDefaults } from './defaults'
 import { useRemoteSearch } from './composables/useRemoteSearch'
+import { useApiLoader } from './composables/useApiLoader'
 import { useForwardRef } from '../../../composables/useForwardRef'
 
 /**
@@ -43,15 +44,25 @@ const props = withDefaults(defineProps<TmSelectProps>(), {
   // undefined 表示「未传」，交给 ant 内部处理
   modelValue: undefined,
   remote: undefined,
+  api: undefined,
+  resultMap: undefined,
   // 公司默认值兜底；业务显式传入同名 prop 时自动覆盖
   showSearch: tmSelectDefaults.showSearch,
   allowClear: tmSelectDefaults.allowClear,
-  // bordered: 关键默认（2026-08-06）——根因与 TmInput 完全一致：
-  // 类型化 defineProps 把 bordered 生成 Boolean 运行时 prop（未传默认 false），
-  // 覆盖 antd 的 `bordered = true` 解构兜底，导致选择器渲染成 borderless 无边框。
-  // 必须在 withDefaults 显式兜底为 true（仅写进 tmSelectDefaults 不生效）；
-  // 业务显式传 bordered=false 仍可覆盖。
+  // bordered / showArrow / virtual / autoClearSearchValue / defaultActiveFirstOption:
+  // 关键默认（2026-08-06）——根因与 TmInput 完全一致：
+  // 类型化 defineProps 把 antd Boolean 属性（默认 true）生成 Boolean 运行时 prop、
+  // 未传时默认 false，覆盖 antd 的 `prop = true` 解构兜底。
+  // 必须在 withDefaults 显式兜底为 true；业务显式传 false 仍可覆盖。
   bordered: tmSelectDefaults.bordered,
+  showArrow: tmSelectDefaults.showArrow,
+  virtual: tmSelectDefaults.virtual,
+  autoClearSearchValue: tmSelectDefaults.autoClearSearchValue,
+  defaultActiveFirstOption: tmSelectDefaults.defaultActiveFirstOption,
+  // 公司扩展默认：搜索体验（2026-08-06 新增 api 数据源）
+  // fieldNames 默认 undefined（ant 原生 prop），映射时由 mapApiResponse 内部兜底 'label'/'value'
+  debounce: tmSelectDefaults.debounce,
+  minLength: tmSelectDefaults.minLength,
 })
 
 /**
@@ -85,25 +96,55 @@ const slotNames = Object.keys(useSlots()) as string[]
 const { innerRef, exposed } = useForwardRef<SelectInstance>()
 defineExpose(exposed)
 
-// 远程搜索控制器：options（拉取结果）/ loading（请求状态）/ search（取数入口）
-const { options: remoteOptions, loading: loadingState, search } = useRemoteSearch(
+// api 挂载加载控制器：挂载时调 api({}) 获取初始列表并映射为 options（获取数据模式）
+const { options: apiOptions, loading: apiLoading } = useApiLoader(
+  () => props.api,
+  { fieldNames: props.fieldNames, resultMap: props.resultMap },
+)
+
+// 远程搜索控制器：options（拉取结果）/ loading（请求状态）/ search（取数入口）/ currentQuery（搜索词）
+const {
+  options: remoteOptions,
+  loading: loadingState,
+  currentQuery,
+  search,
+} = useRemoteSearch(
   () => props.remote,
+  // 搜索体验配置：防抖 + 最小输入长度（仅 remote 模式生效）
+  { debounce: props.debounce, minLength: props.minLength },
+)
+
+// searchActive：remote 模式且输入达到 minLength → 判定为「激活搜索」，渲染 searchResult 临时覆盖
+const searchActive = computed(
+  () => props.remote !== undefined && currentQuery.value.length >= props.minLength,
+)
+
+// baseOptions：api 模式用 api 挂载结果，否则本地业务 options（搜索未激活时的常驻列表）
+// 兜底为空数组，保证传给 ant 的 options 恒为数组（避免 undefined 下发）
+const baseOptions = computed(() =>
+  props.api !== undefined ? apiOptions.value : (props.options ?? []),
 )
 
 /**
- * 合并后的 options：远程模式用 remoteOptions（由 search 填充），
- * 本地模式原样透传业务传入的 options。单点写入避免双重下发。
+ * 合并后的 options（三态）：
+ * - 搜索激活：用 remoteOptions（searchResult，临时覆盖 baseOptions）
+ * - 搜索未激活：回退 baseOptions（api 初始列表 或 本地 options）
+ * api 与 remote 写入不同槽位，互不覆盖；单点写入避免双重下发。
  */
 const mergedOptions = computed(() =>
-  props.remote ? remoteOptions.value : props.options,
+  searchActive.value ? remoteOptions.value : baseOptions.value,
 )
 
 /**
  * 扩展属性剥离：仅剔除 ant 不识别的扩展键 + 与 v-model:value 冲突的数值通道
- * - remote / modelValue：公司扩展键，ant 不识别，必须剔除避免 ant 警告
+ * - remote / modelValue / api / resultMap / debounce / minLength：公司扩展键，
+ *   ant 不识别，必须剔除避免 ant 警告
  * - value / defaultValue / onUpdate:value：v-model:value="inner" 单点写入的数值通道，
  *   若同时透传会与 computed inner 冲突，必须由 inner 单点写入
  * - options / loading / filterOption：单点重新写入（见下方），先剥离避免重复键
+ *
+ * 注意：fieldNames 是 ant Select 原生 prop（选项字段映射），【不剥离】——
+ * 它同时被 mapApiResponse 用于响应字段映射，且透传给 ASelect 控制选项渲染，语义协调。
  *
  * 关键：onSearch / onChange 等【通知事件不剥离】。它们是 ant Select 的「通知事件」，
  * 仅用于向业务回调「值/搜索已变化」，不是数值写入通道，与 v-model:value 不冲突。
@@ -116,22 +157,29 @@ const antProps = computed(() => {
   const {
     remote: _r,
     modelValue: _mv,
+    api: _api,
+    resultMap: _rm,
+    debounce: _db,
+    minLength: _ml,
     value: _v,
     defaultValue: _dv,
     options: _o,
     loading: _l,
     filterOption: _fo,
     'onUpdate:value': _ouv,
+    open: _open,
     ...rest
   } = props
   return {
     ...rest,
     // 单点写入 options：远程模式用 remoteOptions，本地模式用业务 options
     options: mergedOptions.value,
-    // loading 合并：业务 loading ∪ 远程搜索 loading，避免任一来源被覆盖
-    loading: Boolean(props.loading) || loadingState.value,
+    // loading 合并：业务 loading ∪ 远程搜索 loading ∪ api 挂载 loading，避免任一来源被覆盖
+    loading: Boolean(props.loading) || loadingState.value || apiLoading.value,
     // filterOption 自适应：业务显式传入则尊重；否则本地模式启用 ant 内置过滤、远程模式禁用（服务端过滤）
-    filterOption: props.filterOption ?? (props.remote ? false : true),
+    filterOption: props.filterOption ?? (props.remote !== undefined ? false : true),
+    // open：仅业务显式传 true 时下发（受控打开）；false 时置 undefined 让 antd 内部管理
+    open: props.open || undefined,
   }
 })
 
@@ -164,7 +212,7 @@ const inner = computed<SelectProps['value']>({
  * 与模板 @search="onSearch" 合并为监听器数组，两者按序都被调用
  */
 const onSearch = (query: string): void => {
-  if (props.remote) void search(query)
+  if (props.remote !== undefined) void search(query)
 }
 </script>
 

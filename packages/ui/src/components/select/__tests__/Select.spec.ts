@@ -53,6 +53,26 @@ describe('TmSelect', () => {
     expect(wrapper.findComponent({ name: 'ASelect' }).props('bordered')).toBe(true)
   })
 
+  it('公司默认 showArrow/virtual/autoClearSearchValue/defaultActiveFirstOption=true（回归 Boolean 默认陷阱）', () => {
+    // 回归 2026-08-06：与 bordered 同源。antd 中这些 Boolean prop 默认 true，
+    // Vue 类型化 defineProps 未传时默认 false，必须 withDefaults 显式兜底。
+    const wrapper = mount(TmSelect)
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+    expect(inner.props('showArrow')).toBe(true)
+    expect(inner.props('virtual')).toBe(true)
+    expect(inner.props('autoClearSearchValue')).toBe(true)
+    expect(inner.props('defaultActiveFirstOption')).toBe(true)
+  })
+
+  it('open 剥离：未传时不下发到内部 ASelect（防止 Vue Boolean 默认 false 锁定下拉）', () => {
+    // 回归 2026-08-06：antd Select 的 open 是受控/非受控 prop。
+    // 未传时（undefined）antd 内部管理——点击 toggle 下拉。
+    // Vue 类型化 defineProps 未传时默认 false，传递给 antd 会锁定下拉关闭。
+    // TmSelect 在 antProps 中剥离 open（false 时置 undefined，v-bind 跳过该 key）。
+    const wrapper = mount(TmSelect)
+    expect(wrapper.findComponent({ name: 'ASelect' }).props('open')).toBeUndefined()
+  })
+
   it('filterOption 自适应：本地模式默认 true / 远程模式默认 false（业务显式覆盖始终生效）', () => {
     // 本地模式默认启用 ant 内置过滤（输入即过滤选项）
     const local = mount(TmSelect)
@@ -121,7 +141,8 @@ describe('TmSelect', () => {
 
   it('remote 远程搜索：触发 @search 调用 remote、填充 options 并复位 loading', async () => {
     const remote = vi.fn().mockResolvedValue([{ label: '苹果', value: 'apple' }])
-    const wrapper = mount(TmSelect, { props: { remote } })
+    // debounce: 0 关闭防抖，保持即时取数语义（防抖合并单独在专属用例中覆盖）
+    const wrapper = mount(TmSelect, { props: { remote, debounce: 0 } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
     // 初始：远程未取数，options 为空
     expect(inner.props('options')).toEqual([])
@@ -156,7 +177,7 @@ describe('TmSelect', () => {
       .mockReturnValueOnce(promiseA)
       .mockReturnValueOnce(promiseB)
 
-    const wrapper = mount(TmSelect, { props: { remote } })
+    const wrapper = mount(TmSelect, { props: { remote, debounce: 0 } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
 
     // 1) 并发触发两次 search：A 先发得到 tokenA，B 立即跟上使 lastToken 自增到 tokenB（A 作废）
@@ -219,7 +240,7 @@ describe('TmSelect', () => {
     const remote = vi
       .fn()
       .mockReturnValue(new Promise<TmSelectOption[]>((r) => (resolveRemote = r)))
-    const wrapper = mount(TmSelect, { props: { remote, loading: true } })
+    const wrapper = mount(TmSelect, { props: { remote, loading: true, debounce: 0 } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
 
     // 业务 loading 单独已为 true（合并前基线）
@@ -282,5 +303,106 @@ describe('TmSelect', () => {
       slots: { placeholder: '请选择水果' },
     })
     expect(wrapper.text()).toContain('请选择水果')
+  })
+
+  it('api 挂载加载：调用一次、响应映射后填充 options、loading 复位', async () => {
+    // api 获取数据模式：挂载时调用 api({})，响应经 fieldNames/智能识别映射为选项
+    const api = vi.fn().mockResolvedValue({ data: [{ label: '苹果', value: 'apple' }] })
+    const wrapper = mount(TmSelect, { props: { api } })
+    await flush()
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+    expect(api).toHaveBeenCalledTimes(1)
+    expect(api).toHaveBeenCalledWith({})
+    expect(inner.props('options')).toEqual([{ label: '苹果', value: 'apple' }])
+    expect(inner.props('loading')).toBe(false)
+  })
+
+  it('api 响应映射：fieldNames 自定义字段名生效', async () => {
+    const api = vi.fn().mockResolvedValue([{ name: '张三', id: 1 }])
+    const wrapper = mount(TmSelect, { props: { api, fieldNames: { label: 'name', value: 'id' } } })
+    await flush()
+    expect(wrapper.findComponent({ name: 'ASelect' }).props('options')).toEqual([
+      { label: '张三', value: 1 },
+    ])
+  })
+
+  it('minLength 门槛：输入低于阈值不调用 remote、options 回退基础列表', async () => {
+    const remote = vi.fn().mockResolvedValue([{ label: 'X', value: 'x' }])
+    const wrapper = mount(TmSelect, { props: { remote, debounce: 0, minLength: 2 } })
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+    // 单字符输入低于 minLength=2：不发起请求
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      'a',
+    )
+    await flush()
+    expect(remote).not.toHaveBeenCalled()
+    // options 回退基础列表（未配置 api/本地 options → 空数组兜底）
+    expect(inner.props('options')).toEqual([])
+  })
+
+  it('防抖合并：快速连续输入只发一次请求、使用最终完整词', async () => {
+    const remote = vi.fn().mockResolvedValue([{ label: '苹果', value: 'apple' }])
+    const wrapper = mount(TmSelect, { props: { remote, debounce: 50 } })
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+    // 间隔 < debounce 的连续输入：前两次待发请求被取消，仅 'app' 真正触发
+    for (const q of ['a', 'ap', 'app']) {
+      ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+        'search',
+        q,
+      )
+    }
+    // 等待超过防抖窗口
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    expect(remote).toHaveBeenCalledTimes(1)
+    expect(remote).toHaveBeenCalledWith('app')
+    expect(inner.props('options')).toEqual([{ label: '苹果', value: 'apple' }])
+  })
+
+  it('共存：api 初始列表 → remote 搜索临时覆盖 → 清空回退 api 列表', async () => {
+    // api（获取数据）与 remote（搜索）并存：初始渲染 api 列表，
+    // 输入达到 minLength 后 remote 结果覆盖，清空输入回退 baseOptions
+    const api = vi.fn().mockResolvedValue([{ label: '初始项', value: 'init' }])
+    const remote = vi.fn().mockResolvedValue([{ label: '搜索结果', value: 'hit' }])
+    const wrapper = mount(TmSelect, { props: { api, remote, debounce: 0 } })
+    await flush() // api 挂载加载完成
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+
+    // 阶段 1：初始渲染 api 列表
+    expect(inner.props('options')).toEqual([{ label: '初始项', value: 'init' }])
+
+    // 阶段 2：输入搜索词（>= minLength）→ remote 结果临时覆盖
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      '张',
+    )
+    await flush()
+    expect(remote).toHaveBeenCalledWith('张')
+    expect(inner.props('options')).toEqual([{ label: '搜索结果', value: 'hit' }])
+
+    // 阶段 3：清空输入 → 回退 api 基础列表
+    ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
+      'search',
+      '',
+    )
+    await flush()
+    expect(inner.props('options')).toEqual([{ label: '初始项', value: 'init' }])
+  })
+
+  it('loading 合并：api 加载期间 loading 为 true、完成后复位', async () => {
+    let resolveApi!: (v: TmSelectOption[]) => void
+    const api = vi
+      .fn()
+      .mockReturnValue(new Promise<TmSelectOption[]>((r) => (resolveApi = r)))
+    const wrapper = mount(TmSelect, { props: { api } })
+    const inner = wrapper.findComponent({ name: 'ASelect' })
+    await nextTick()
+    // api 请求 in flight：合并 loading 为 true
+    expect(inner.props('loading')).toBe(true)
+    // api 完成：loading 复位为 false
+    resolveApi([{ label: 'X', value: 'x' }])
+    await flush()
+    expect(inner.props('loading')).toBe(false)
+    expect(inner.props('options')).toEqual([{ label: 'X', value: 'x' }])
   })
 })
