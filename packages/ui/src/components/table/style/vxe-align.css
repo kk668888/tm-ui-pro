@@ -1,0 +1,8 @@
+/* packages/ui/src/components/table/style/vxe-align.css
+   vxe ↔ 公司视觉对齐补充。
+   运行时由 TmConfigProvider 注入的 CSS 变量（--vxe-ui-font-size / --vxe-ui-border-radius / ...）
+   进一步联动 ant 设计体系，确保 vxe-grid 在 @tm/ui 主题下视觉统一。 */
+.tm-table :where(.vxe-table) {
+  font-size: var(--vxe-ui-font-size, 14px);
+  border-radius: var(--vxe-ui-border-radius, 6px);
+}
