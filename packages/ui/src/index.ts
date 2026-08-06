@@ -3,6 +3,7 @@
 import type { App } from 'vue'
 import { TmButton } from './components/button'
 import { TmInput } from './components/input'
+import { TmSelect } from './components/select'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -11,13 +12,16 @@ import { TmInput } from './components/input'
 export const install = (app: App): void => {
   app.use(TmButton as unknown as { install: (app: App) => void })
   app.use(TmInput as unknown as { install: (app: App) => void })
+  app.use(TmSelect as unknown as { install: (app: App) => void })
 }
 
-// 组件 export：业务方可按需 import { TmButton, TmInput } from '@tm/ui'
+// 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect } from '@tm/ui'
 export { TmButton } from './components/button'
 export { TmInput } from './components/input'
-// 类型 export：业务方可直接 import type { TmButtonProps, InputProps } from '@tm/ui'
+export { TmSelect } from './components/select'
+// 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
+export type { TmSelectProps, TmSelectExtProps, SelectProps } from './components/select'
 
 export default { install }
