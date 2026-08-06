@@ -17,15 +17,14 @@
       "import": "./es/components/table/index.js",
       "require": "./lib/components/table/index.cjs"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./es/ui.css"
   },
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
     "es",
-    "lib",
-    "dist"
+    "lib"
   ],
   "scripts": {
     "build": "vite build",
