@@ -1,8 +1,46 @@
 /* packages/ui/src/components/table/style/vxe-align.css
-   vxe ↔ 公司视觉对齐补充。
-   运行时由 TmConfigProvider 注入的 CSS 变量（--vxe-ui-font-size / --vxe-ui-border-radius / ...）
-   进一步联动 ant 设计体系，确保 vxe-grid 在 @tm/ui 主题下视觉统一。 */
-.tm-table :where(.vxe-table) {
+   vxe ↔ 公司视觉对齐补充 + TmTable v2 布局。
+   运行时由 TmConfigProvider 注入的 CSS 变量（--vxe-ui-primary-color / --vxe-ui-table-border-color / ...）
+   联动 ant 设计 token，确保 vxe-grid 在 @tm/ui 主题下视觉统一。 */
+
+/* ── TmTable v2 布局：flex column，宽度撑满父容器，表格自然高度 ── */
+.tm-table {
+  display: flex;
+  flex-direction: column;
+  /* 撑满父容器宽度：即使父容器是 flex（如文档站 DemoBlock 预览区），表格也占满可用宽 */
+  width: 100%;
+}
+/* 表格主体：宽度不溢出（列总宽超容器时走 vxe 内部滚动），高度由业务 height 或内容决定 */
+.tm-table__grid {
+  min-width: 0;
+}
+/* ant 分页器：右对齐，与表格间距 12px */
+.tm-table__pager {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+/* 搜索区与表格间距 */
+.tm-table__search {
+  margin-bottom: 16px;
+}
+
+/* ── vxe ↔ ant 视觉对齐细节 ── */
+.tm-table :where(.vxe-grid .vxe-table) {
   font-size: var(--vxe-ui-font-size, 14px);
   border-radius: var(--vxe-ui-border-radius, 6px);
+}
+/* 表头 / 单元格字号对齐 ant（14px） */
+.tm-table :where(.vxe-grid .vxe-header--column),
+.tm-table :where(.vxe-grid .vxe-body--column) {
+  font-size: var(--vxe-ui-font-size, 14px);
+}
+/* 表头字重对齐 ant Table（semibold），提升层级辨识 */
+.tm-table :where(.vxe-grid .vxe-header--column) {
+  font-weight: 600;
+}
+/* 内容溢出省略行高与单元格内边距对齐 ant */
+.tm-table :where(.vxe-grid .vxe-body--column) {
+  padding: 4px 8px;
+  line-height: 22px;
 }

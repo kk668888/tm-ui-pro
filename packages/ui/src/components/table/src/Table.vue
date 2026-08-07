@@ -1,46 +1,57 @@
 <!-- packages/ui/src/components/table/src/Table.vue -->
 <!--
-  TmTable 范本组件：薄封装 vxe-grid + request 远程扩展
-  核心机制（沿用 TmSelect/TmInput 已确立的封装模式）：
-  1. 单一 forwardBindings computed（plan-bug #1 修正）：合并 $attrs + 已剥离扩展键的 vxe 原生 props
-     - 远程模式：data/total/pagerConfig 由 usePagination 维护并下发
-     - 静态模式：透传业务 data prop
-  2. 扩展属性剥离：request 不下发 vxe（vxe 不识别），仅在内部驱动 onMounted + page-change
-  3. 方法透传：useForwardRef + defineExpose(exposed)（plan-bug #2 方案 A，与 TmSelect 一致）
-     - 不 spread Proxy（vxe 方法 commit/revertData/clearData/getCheckboxRecords 全部保真转发）
-     - fetchData 不暴露 vm：mount 拉首页 + page-change 自动 refetch 已覆盖核心场景
-  4. request 远程扩展（Bug 3/4 修复）：
-     - Bug 3：远程 data + total 必须透传 VxeGrid（plan 漏写 → 表格空）
-     - Bug 4：page-change 事件必须绑定 onPageChange（plan 漏写 → 翻页失效）
-  5. race condition 防护：usePagination 内部 token 守卫，快速翻页下乱序响应被丢弃
+  TmTable 范本组件：薄封装 vxe-grid + ant 分页/搜索（v2 table-ant-pagination-search）
+  核心机制：
+  1. 单一 forwardBindings computed：合并 $attrs + 已剥离扩展键的 vxe 原生 props
+     - 分页器改用 ant-design-vue <a-pagination>，pagerConfig 不再下发 vxe（vxe 不渲染分页器）
+     - data = usePagination.data（远程=拉取结果；静态=当前页本地切片）
+     - total 写入 a-pagination.total（ant Pagination 标准）
+  2. 扩展属性剥离：request / search / density / pagerConfig 不下发 vxe
+     - request 仅在内部驱动 onMounted + a-pagination change
+     - search 驱动表格上方 ant 搜索表单；density 合并进 row-config
+  3. 方法透传：useForwardRef + defineExpose(exposed)
+  4. ant Pagination change 事件驱动远程拉数（v2 替代 vxe page-change）
+  5. race condition 防护：usePagination 内部 token 守卫
+  6. 布局：外层 flex column，grid 占剩余高度，a-pagination 固定底部
 -->
 <script setup lang="ts">
-// 所有 import 必须在 <script setup> 顶部（plan-bug #5 修正：plan 把 onMounted 写在 script 中途）
-import { computed, onMounted, useAttrs, useSlots } from 'vue'
+import { computed, onMounted, useAttrs, useSlots, watch } from 'vue'
+import {
+  Pagination as APagination,
+  Form as AForm,
+  FormItem as AFormItem,
+  Row as ARow,
+  Col as ACol,
+  Input as AInput,
+  Select as ASelect,
+  DatePicker as ADatePicker,
+  Button as AButton,
+  Space as ASpace,
+} from 'ant-design-vue'
 import { VxeGrid, type VxeGridInstance } from 'vxe-table'
 import type { TmTableProps } from './props'
 import { tmTableDefaults } from './defaults'
 import { useColumns } from './composables/useColumns'
 import { usePagination } from './composables/usePagination'
+import { useSearch } from './composables/useSearch'
 import { useForwardRef } from '../../../composables/useForwardRef'
 
 // name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传，改为手动 forwardBindings 合并
 defineOptions({ name: 'TmTable', inheritAttrs: false })
 
 /**
- * 组件 props：TmTableProps = VxeGridProps（vxe 原生）+ { request? }（公司扩展）
+ * 组件 props：TmTableProps = VxeGridProps（vxe 原生）+ { request? / search? / density? }（公司扩展）
  *
  * withDefaults 兜底公司默认；业务显式传入同名 prop 时自动覆盖：
  * - border / stripe / showOverflow：视觉规范默认值
  * - pagerConfig：对象类型，必须用工厂函数返回（避免多实例共享引用）
- * - request：undefined 表示「未配置远程模式」
+ *   注意：pagerConfig 不再透传 vxe-grid，其 pageSize/pageSizes 改为驱动 ant Pagination
  */
 const props = withDefaults(defineProps<TmTableProps>(), {
   border: tmTableDefaults.border,
   stripe: tmTableDefaults.stripe,
   showOverflow: tmTableDefaults.showOverflow,
-  // pagerConfig 工厂：每实例独立对象，且显式 spread pageSizes 让 readonly tuple（来自
-  // tmTableDefaults 的 as const）还原为 vxe PagerConfig 要求的可变数组类型（vue-tsc 修复）。
+  fit: tmTableDefaults.fit,
   pagerConfig: () => ({
     pageSize: tmTableDefaults.pagerConfig.pageSize,
     pageSizes: [...tmTableDefaults.pagerConfig.pageSizes],
@@ -51,98 +62,166 @@ const props = withDefaults(defineProps<TmTableProps>(), {
 const $attrs = useAttrs()
 
 // slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
-// 不再触发 TS7022 circular inference（T14 收口 2）。
-// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
+// 不再触发 TS7022 circular inference（T14 收口 2）
 const slotNames = Object.keys(useSlots()) as string[]
 
 /**
  * 方法透传：父组件通过 ref 可调用 commit / revertData / clearData / getCheckboxRecords 等 vxe 实例方法
- *
- * 方案 A（与 TmSelect 一致）：defineExpose(exposed) 直传 Proxy，不 spread
- * —— spread 会因 useForwardRef 的 Proxy 未实现 ownKeys/getOwnPropertyDescriptor 而丢失全部方法。
  */
 const { innerRef, exposed } = useForwardRef<VxeGridInstance>()
 defineExpose(exposed)
 
-/** 远程数据 + 分页驱动（含 race condition token 守卫） */
-const {
-  page,
-  data: remoteData,
-  total: remoteTotal,
-  loading: remoteLoading,
-  fetchData,
-  onPageChange,
-} = usePagination(() => props.request)
+/**
+ * 分页 + 数据驱动：ant Pagination change 驱动
+ * - 远程模式：fetchData 拉数，竞态 token 守卫
+ * - 静态模式：data 为当前页切片，total = 数据长度
+ */
+const pagination = usePagination({
+  getRequest: () => props.request,
+  getStaticData: () => props.data,
+})
+
+/** 搜索控制器：search 扩展键声明式 ant 表单（未配置时 no-op） */
+const search = useSearch(props.search, {
+  fetchData: pagination.fetchData,
+  resetToFirst: pagination.resetToFirst,
+})
 
 /** 列归一化：补公司默认 align=left / showOverflow=true */
 const columns = useColumns(() => props.columns)
 
 /**
- * 单一合并透传对象（plan-bug #1 修正：原 plan 双 v-bind 不合法）
- *
- * 远程模式（request 配置）：
- * - 剥离 data/pagerConfig/loading 由 composable 重新写入（Bug 3 修复：plan 漏写导致空表）
- * - data = remoteData.value（composable 拉取的最新数据）
- * - total 写入 pagerConfig.total（vxe pager 标准）
- * - currentPage/pageSize 双向同步给 vxe pager（避免 vxe 内部状态与 composable 分裂）
- * - loading 合并：业务 loading ∪ 远程 loading
- * - 绑定 onPageChange 到 vxe page-change 事件（Bug 4 修复：plan 漏写导致翻页失效）
- *
- * 静态模式（无 request）：仅剥离 request，业务 data/pagerConfig 原样透传
+ * 业务显式传 pagerConfig.pageSize 时，同步为 ant Pagination 初始页大小（响应式跟随变化）
+ */
+watch(
+  () => props.pagerConfig?.pageSize,
+  (size) => {
+    if (size) pagination.page.pageSize = size
+  },
+  { immediate: true },
+)
+
+/** ant Pagination 页大小选项：vxe pageSizes 数字数组 → ant 字符串数组 */
+const pageSizeOptions = computed(() =>
+  (props.pagerConfig?.pageSizes ?? tmTableDefaults.pagerConfig.pageSizes).map(String),
+)
+
+/**
+ * density → row-config.height 合并（业务显式 row-config.height 优先）
+ * 未配置 density 且业务未传 row-config 时返回 undefined（不注入，保持薄封装）
+ */
+const rowConfig = computed(() => {
+  const base = props.rowConfig ?? {}
+  if (base.height != null) return base
+  if (!props.density) return Object.keys(base).length ? base : undefined
+  return { ...base, height: tmTableDefaults.densityHeight[props.density] }
+})
+
+/**
+ * grid 高度策略：
+ * 业务显式传 height（如固定高度 / "100%" 撑满父容器）时使用；
+ * 未传时表格自然高度（按行数渲染），宽度始终撑满父容器。
+ */
+const gridHeight = computed(() => props.height)
+
+/**
+ * 单一合并透传对象：$attrs + 已剥离扩展键的 vxe 原生 props
+ * - 剥离 request / search / density / pagerConfig（vxe 不识别或不渲染分页）
+ * - data = pagination.data（远程拉取结果 / 静态当前页切片）
+ * - loading = 业务 loading ∪ 远程 loading
+ * - rowConfig / height 按上述策略注入
  */
 const forwardBindings = computed(() => {
-  if (props.request) {
-    // 远程模式：剥离由 composable 接管的字段
-    const {
-      request: _r,
-      data: _d,
-      pagerConfig: _pc,
-      loading: _l,
-      ...rest
-    } = props
-    return {
-      ...$attrs,
-      ...rest,
-      columns: columns.value,
-      data: remoteData.value,
-      loading: Boolean(props.loading) || remoteLoading.value,
-      pagerConfig: {
-        ...(props.pagerConfig ?? {}),
-        total: remoteTotal.value,
-        currentPage: page.currentPage,
-        pageSize: page.pageSize,
-      },
-      // Bug 4 修复：plan 漏写 page-change 事件绑定 → 翻页不触发拉数
-      onPageChange,
-    }
-  }
-  // 静态模式：仅剥离扩展键 request
-  const { request: _r, ...rest } = props
+  const { request: _r, search: _s, density: _d, pagerConfig: _pc, data: _data, loading: _loading, height: _height, ...rest } = props
   return {
     ...$attrs,
     ...rest,
     columns: columns.value,
+    data: pagination.data.value,
+    loading: Boolean(props.loading) || pagination.loading.value,
+    ...(rowConfig.value != null ? { rowConfig: rowConfig.value } : {}),
+    ...(gridHeight.value != null ? { height: gridHeight.value } : {}),
   }
 })
 
-/** 远程模式：挂载时自动拉首页（与 plan 方案 A 一致，fetchData 不暴露 vm） */
+/** 远程模式：挂载时自动拉首页 */
 onMounted(() => {
-  if (props.request) void fetchData()
+  if (props.request) void pagination.fetchData()
 })
 </script>
 
 <template>
   <div class="tm-table">
-    <!-- v-bind="forwardBindings" 单点承载 $attrs + 已剥离扩展键的 vxe 原生 props -->
-    <VxeGrid ref="innerRef" v-bind="forwardBindings">
-      <!--
-        动态透传全部插槽：empty / toolbar / top / bottom / form / ...
-        用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
-      -->
-      <template v-for="name in slotNames" :key="name" #[name]="slotData">
-        <slot :name="name" v-bind="slotData ?? {}" />
-      </template>
-    </VxeGrid>
+    <!-- search 搜索区（可选）：ant 声明式表单，查询/重置接 useSearch -->
+    <div v-if="props.search" class="tm-table__search">
+      <a-form :model="search.model" @finish="search.handleSearch">
+        <a-row :gutter="16">
+          <a-col
+            v-for="field in search.fields"
+            :key="field.field"
+            :span="field.span ?? 8"
+          >
+            <a-form-item :label="field.label" :name="field.field">
+              <a-input
+                v-if="(field.type ?? 'input') === 'input'"
+                v-model:value="search.model[field.field]"
+                :placeholder="field.placeholder"
+                allow-clear
+              />
+              <a-select
+                v-else-if="field.type === 'select'"
+                v-model:value="search.model[field.field]"
+                :options="field.options"
+                :placeholder="field.placeholder"
+                allow-clear
+                style="width: 100%"
+              />
+              <a-date-picker
+                v-else-if="field.type === 'date'"
+                v-model:value="search.model[field.field]"
+                :placeholder="field.placeholder"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" html-type="submit">
+                  {{ tmTableDefaults.searchButtonText }}
+                </a-button>
+                <a-button @click="search.resetQuery">
+                  {{ tmTableDefaults.resetButtonText }}
+                </a-button>
+              </a-space>
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </div>
+
+    <!-- 表格主体：vxe-grid，宽度撑满父容器，高度按业务 height 或内容自然渲染 -->
+    <div class="tm-table__grid">
+      <VxeGrid ref="innerRef" v-bind="forwardBindings">
+        <!-- 动态透传全部插槽：empty / toolbar / top / bottom / form / ... -->
+        <template v-for="name in slotNames" :key="name" #[name]="slotData">
+          <slot :name="name" v-bind="slotData ?? {}" />
+        </template>
+      </VxeGrid>
+    </div>
+
+    <!-- ant 分页器：固定底部，change 事件驱动远程拉数 / 静态切页 -->
+    <div class="tm-table__pager">
+      <a-pagination
+        :current="pagination.page.currentPage"
+        :page-size="pagination.page.pageSize"
+        :total="pagination.total.value"
+        :page-size-options="pageSizeOptions"
+        :show-total="(total: number) => `共 ${total} 条`"
+        show-size-changer
+        @change="pagination.onChange"
+      />
+    </div>
   </div>
 </template>
 
