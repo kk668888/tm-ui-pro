@@ -203,3 +203,203 @@ describe('TmFormItem', () => {
     expect(wrapper.find('.item-content').exists()).toBe(true)
   })
 })
+
+// ============================================================
+// v2 新增：FormContext 级联（readonly / disabled / submitting）+ 变更追踪
+// ============================================================
+
+describe('TmForm v2 扩展能力', () => {
+  it('submitting prop 经 FormContext 下发到 TmFormItem slot props', async () => {
+    // TmFormItem default slot 应能拿到 submitting 字段（经 slotScope 暴露）
+    let capturedScope: unknown = null
+    const wrapper = mount(TmForm, {
+      props: { submitting: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { label: '字段', name: 'f1' }, {
+            default: (slotData: unknown) => {
+              capturedScope = slotData
+              return h('input')
+            },
+          }),
+      },
+    })
+    await nextTick()
+    expect(capturedScope).toBeDefined()
+    expect((capturedScope as Record<string, unknown>)?.submitting).toBe(true)
+  })
+
+  it('readonly prop 经 FormContext 下发到 TmFormItem slot props', async () => {
+    let capturedScope: unknown = null
+    const wrapper = mount(TmForm, {
+      props: { readonly: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { label: '字段', name: 'f1' }, {
+            default: (slotData: unknown) => {
+              capturedScope = slotData
+              return h('input')
+            },
+          }),
+      },
+    })
+    await nextTick()
+    expect((capturedScope as Record<string, unknown>)?.readonly).toBe(true)
+  })
+
+  it('disabled prop 经 FormContext 下发到 TmFormItem slot props', async () => {
+    let capturedScope: unknown = null
+    const wrapper = mount(TmForm, {
+      props: { disabled: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { label: '字段', name: 'f1' }, {
+            default: (slotData: unknown) => {
+              capturedScope = slotData
+              return h('input')
+            },
+          }),
+      },
+    })
+    await nextTick()
+    expect((capturedScope as Record<string, unknown>)?.disabled).toBe(true)
+  })
+
+  it('isDirty()：model 与 onMounted 快照相同时返回 false', async () => {
+    const formState = reactive({ name: 'Tom' })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    const vm = wrapper.vm as unknown as { isDirty: () => boolean }
+    // onMounted 自动快照 → model 未变 → isDirty false
+    expect(vm.isDirty()).toBe(false)
+  })
+
+  it('isDirty()：model 变更后返回 true', async () => {
+    const formState = reactive({ name: 'Tom' })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    formState.name = 'Jerry'
+    await nextTick()
+    const vm = wrapper.vm as unknown as { isDirty: () => boolean }
+    expect(vm.isDirty()).toBe(true)
+  })
+
+  it('getDirtyFields()：返回变更字段名列表', async () => {
+    const formState = reactive({ name: 'Tom', age: 20 })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    formState.name = 'Jerry'
+    await nextTick()
+    const vm = wrapper.vm as unknown as { getDirtyFields: () => string[] }
+    expect(vm.getDirtyFields()).toEqual(['name'])
+  })
+
+  it('resetToInitial()：恢复 model 到快照值 + 清除校验', async () => {
+    const formState = reactive({ name: 'Tom' })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    formState.name = 'Jerry'
+    await nextTick()
+    const vm = wrapper.vm as unknown as {
+      resetToInitial: () => void
+      isDirty: () => boolean
+    }
+    vm.resetToInitial()
+    await nextTick()
+    expect(formState.name).toBe('Tom')
+    expect(vm.isDirty()).toBe(false)
+  })
+
+  it('markInitial()：重新快照后 isDirty 回到 false', async () => {
+    const formState = reactive({ name: 'Tom' })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    formState.name = 'Jerry'
+    await nextTick()
+    const vm = wrapper.vm as unknown as {
+      markInitial: () => void
+      isDirty: () => boolean
+    }
+    // 修改后 isDirty = true
+    expect(vm.isDirty()).toBe(true)
+    // 标记为新的初始值
+    vm.markInitial()
+    // isDirty 回到 false（新的快照 = 当前值）
+    expect(vm.isDirty()).toBe(false)
+  })
+
+  it('公司扩展键透传边界：submitting/readonly 不误透传，disabled 走 ant 原生 prop', () => {
+    const wrapper = mount(TmForm, {
+      props: { submitting: true, readonly: true, disabled: true },
+    })
+    const inner = wrapper.findComponent({ name: 'AForm' })
+    // submitting/readonly 是纯公司扩展键，ant Form 无对应 prop，不应透传
+    expect(inner.props('submitting')).toBeUndefined()
+    expect(inner.props('readonly')).toBeUndefined()
+    // disabled 是 ant Form 原生 prop（整表禁用），应透传保留原生能力
+    expect(inner.props('disabled')).toBe(true)
+  })
+})
+
+// ============================================================
+// v2 新增：TmInput / TmSelect 适配 FormContext 级联
+// ============================================================
+
+describe('TmInput FormContext 级联', () => {
+  it('TmForm readonly 级联到内部 TmInput 的 readonly', async () => {
+    const formState = reactive({ name: '' })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, readonly: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'name' }, {
+            default: () => h(TmInput, { modelValue: '' }),
+          }),
+      },
+    })
+    await nextTick()
+    const input = wrapper.findComponent({ name: 'AInput' })
+    expect(input.props('readonly')).toBe(true)
+  })
+
+  it('TmForm disabled 级联到内部 TmInput 的 disabled', async () => {
+    const formState = reactive({ name: '' })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, disabled: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'name' }, {
+            default: () => h(TmInput, { modelValue: '' }),
+          }),
+      },
+    })
+    await nextTick()
+    const input = wrapper.findComponent({ name: 'AInput' })
+    expect(input.props('disabled')).toBe(true)
+  })
+
+  it('TmInput 业务显式传 readonly 优先于 TmForm context', async () => {
+    const formState = reactive({ name: '' })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, readonly: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'name' }, {
+            // 业务显式传 false——应覆盖 Form context 的 true
+            default: () => h(TmInput, { modelValue: '', readonly: false }),
+          }),
+      },
+    })
+    await nextTick()
+    const input = wrapper.findComponent({ name: 'AInput' })
+    expect(input.props('readonly')).toBe(false)
+  })
+
+  it('TmInput 无 TmForm 祖先时不受影响', () => {
+    const wrapper = mount(TmInput, { props: { modelValue: '' } })
+    const input = wrapper.findComponent({ name: 'AInput' })
+    // 独立使用时 readonly/disabled 走 ant 默认（undefined）
+    expect(input.props('readonly')).toBeUndefined()
+    expect(input.props('disabled')).toBeUndefined()
+  })
+})

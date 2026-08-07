@@ -16,6 +16,7 @@ import { computed, useAttrs, useSlots } from 'vue'
 import { Input as AInput } from 'ant-design-vue'
 import type { TmInputProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useFormContext } from '../../form/src/composables/useFormContext'
 import { tmInputDefaults } from './defaults'
 
 /**
@@ -50,6 +51,11 @@ const props = withDefaults(defineProps<TmInputProps>(), {
   // 必须在 withDefaults 显式兜底为 true（仅写进 tmInputDefaults 不生效，
   // withDefaults 只对列出的键应用默认值）；业务显式传 bordered=false 仍可覆盖。
   bordered: tmInputDefaults.bordered,
+  // readonly/disabled 级联（v2）：类型化 defineProps 把 Boolean 属性默认 false，
+  // 导致「未传」被识别成 false，`false ?? formContext?.readonly` 永远不落空，
+  // TmForm 级联失效。withDefaults 显式置 undefined，区分「未传」→ 可落空到 context。
+  readonly: undefined,
+  disabled: undefined,
 })
 
 /**
@@ -62,6 +68,9 @@ const emit = defineEmits<{
 
 // inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象（class/style/id/data-*等）
 const $attrs = useAttrs()
+
+/** 注入祖先 TmForm 联动上下文（无祖先时返回 undefined，不影响独立使用） */
+const formContext = useFormContext()
 
 // slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
 // 不再触发 TS7022 circular inference（T14 收口 2）。
@@ -99,7 +108,12 @@ const antProps = computed(() => {
     'onUpdate:value': _ouv,
     ...rest
   } = props
-  return rest
+  // FormContext 级联：业务显式传优先；否则取 TmForm context；两者皆无走 ant 默认
+  return {
+    ...rest,
+    readonly: rest.readonly ?? formContext?.value?.readonly,
+    disabled: rest.disabled ?? formContext?.value?.disabled,
+  }
 })
 
 /**

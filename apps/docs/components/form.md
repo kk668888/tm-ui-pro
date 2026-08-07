@@ -18,6 +18,9 @@
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步
 import FormDemo from '../../../packages/ui/src/components/form/demos/basic.vue'
+import FormReadonlyDemo from '../../../packages/ui/src/components/form/demos/readonly.vue'
+import FormSubmittingDemo from '../../../packages/ui/src/components/form/demos/submitting.vue'
+import FormDirtyDemo from '../../../packages/ui/src/components/form/demos/dirty.vue'
 </script>
 
 <DemoBlock>
@@ -26,20 +29,55 @@ import FormDemo from '../../../packages/ui/src/components/form/demos/basic.vue'
 
 <<< ../../../packages/ui/src/components/form/demos/basic.vue
 
+## 只读 / 禁用
+
+`readonly` 与 `disabled` 两种全局级联模式：点击按钮在「编辑 / 只读 / 禁用」间切换。`readonly` 级联到 `TmInput`（可选中但不可编辑，保留文字与底色），`TmSelect` 锁死下拉不可选择；`disabled` 透传 ant Form 原生整表禁用 + 级联到 `TmInput`/`TmSelect`（灰底不可操作）。
+
+<DemoBlock>
+  <FormReadonlyDemo />
+</DemoBlock>
+
+<<< ../../../packages/ui/src/components/form/demos/readonly.vue
+
+## 提交 loading
+
+`submitting` 经 FormContext 下发到 `TmFormItem` 的 slot props。表单触发点不在表单内时（弹窗 / 抽屉 footer 按钮），业务在调用处自行控制 `submitting`；本 demo 用表单内按钮演示：提交期间按钮自动 `loading` + 禁用，防止重复提交。
+
+<DemoBlock>
+  <FormSubmittingDemo />
+</DemoBlock>
+
+<<< ../../../packages/ui/src/components/form/demos/submitting.vue
+
+## 变更追踪
+
+`isDirty` / `getDirtyFields` / `resetToInitial` / `markInitial` 四个方法基于 `onMounted` 的 model 快照。典型场景：离开页面前确认未保存修改、「模拟保存」后调用 `markInitial` 复位脏标记、一键恢复初始值。
+
+<DemoBlock>
+  <FormDirtyDemo />
+</DemoBlock>
+
+<<< ../../../packages/ui/src/components/form/demos/dirty.vue
+
 ## API
 
 ### TmForm Props
 
-`TmForm` 不引入额外 props，全部透传 ant Form：
+`TmForm` 透传 ant Form 全部 props，另增三个公司扩展键：
 
 | 属性 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | model | 表单数据对象（与 ant `FormProps.model` 一致） | `Record<string, any>` | `-` |
-| 其余属性 | 透传 ant Form 全部 props / slots / events（如 `rules` / `layout` / `label-col` / `wrapper-col` / `colon` / `disabled`） | `FormProps` | `-` |
+| submitting | 提交 loading 态。经 FormContext 下发，`TmFormItem` 的 slot props 可拿到（业务按钮区可据此禁用/loading） | `boolean` | `false` |
+| readonly | 全局只读模式。经 FormContext 级联：`TmInput` 只读不可编辑（业务显式传同名 prop 优先）；`TmSelect` 因 ant 原生无 readonly prop，改为受控 `open:false` 锁死下拉 + 关闭清除按钮实现只读 | `boolean` | `false` |
+| disabled | 全局禁用模式。透传 ant Form 原生 `disabled`（整表禁用）+ 级联到 `TmInput`/`TmSelect` | `boolean` | `false` |
+| 其余属性 | 透传 ant Form 全部 props / slots / events（如 `rules` / `layout` / `label-col` / `wrapper-col` / `colon`） | `FormProps` | `-` |
 
 ### TmForm Methods
 
-业务侧通过 `ref` 可调用以下 ant Form 实例方法（经 `useForwardRef` 透传）：
+业务侧通过 `ref` 可调用以下方法（ant Form 实例方法经 `useForwardRef` 透传 + 公司级变更追踪方法）：
+
+**ant Form 方法透传：**
 
 - `validate(nameList?)` — 触发全表单（或指定字段）校验，返回 Promise
 - `validateFields(nameList?)` — 同 `validate` 但不校验未声明 rules 的字段
@@ -47,10 +85,20 @@ import FormDemo from '../../../packages/ui/src/components/form/demos/basic.vue'
 - `clearValidate(nameList?)` — 清空校验状态
 - `scrollToField(name)` — 滚动到指定字段
 
+**变更追踪（v2 新增）：**
+
+- `isDirty()` — 当前 model 是否有字段值与 `onMounted` 快照不同（浅比较），返回 `boolean`
+- `getDirtyFields()` — 返回所有已变更字段名数组
+- `resetToInitial()` — 重置 model 全部字段到初始快照 + 清除校验状态（等价「恢复到刚挂载时」）
+- `markInitial()` — 手动把当前 model 标记为新的初始快照（编辑场景异步加载完数据后调用，使 `isDirty()` 复位）
+
 ```ts
 import type { FormInstance } from '@tm/ui'
 const formRef = ref<FormInstance>()
 await formRef.value?.validate()
+const dirty = formRef.value?.isDirty()         // 离开页面前确认
+const fields = formRef.value?.getDirtyFields() // 需要展示哪些字段变了
+formRef.value?.markInitial()                   // 提交成功后复位脏标记
 ```
 
 ### TmFormItem Props
@@ -63,6 +111,14 @@ await formRef.value?.validate()
 | label | 标签文案 | `string \| VNode` | `-` |
 | rules | 字段级校验规则（与父级 `TmForm.rules` 二选一，字段级优先） | `Rule[]` | `-` |
 | 其余属性 | 透传 ant FormItem 全部 props / slots（如 `wrapper-col` / `required` / `extra` / `tooltip`） | `FormItemProps` | `-` |
+
+**Default slot props（v2 新增）**：`TmFormItem` 的默认插槽会把 FormContext 的 `submitting` / `readonly` / `disabled` 透传给子控件，便于第三方控件（非 `@tm/ui`）消费级联状态：
+
+```vue
+<TmFormItem label="名称" name="name" v-slot="{ readonly, disabled, submitting }">
+  <input :readonly="readonly" :disabled="disabled" />
+</TmFormItem>
+```
 
 ### TmForm / TmFormItem Types
 
@@ -77,6 +133,8 @@ import type {
 
 ## 扩展机制
 
-- **方法透传**：`useForwardRef` 把内部 ant Form / FormItem 实例的方法逐个 `defineExpose`，业务侧 `formRef.value?.validate()` 等价 `formRef.value?.validate()` 直接调用 ant 实例。
+- **方法透传**：`useForwardRef` 把内部 ant Form / FormItem 实例的方法逐个 `defineExpose`，业务侧 `formRef.value?.validate()` 等价直接调用 ant 实例。
+- **FormContext 级联（v2）**：`TmForm` 经 `provide/inject` 下发 `submitting` / `readonly` / `disabled` 计算属性。`TmFormItem` 通过 slot props 暴露给子控件；`TmInput` / `TmSelect` 直接 inject 自动级联（业务显式传同名 prop 优先于 context）。`disabled` 同时透传 ant Form 原生 prop，保留 ant 整表禁用能力；`readonly` 对 `TmInput` 走原生只读、对 `TmSelect` 用受控 `open:false` 锁死下拉（ant Select 无 readonly prop）。
+- **变更追踪（v2）**：`onMounted` 自动快照 `model` 为初始值，暴露 `isDirty()` / `getDirtyFields()` / `resetToInitial()` / `markInitial()`，适用于「离开前确认保存」「提交后复位脏标记」等场景。
 - **零摩擦透传**：`$attrs` 全量透传，保留 ant Form 全部能力（`rules` / `layout` / 自定义 `validateStatus` 等）。
 - **配套性**：与 `TmInput` / `TmSelect` 等组件库表单控件配套使用时，字段校验与 ant Form 完全等价（`v-model` 桥接不影响 `name` 路径解析）。

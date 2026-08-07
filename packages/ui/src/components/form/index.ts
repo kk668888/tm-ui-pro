@@ -14,7 +14,8 @@ import { withInstall } from '../../utils/withInstall'
 export const TmForm = withInstall(Form, 'TmForm')
 export const TmFormItem = withInstall(FormItem, 'TmFormItem')
 
-// 类型透传：业务方可直接 import { FormProps, FormInstance, FormItemProps } from '@tm/ui'
+// 类型透传：业务方可直接 import { FormProps, FormInstance, FormItemProps, TmFormProps } from '@tm/ui'
 export type { FormProps, FormInstance, FormItemProps, FormItemInstance } from 'ant-design-vue'
+export type { TmFormProps, TmFormExtProps } from './src/props'
 
 export default { TmForm, TmFormItem }

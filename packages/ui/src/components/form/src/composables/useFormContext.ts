@@ -1,44 +1,46 @@
 // packages/ui/src/components/form/src/composables/useFormContext.ts
-// TmForm ↔ TmFormItem 联动上下文：provide/inject 通道（v1 预留占位）
+// TmForm ↔ TmFormItem 联动上下文：provide/inject 通道
 //
 // 设计要点：
-// - v1 FormContext 接口为空，仅作为「通道可用」的预留占位。
-//   后续公司级联动（如统一字段通信、跨字段校验提示、字段元数据下发）将注入此处，
-//   届时只需扩展 FormContext 接口，Form/FormItem 模板无需改动。
-// - useFormContext() 用 inject(FORM_KEY, undefined)：FormItem 在无 TmForm 祖先时返回 undefined，
-//   不报错也不影响渲染（独立使用 FormItem 的容错场景）。
+// - v2 扩展：FormContext 从空占位升级为承载 submitting / readonly / disabled 的联动上下文。
+//   providing 侧（TmForm）用 computed 下发，consuming 侧（TmFormItem / TmInput / TmSelect）
+//   通过 inject 拿到 ComputedRef<FormContext>，响应式追踪最新 props 值。
+// - useFormContext() 用 inject(FORM_KEY, undefined)：在无 TmForm 祖先时返回 undefined，
+//   不报错也不影响渲染（独立使用控件的容错场景）。
 // - TmForm/TmFormItem 是 ant Form/FormItem 的纯薄封装，内部 ant Form↔FormItem 的真实联动
 //   由 ant 自身的 provide/inject 通道维护，本通道仅用于「公司层扩展」，两者互不干扰。
-import { inject, provide, type InjectionKey } from 'vue'
+import { inject, provide, type InjectionKey, type ComputedRef } from 'vue'
 
 /**
- * Form 与 FormItem 间联动上下文（v1 预留）
+ * Form 与 FormItem / 表单控件间联动上下文（v2 扩展）
  *
- * 当前为空接口占位，保证 provide/inject 通道可用。
- * 后续承载公司级表单联动：字段通信、跨字段校验、字段元数据等。
+ * - submitting：提交 loading 态，TmFormItem slot props 暴露给按钮区（防止重复提交）
+ * - readonly：全局只读模式，TmInput/TmSelect inject 后自动合并到自身 prop（业务显式传优先）
+ * - disabled：全局禁用模式，行为同 readonly
  */
 export interface FormContext {
-  // 预留：公司级表单联动 / 字段通信将注入此处
+  submitting?: boolean
+  readonly?: boolean
+  disabled?: boolean
 }
 
-/** TmForm → TmFormItem 联动的注入键（Symbol 保证隔离） */
-export const FORM_KEY: InjectionKey<FormContext> = Symbol('TmForm')
+/** TmForm → 后代组件的联动注入键（Symbol 保证隔离） */
+export const FORM_KEY: InjectionKey<ComputedRef<FormContext>> = Symbol('TmForm')
 
 /**
- * Form 组件向后代提供联动上下文
+ * Form 组件向后代提供联动上下文（v2：接收 ComputedRef 保证响应式）
  *
- * @param ctx 当前仅占位（空对象），后续扩展公司级联动字段
+ * @param ctx computed ref，内含 submitting / readonly / disabled
  */
-export function provideForm(ctx: FormContext): void {
+export function provideForm(ctx: ComputedRef<FormContext>): void {
   provide(FORM_KEY, ctx)
 }
 
 /**
- * FormItem 注入联动上下文（v1 占位，返回 undefined 也不影响渲染）
+ * 后代组件注入联动上下文
  *
- * @returns 祖先 TmForm 提供的 FormContext；无 TmForm 祖先时返回 undefined
+ * @returns ComputedRef<FormContext>；无 TmForm 祖先时返回 undefined（容错）
  */
-export function useFormContext(): FormContext | undefined {
-  // 默认值显式传 undefined：避免 inject 在无 provider 时走 fallback 警告
+export function useFormContext(): ComputedRef<FormContext> | undefined {
   return inject(FORM_KEY, undefined)
 }

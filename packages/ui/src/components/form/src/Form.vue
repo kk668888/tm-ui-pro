@@ -1,96 +1,149 @@
 <!-- packages/ui/src/components/form/src/Form.vue -->
 <!--
-  TmForm 范本组件：ant Form 的纯薄封装 + provide/inject 联动通道预留 + validate 方法透传
-  核心机制（沿用 TmButton/TmInput/TmSelect 已确立的封装模式）：
+  TmForm 范本组件：ant Form 的纯薄封装 + provide/inject 联动通道 + 变更追踪
+
+  核心机制（v2 扩展）：
   1. props 透传：ant Form 原生 props（layout/colon/hideRequiredMark/model/...）原样下发
-  2. $attrs 透传：inheritAttrs:false + 手动合并到 forwardBindings（单一 v-bind，plan-bug #1 修正）
+  2. $attrs 透传：inheritAttrs:false + 手动合并到 forwardBindings（单一 v-bind）
   3. slots 透传：v-for $slots 动态转发全部插槽
-  4. 方法透传：useForwardRef 把 ant Form 实例的 validate/validateFields/resetFields/clearValidate 等
-     方法代理给父组件 ref，业务侧 ref.value.validate() 即可触发真实校验链路
-  5. provide/inject：provideForm({}) 预留公司级联动通道（v1 占位，不影响 ant 内部联动）
-  6. 公司默认值：layout=horizontal / hideRequiredMark=false 兜底，业务可覆盖
-  注：纯薄封装，不新增公司扩展键（与 Button/Input/Select 不同）
+  4. 方法透传：useForwardRef 把 ant Form 实例方法代理给父组件 ref
+  5. v2 新增 — FormContext 联动通道：
+     - submitting / readonly / disabled 经 computed provide 下发
+     - TmFormItem slot props / TmInput / TmSelect 消费 context，实现级联只读/禁用
+  6. v2 新增 — 变更追踪：
+     - onMounted 自动快照 model 作为 initialValues
+     - 暴露 isDirty() / getDirtyFields() / resetToInitial() / markInitial()
+     - 供业务在「离开前确认保存」「提交后重置脏标记」等场景使用
+  7. 公司默认值：layout=horizontal / hideRequiredMark=false 兜底，业务可覆盖
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
-import { Form as AForm, type FormProps, type FormInstance } from 'ant-design-vue'
+import { computed, onMounted, ref, useAttrs, useSlots } from 'vue'
+import { Form as AForm, type FormInstance } from 'ant-design-vue'
 import { useForwardRef } from '../../../composables/useForwardRef'
 import { tmFormDefaults } from './defaults'
-import { provideForm } from './composables/useFormContext'
+import type { TmFormProps } from './props'
+import { provideForm, type FormContext } from './composables/useFormContext'
 
-// name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传，改为手动 $attrs 合并
+// name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传
 defineOptions({ name: 'TmForm', inheritAttrs: false })
 
 /**
- * 组件 props：直接复用 ant FormProps（纯透传，不新增公司扩展键）
- *
- * 设计要点：
- * - 业务方使用 TmForm 时，IDE 提示等同于直接写 <AForm>（layout/model/rules/colon/...）。
- * - withDefaults 落地公司默认 layout/hideRequiredMark，业务显式传入同名 prop 时自动覆盖。
- *
- * 类型来源（plan-bug #2/#3 实测核实结论）：
- * ant-design-vue 4.2.6 经 components.d.ts L49 → ./form/index.d.ts 显式 re-export
- * `export type { FormProps, FormInstance } from './Form'`，二者均从 'ant-design-vue' 主入口可导入，
- * 且 FormInstance 含 validate/validateFields/resetFields/clearValidate/getFieldsValue/scrollToField 完整方法
- * 类型定义（见 node_modules/.../ant-design-vue/es/form/Form.d.ts L235-249）。
- * 故直接使用 FormInstance 作为 useForwardRef 泛型，无需 InstanceType<typeof AForm> fallback。
+ * 组件 props：TmFormProps = ant FormProps + 公司扩展键（submitting/readonly/disabled，见 props.ts）
+ * withDefaults 落地公司默认 layout/hideRequiredMark，扩展键默认 undefined（未传不生效）
  */
-const props = withDefaults(defineProps<FormProps>(), {
-  // 公司默认值兜底；业务显式传入同名 prop 时自动覆盖
+const props = withDefaults(defineProps<TmFormProps>(), {
   layout: tmFormDefaults.layout,
   hideRequiredMark: tmFormDefaults.hideRequiredMark,
+  submitting: undefined,
+  readonly: undefined,
+  disabled: undefined,
 })
 
-// inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象（class/style/id/data-*等）
 const $attrs = useAttrs()
-
-// slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
-// 不再触发 TS7022 circular inference（T14 收口 2）。
-// useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
 const slotNames = Object.keys(useSlots()) as string[]
 
-/**
- * 方法透传：父组件通过 ref 可调用 validate/validateFields/resetFields/clearValidate 等任意 ant Form 实例方法
- * - innerRef：绑定到内部 <AForm ref="innerRef">，挂载后由 Vue 自动填充 AForm 实例
- * - exposed：Proxy 代理对象，运行时把任意 key 转发到 innerRef.value[key]
- * - defineExpose：把 exposed 注册为父组件 ref 能拿到的对外接口
- *
- * 关键（plan-bug #4 处理）：直接 defineExpose(exposed) 暴露 Proxy 做方法透传，
- * 不使用 defineExpose({ ...exposed })——后者会 spread Proxy，
- * 因 useForwardRef 的 Proxy 未实现 ownKeys/getOwnPropertyDescriptor trap，
- * spread 出来是空对象，导致 ant Form 方法（validate 等）透传全部丢失。
- * Form 无额外本地方法，直传 exposed 即可（参照 TmInput.vue）。
- */
+// ============================================================
+// 方法透传 + 变更追踪方法合并暴露
+// ============================================================
+
 const { innerRef, exposed } = useForwardRef<FormInstance>()
-defineExpose(exposed)
 
-/**
- * 合并透传对象：$attrs（class/style/id/外部监听器/data-* 等）+ props（ant 原生 + 公司默认）
- * Vue 模板不支持同一元素写两个 v-bind，因此预先合并为单个对象（plan-bug #1 修正）。
- * 顺序：props 覆盖 $attrs——同名时受控 props 优先；
- * 实际上 ant 已定义的 prop 会自动从 $attrs 分离，合并顺序仅作受控写法的兜底保护。
- *
- * 注：Form 是纯透传无扩展键，无需剥离任何字段（与 Input/Select 不同）。
- */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...props,
+/** 内部工具：JSON deep clone model 值 */
+const snapshot = (): Record<string, unknown> => {
+  const m = props.model ?? {}
+  try {
+    return JSON.parse(JSON.stringify(m)) as Record<string, unknown>
+  } catch {
+    // model 含不可序列化值（File/Date 等），降级为空对象
+    return {}
+  }
+}
+
+/** model 初始快照（onMounted 自动取一次，markInitial 手动更新） */
+const initialSnapshot = ref<Record<string, unknown>>({})
+
+onMounted(() => {
+  initialSnapshot.value = snapshot()
+})
+
+/** 是否有任一字段值与初始值不同（浅比较） */
+const isDirty = (): boolean => {
+  const current = (props.model ?? {}) as Record<string, unknown>
+  const initial = initialSnapshot.value
+  const allKeys = [...new Set([...Object.keys(initial), ...Object.keys(current)])]
+  return allKeys.some((k) => current[k] !== initial[k])
+}
+
+/** 返回所有值已变更的字段名列表 */
+const getDirtyFields = (): string[] => {
+  const current = (props.model ?? {}) as Record<string, unknown>
+  const initial = initialSnapshot.value
+  const allKeys = [...new Set([...Object.keys(initial), ...Object.keys(current)])]
+  return allKeys.filter((k) => current[k] !== initial[k])
+}
+
+/** 重置 model 到初始快照 + 清除校验状态 */
+const resetToInitial = (): void => {
+  const model = (props.model ?? {}) as Record<string, unknown>
+  const initial = initialSnapshot.value
+  Object.assign(model, initial)
+  // 清除初始快照之后新增的字段
+  for (const key of Object.keys(model)) {
+    if (!(key in initial)) delete model[key]
+  }
+  // 联动清除 ant 校验错误
+  innerRef.value?.clearValidate()
+}
+
+/** 手动标记当前 model 为「初始值」（编辑场景异步加载完数据后调用） */
+const markInitial = (): void => {
+  initialSnapshot.value = snapshot()
+}
+
+// 组合：自定义方法优先，未命中则透传到 ant Form 实例
+const customMethods = { isDirty, getDirtyFields, resetToInitial, markInitial }
+const formExposed = new Proxy(exposed as object, {
+  get(target, key, receiver) {
+    if (typeof key === 'string' && key in customMethods) {
+      return customMethods[key as keyof typeof customMethods]
+    }
+    return Reflect.get(target, key, receiver)
+  },
+  has(target, key) {
+    if (typeof key === 'string' && key in customMethods) return true
+    return Reflect.has(target, key)
+  },
+})
+defineExpose(formExposed)
+
+// ============================================================
+// FormContext 联动通道
+// ============================================================
+
+const formContext = computed<FormContext>(() => ({
+  submitting: props.submitting,
+  readonly: props.readonly,
+  disabled: props.disabled,
 }))
+provideForm(formContext)
 
-// 预留公司级联动上下文（v1 占位，不影响 ant Form↔FormItem 内部联动）
-provideForm({})
+// ============================================================
+// 透传合并（剥离公司扩展键，只把 ant 认识的 props 传给 AForm）
+// ============================================================
+
+const forwardBindings = computed(() => {
+  // disabled 是 ant Form 原生 prop（整表禁用），需透传给 AForm——不剥离。
+  // submitting / readonly 为纯公司扩展键，ant 无对应 prop，剥离避免 ant 警告。
+  const { submitting: _s, readonly: _r, ...antProps } = props
+  return {
+    ...$attrs,
+    ...antProps,
+  }
+})
 </script>
 
 <template>
-  <!--
-    v-bind="forwardBindings" 承载 $attrs 与 ant 原生 props（单一 v-bind，plan-bug #1 修正）
-    ref="innerRef" 由 useForwardRef 绑定，挂载后填充 AForm 实例供方法透传
-  -->
   <AForm ref="innerRef" v-bind="forwardBindings">
-    <!--
-      动态透传全部插槽：default 等
-      用 Object.keys($slots) 迭代字符串键（避免 vue-tsc TS7022 circular inference）
-    -->
     <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
     </template>

@@ -14,8 +14,9 @@
 // 11. filterOption edge case：options + remote 同存时默认 false（服务端过滤模式锁定）
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { h, nextTick, reactive } from 'vue'
 import TmSelect from '../src/Select.vue'
+import { TmForm, TmFormItem } from '../../form/index'
 import type { TmSelectOption } from '../src/props'
 
 /**
@@ -404,5 +405,98 @@ describe('TmSelect', () => {
     await flush()
     expect(inner.props('loading')).toBe(false)
     expect(inner.props('options')).toEqual([{ label: 'X', value: 'x' }])
+  })
+})
+
+// ============================================================
+// v2 新增：TmSelect 适配 FormContext 级联（readonly / disabled）
+// ============================================================
+
+describe('TmSelect FormContext 级联', () => {
+  // 注：ant Select 只有 disabled 是真实 prop，readonly 未被 ant Select 运行时处理
+  // （ant-design-vue/es/select 源码无 readonly 命中）。故只测试 disabled 级联效果。
+
+  it('TmForm disabled 级联到内部 TmSelect 的 disabled', async () => {
+    const formState = reactive({ fruit: undefined })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, disabled: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'fruit' }, {
+            default: () => h(TmSelect, { modelValue: undefined }),
+          }),
+      },
+    })
+    await nextTick()
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    expect(select.props('disabled')).toBe(true)
+  })
+
+  it('TmSelect 业务显式传 disabled 优先于 TmForm context', async () => {
+    const formState = reactive({ fruit: undefined })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, disabled: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'fruit' }, {
+            // 业务显式传 false——应覆盖 Form context 的 true
+            default: () => h(TmSelect, { modelValue: undefined, disabled: false }),
+          }),
+      },
+    })
+    await nextTick()
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    expect(select.props('disabled')).toBe(false)
+  })
+
+  it('TmSelect 无 TmForm 祖先时 disabled 走 ant 默认', () => {
+    const wrapper = mount(TmSelect, { props: { options: [] } })
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    expect(select.props('disabled')).toBeUndefined()
+  })
+
+  // ant Select 无 readonly prop，readonly 通过「受控 open=false 锁死下拉 + allowClear=false 禁清空」实现
+  it('TmForm readonly 时 ASelect 受控 open=false（下拉无法打开）', async () => {
+    const formState = reactive({ fruit: undefined })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, readonly: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'fruit' }, {
+            default: () => h(TmSelect, { modelValue: undefined }),
+          }),
+      },
+    })
+    await nextTick()
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    // 受控 open=false：BaseSelect 内部 open 恒等于 props.open，用户点击无法打开
+    expect(select.props('open')).toBe(false)
+    // 只读语义禁止清空：allowClear 强制关闭
+    expect(select.props('allowClear')).toBe(false)
+  })
+
+  it('非 readonly 时 open 走 ant 内部管理（undefined）、allowClear 保留默认', async () => {
+    const wrapper = mount(TmSelect, { props: { options: [] } })
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    // 未受控：open undefined（ant 内部管理），allowClear 默认 true
+    expect(select.props('open')).toBeUndefined()
+    expect(select.props('allowClear')).toBe(true)
+  })
+
+  it('readonly 不改变 disabled（两者可共存，disabled 仍级联）', async () => {
+    const formState = reactive({ fruit: undefined })
+    const wrapper = mount(TmForm, {
+      props: { model: formState, readonly: true, disabled: true },
+      slots: {
+        default: () =>
+          h(TmFormItem, { name: 'fruit' }, {
+            default: () => h(TmSelect, { modelValue: undefined }),
+          }),
+      },
+    })
+    await nextTick()
+    const select = wrapper.findComponent({ name: 'ASelect' })
+    expect(select.props('open')).toBe(false) // readonly 锁下拉
+    expect(select.props('disabled')).toBe(true) // disabled 仍生效
   })
 })
