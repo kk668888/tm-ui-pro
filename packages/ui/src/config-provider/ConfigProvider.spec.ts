@@ -1,7 +1,9 @@
 // packages/ui/src/config-provider/ConfigProvider.spec.ts
-// TmConfigProvider 单测：验证插槽渲染 + vxe CSS 变量桥接通道存在
+// TmConfigProvider 单测：验证插槽渲染 + vxe CSS 变量桥接通道存在 + locale 默认中文
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import enUS from 'ant-design-vue/es/locale/en_US'
 import ConfigProvider from './ConfigProvider.vue'
 
 describe('TmConfigProvider', () => {
@@ -22,5 +24,18 @@ describe('TmConfigProvider', () => {
     expect(style).toContain('--vxe-ui-primary-color')
     expect(style).toContain('--vxe-ui-font-family')
     expect(style).toContain('--vxe-ui-border-radius')
+  })
+
+  it('locale 默认 zh_CN 传入内部 AConfigProvider（ant 组件显示中文）', () => {
+    const wrapper = mount(ConfigProvider)
+    const acp = wrapper.findComponent({ name: 'AConfigProvider' })
+    // 断言语言标识字段（locale 对象经 props 传递会被响应式代理，不比较引用）
+    expect((acp.props('locale') as { locale: string }).locale).toBe(zhCN.locale)
+  })
+
+  it('业务可传其他 locale 覆盖默认中文', () => {
+    const wrapper = mount(ConfigProvider, { props: { locale: enUS } })
+    const acp = wrapper.findComponent({ name: 'AConfigProvider' })
+    expect((acp.props('locale') as { locale: string }).locale).toBe('en')
   })
 })
