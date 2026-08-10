@@ -54,7 +54,12 @@ export default defineConfig({
         },
         {
           text: '表单',
-          items: [{ text: 'Form 表单', link: '/components/form' }],
+          items: [
+            { text: 'Form 表单', link: '/components/form' },
+            { text: 'DatePicker 日期选择', link: '/components/date-picker' },
+            { text: 'Cascader 级联选择', link: '/components/cascader' },
+            { text: 'TreeSelect 树选择', link: '/components/tree-select' },
+          ],
         },
         {
           text: '数据展示',

@@ -110,6 +110,10 @@ importers:
         version: 1.6.4(@algolia/client-search@5.56.0)(@types/node@22.20.1)(async-validator@4.2.5)(axios@1.19.0)(lightningcss@1.33.0)(postcss@8.5.25)(search-insights@2.17.3)(typescript@5.9.3)
 
   packages/ui:
+    dependencies:
+      dayjs:
+        specifier: ^1.10.5
+        version: 1.11.21
     devDependencies:
       '@ant-design/icons-vue':
         specifier: ^7.0.0

@@ -38,6 +38,9 @@
     "build": "vite build",
     "test": "vitest run"
   },
+  "dependencies": {
+    "dayjs": "^1.10.5"
+  },
   "peerDependencies": {
     "@ant-design/icons-vue": "^7.0.0",
     "@vxe-ui/core": "4.4.18",

@@ -21,6 +21,7 @@ import { tmSelectDefaults } from './defaults'
 import { useRemoteSearch } from './composables/useRemoteSearch'
 import { useApiLoader } from './composables/useApiLoader'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useReadonlyLock } from '../../../composables/useReadonlyLock'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 
 /**
@@ -64,6 +65,10 @@ const props = withDefaults(defineProps<TmSelectProps>(), {
   // fieldNames 默认 undefined（ant 原生 prop），映射时由 mapApiResponse 内部兜底 'label'/'value'
   debounce: tmSelectDefaults.debounce,
   minLength: tmSelectDefaults.minLength,
+  // open 显式置 undefined：ant SelectProps 的 open 是 Boolean prop，类型化 defineProps 会让
+  // 未传时默认 false（受控关闭），useReadonlyLock 直透后无法区分「未传」与「显式 false」。
+  // 置 undefined 让未传走 ant 内部管理（不受控），显式 open={false} 才受控关闭。
+  open: undefined,
   // disabled 级联（v2）：类型化 defineProps 把 Boolean 属性默认 false，
   // 导致「未传」被识别成 false，`false ?? formContext?.disabled` 永远不落空，
   // TmForm 级联失效。withDefaults 显式置 undefined，区分「未传」→ 可落空到 context。
@@ -146,12 +151,24 @@ const mergedOptions = computed(() =>
 )
 
 /**
+ * 只读锁 + disabled 级联（v3 回填 useReadonlyLock，design 决策 1）：
+ * 从 useReadonlyLock 统一获取 readonly 锁闭（open:false/allowClear:false/showSearch:false）
+ * 与 disabled `??` 级联，删除本文件内联只读逻辑。行为与 v2 内联实现完全一致（Select.spec.ts 守护）。
+ * searchable: true——Select 有内嵌搜索框，readonly 时必须一并锁死 combobox 输入入口。
+ */
+const { isReadonly: _isReadonly, antProps: lockAntProps } = useReadonlyLock(
+  props,
+  formContext,
+  { searchable: true },
+)
+
+/**
  * 扩展属性剥离：仅剔除 ant 不识别的扩展键 + 与 v-model:value 冲突的数值通道
  * - remote / modelValue / api / resultMap / debounce / minLength：公司扩展键，
  *   ant 不识别，必须剔除避免 ant 警告
  * - value / defaultValue / onUpdate:value：v-model:value="inner" 单点写入的数值通道，
  *   若同时透传会与 computed inner 冲突，必须由 inner 单点写入
- * - options / loading / filterOption：单点重新写入（见下方），先剥离避免重复键
+ * - options / loading / filterOption / open：单点重新写入（见下方），先剥离避免重复键
  *
  * 注意：fieldNames 是 ant Select 原生 prop（选项字段映射），【不剥离】——
  * 它同时被 mapApiResponse 用于响应字段映射，且透传给 ASelect 控制选项渲染，语义协调。
@@ -180,7 +197,6 @@ const antProps = computed(() => {
     open: _open,
     ...rest
   } = props
-  const isReadonly = formContext?.value?.readonly === true
   return {
     ...rest,
     // 单点写入 options：远程模式用 remoteOptions，本地模式用业务 options
@@ -189,20 +205,8 @@ const antProps = computed(() => {
     loading: Boolean(props.loading) || loadingState.value || apiLoading.value,
     // filterOption 自适应：业务显式传入则尊重；否则本地模式启用 ant 内置过滤、远程模式禁用（服务端过滤）
     filterOption: props.filterOption ?? (props.remote !== undefined ? false : true),
-    // open 受控：readonly 时强制 false（ant Select 的 open 是受控 prop，BaseSelect 内部
-    // open 恒等于 props.open，传 false 后用户点击无法打开下拉——实现「只读不可下拉」）；
-    // 非 readonly 时仅业务显式传 true 才下发受控打开，false/未传置 undefined 走 ant 内部管理
-    open: isReadonly ? false : props.open || undefined,
-    // allowClear：readonly 时不显示清除按钮（只读语义禁止清空值）；非 readonly 走业务/默认
-    allowClear: isReadonly ? false : rest.allowClear,
-    // showSearch：readonly 时关闭搜索输入框（ant Select 无 readonly prop，只设 open:false
-    // 锁下拉不够——showSearch 的内嵌 combobox 输入框仍可聚焦打字，必须一并关闭搜索入口）
-    showSearch: isReadonly ? false : rest.showSearch,
-    // FormContext 级联：业务显式传优先；否则取 TmForm context；两者皆无走 ant 默认
-    disabled: rest.disabled ?? formContext?.value?.disabled,
-    // readonly 非 ant Select 声明 prop（ant Select 运行时只认 disabled 与受控 open），
-    // 此处仅透传 context 值作为无效果 attr（未来 ant 支持时自动生效），业务无法显式覆盖
-    readonly: formContext?.value?.readonly,
+    // useReadonlyLock 统一接管 open/allowClear/showSearch/disabled/readonly 锁调整
+    ...lockAntProps.value,
   }
 })
 

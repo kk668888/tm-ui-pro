@@ -16,6 +16,9 @@ import { TmRadioGroup } from './components/radio-group'
 import { TmCheckboxGroup } from './components/checkbox-group'
 import { TmSwitch } from './components/switch'
 import { TmInputNumber } from './components/input-number'
+import { TmDatePicker, TmRangePicker } from './components/date-picker'
+import { TmCascader } from './components/cascader'
+import { TmTreeSelect } from './components/tree-select'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -36,6 +39,10 @@ export const install = (app: App): void => {
   app.use(TmCheckboxGroup as unknown as { install: (app: App) => void })
   app.use(TmSwitch as unknown as { install: (app: App) => void })
   app.use(TmInputNumber as unknown as { install: (app: App) => void })
+  app.use(TmDatePicker as unknown as { install: (app: App) => void })
+  app.use(TmRangePicker as unknown as { install: (app: App) => void })
+  app.use(TmCascader as unknown as { install: (app: App) => void })
+  app.use(TmTreeSelect as unknown as { install: (app: App) => void })
 }
 
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@tm/ui'
@@ -49,6 +56,9 @@ export { TmRadioGroup } from './components/radio-group'
 export { TmCheckboxGroup } from './components/checkbox-group'
 export { TmSwitch } from './components/switch'
 export { TmInputNumber } from './components/input-number'
+export { TmDatePicker, TmRangePicker } from './components/date-picker'
+export { TmCascader } from './components/cascader'
+export { TmTreeSelect } from './components/tree-select'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
@@ -72,5 +82,15 @@ export type {
 } from './components/checkbox-group'
 export type { TmSwitchProps, TmSwitchExtProps, SwitchProps } from './components/switch'
 export type { TmInputNumberProps, TmInputNumberExtProps, InputNumberProps } from './components/input-number'
+export type {
+  TmDatePickerProps,
+  TmDatePickerExtProps,
+  DatePickerProps,
+  TmRangePickerProps,
+  TmRangePickerExtProps,
+  RangePickerProps,
+} from './components/date-picker'
+export type { TmCascaderProps, TmCascaderExtProps, CascaderProps } from './components/cascader'
+export type { TmTreeSelectProps, TmTreeSelectExtProps, TreeSelectProps } from './components/tree-select'
 
 export default { install }
