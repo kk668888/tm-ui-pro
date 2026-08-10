@@ -2,8 +2,8 @@
 // TmNotification 单测：holder 优先 + 无 holder 降级 ant 全局
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { notification as antNotification } from 'ant-design-vue'
-import { TmNotification } from './index'
-import { setHolder, resetHolder, type FeedbackHolder } from '../../utils/feedbackHolder'
+import { TmNotification } from '../index'
+import { setHolder, resetHolder, type FeedbackHolder } from '../../../utils/feedbackHolder'
 
 function makeHolder(): FeedbackHolder {
   return {

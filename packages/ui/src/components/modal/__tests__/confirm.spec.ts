@@ -2,8 +2,8 @@
 // TmModalConfirm 命令式单测：holder 优先 + 无 holder 降级 ant 全局
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Modal as antModal } from 'ant-design-vue'
-import { TmModalConfirm } from './confirm'
-import { setHolder, resetHolder, type FeedbackHolder } from '../../utils/feedbackHolder'
+import { TmModalConfirm } from '../src/confirm'
+import { setHolder, resetHolder, type FeedbackHolder } from '../../../utils/feedbackHolder'
 
 function makeHolder(): FeedbackHolder {
   return {

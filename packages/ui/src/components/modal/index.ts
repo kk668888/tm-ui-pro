@@ -5,7 +5,7 @@
 import type { App, Component } from 'vue'
 import Modal from './src/Modal.vue'
 import { withInstall } from '../../utils/withInstall'
-import { TmModalConfirm, type ModalFuncs } from './confirm'
+import { TmModalConfirm, type ModalFuncs } from './src/confirm'
 
 /** TmModal = 组件（可 app.use / 模板用）+ 命令式静态方法（任意位置调用） */
 export const TmModal = Object.assign(withInstall(Modal, 'TmModal'), TmModalConfirm) as Component & {
@@ -13,5 +13,5 @@ export const TmModal = Object.assign(withInstall(Modal, 'TmModal'), TmModalConfi
 } & ModalFuncs
 // 类型再导出：业务方可直接 import { TmModalProps, ModalProps } from '@tm/ui'
 export * from './src/props'
-export { TmModalConfirm } from './confirm'
+export { TmModalConfirm } from './src/confirm'
 export default TmModal

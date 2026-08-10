@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import TmDrawer from './index'
+import TmDrawer from '../index'
 
 describe('TmDrawer', () => {
   it('v-model：父组件 modelValue=true 时内部 ant Drawer open=true（parent→child）', async () => {

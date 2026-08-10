@@ -6,7 +6,7 @@
 // 与 components/modal/index.ts 的组件式 TmModal 通过 Object.assign 合并导出。
 import { Modal as antModal } from 'ant-design-vue'
 import type { ModalStaticFunctions } from 'ant-design-vue/es/modal/confirm'
-import { getHolder } from '../../utils/feedbackHolder'
+import { getHolder } from '../../../utils/feedbackHolder'
 
 /** ant Modal 命令式方法类型（ModalStaticFunctions 含 warn，剔除） */
 export type ModalFuncs = Omit<ModalStaticFunctions, 'warn'>

@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { TmModal } from './index'
+import { TmModal } from '../index'
 
 describe('TmModal 组件式', () => {
   it('v-model：父组件 modelValue=true 时内部 ant Modal open=true（parent→child）', async () => {

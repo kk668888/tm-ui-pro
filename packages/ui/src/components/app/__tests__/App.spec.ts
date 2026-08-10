@@ -2,8 +2,8 @@
 // TmApp 单测：渲染 slot + 捕获反馈实例到 holder
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import TmApp from './index'
-import { getHolder, resetHolder } from '../../utils/feedbackHolder'
+import TmApp from '../index'
+import { getHolder, resetHolder } from '../../../utils/feedbackHolder'
 
 describe('TmApp', () => {
   beforeEach(() => resetHolder())

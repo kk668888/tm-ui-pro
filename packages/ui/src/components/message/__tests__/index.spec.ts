@@ -2,8 +2,8 @@
 // TmMessage 单测：holder 优先（TmApp 上下文）+ 无 holder 降级 ant 全局
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { message as antMessage } from 'ant-design-vue'
-import { TmMessage } from './index'
-import { setHolder, resetHolder, type FeedbackHolder } from '../../utils/feedbackHolder'
+import { TmMessage } from '../index'
+import { setHolder, resetHolder, type FeedbackHolder } from '../../../utils/feedbackHolder'
 
 function makeHolder(): FeedbackHolder {
   return {
