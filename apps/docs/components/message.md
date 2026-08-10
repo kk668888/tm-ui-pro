@@ -9,21 +9,22 @@
 <script setup>
 import MessageDemo from '../../../packages/ui/src/components/message/demos/basic.vue'
 import MessageDemoCode from '../../../packages/ui/src/components/message/demos/basic.vue?raw'
+
+// 命令式调用示例（CodeBlock 默认折叠展示）
+const messageCode = `import { TmMessage } from '@tm/ui'
+
+TmMessage.success('保存成功')
+TmMessage.error('操作失败')
+TmMessage.warning('请注意')
+TmMessage.info('提示信息')
+TmMessage.loading('加载中...')`
 </script>
 
 <DemoBlock :code="MessageDemoCode">
   <MessageDemo />
 </DemoBlock>
 
-```ts
-import { TmMessage } from '@tm/ui'
-
-TmMessage.success('保存成功')
-TmMessage.error('操作失败')
-TmMessage.warning('请注意')
-TmMessage.info('提示信息')
-TmMessage.loading('加载中...')
-```
+<CodeBlock :code="messageCode" />
 
 ## 配置与销毁
 

@@ -12,6 +12,15 @@ import ModalDemoCode from '../../../packages/ui/src/components/modal/demos/basic
 import ConfirmDemo from '../../../packages/ui/src/components/modal/demos/confirm.vue'
 import ConfirmDemoCode from '../../../packages/ui/src/components/modal/demos/confirm.vue?raw'
 
+// 命令式调用示例（CodeBlock 默认折叠展示）
+const modalCode = `import { TmModal } from '@tm/ui'
+
+TmModal.confirm({
+  title: '确认删除',
+  content: '删除后不可恢复，是否继续？',
+  onOk() { /* 确认逻辑 */ },
+})`
+
 const modalProps = [
   {
     prop: 'modelValue',
@@ -40,15 +49,7 @@ const modalProps = [
   <ConfirmDemo />
 </DemoBlock>
 
-```ts
-import { TmModal } from '@tm/ui'
-
-TmModal.confirm({
-  title: '确认删除',
-  content: '删除后不可恢复，是否继续？',
-  onOk() { /* 确认逻辑 */ },
-})
-```
+<CodeBlock :code="modalCode" />
 
 支持 `confirm` / `info` / `success` / `error` / `warning` 五种，配置对象沿用 ant Modal `confirm` 形态。
 
