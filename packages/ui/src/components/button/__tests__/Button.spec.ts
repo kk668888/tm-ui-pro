@@ -6,12 +6,20 @@
 // 4. 结构扩展 confirm：Popconfirm 包裹
 // 5. 插槽全透传
 // 6. 扩展属性剥离：debounce/confirm 不下发到内部 ant Button
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { Popconfirm } from 'ant-design-vue'
 import TmButton from '../src/Button.vue'
 
 describe('TmButton', () => {
+  it('click 只触发一次业务 onClick 回调（onClick 剥离修复，2026-08-10）', async () => {
+    // 回归：antProps 若把 props.onClick 透传给 AButton，加上模板 @click="onClick"（防抖 emit），
+    // AButton 收到两个 onClick，点击会触发业务回调 2 次（一次直接调、一次经 emit 再调）
+    const spy = vi.fn()
+    const wrapper = mount(TmButton, { props: { onClick: spy } })
+    await wrapper.find('button').trigger('click')
+    expect(spy).toHaveBeenCalledTimes(1)
+  })
   it('透传 ant 原生 props 到内部按钮（type/danger 真实下发到 ant Button）', () => {
     const wrapper = mount(TmButton, { props: { type: 'primary', danger: true } })
     // class 层面：ant-btn-primary 已渲染

@@ -41,11 +41,16 @@ const { onClick } = useDebounceClick(props, emit)
 // useSlots() 拿到响应式 slots 对象；Object.keys 一次性快照（slot 集合在 mount 后稳定，无需响应式）。
 const slotNames = Object.keys(useSlots()) as string[]
 
-// ★ 扩展属性剥离：从 props 中解构出 debounce/confirm，剩余 rest 即 ant 认识的原生属性
+// ★ 扩展属性剥离：从 props 中解构出 debounce/confirm/onClick，剩余 rest 即 ant 认识的原生属性
 // 这样内部 AButton 不会收到 ant 不识别的 props 而产生 console warning
-// 解构出的扩展属性用不到，重命名为 _d/_c 下划线前缀以标记「故意未使用」
+// 解构出的扩展属性用不到，重命名为 _d/_c/_oc 下划线前缀以标记「故意未使用」
+//
+// onClick 剥离（2026-08-10 修复）：模板 `<AButton @click="onClick">`（useDebounceClick 防抖）是
+// click 唯一入口——它 emit('click') 触发 props.onClick（业务 @click）。若 onClick 同时透传到
+// forwardBindings，AButton 会收到两个 onClick（透传的 props.onClick + 模板防抖），点击触发 2 次
+// 业务回调（一次直接调 props.onClick，一次经防抖 emit 再调 props.onClick）。
 const antProps = computed(() => {
-  const { debounce: _d, confirm: _c, ...rest } = props
+  const { debounce: _d, confirm: _c, onClick: _oc, ...rest } = props
   return rest
 })
 
