@@ -19,6 +19,9 @@ import { TmInputNumber } from './components/input-number'
 import { TmDatePicker, TmRangePicker } from './components/date-picker'
 import { TmCascader } from './components/cascader'
 import { TmTreeSelect } from './components/tree-select'
+import { TmTag } from './components/tag'
+import { TmEmpty } from './components/empty'
+import { TmBadge } from './components/badge'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -43,6 +46,9 @@ export const install = (app: App): void => {
   app.use(TmRangePicker as unknown as { install: (app: App) => void })
   app.use(TmCascader as unknown as { install: (app: App) => void })
   app.use(TmTreeSelect as unknown as { install: (app: App) => void })
+  app.use(TmTag as unknown as { install: (app: App) => void })
+  app.use(TmEmpty as unknown as { install: (app: App) => void })
+  app.use(TmBadge as unknown as { install: (app: App) => void })
 }
 
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@tm/ui'
@@ -59,6 +65,9 @@ export { TmInputNumber } from './components/input-number'
 export { TmDatePicker, TmRangePicker } from './components/date-picker'
 export { TmCascader } from './components/cascader'
 export { TmTreeSelect } from './components/tree-select'
+export { TmTag } from './components/tag'
+export { TmEmpty } from './components/empty'
+export { TmBadge } from './components/badge'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
@@ -92,5 +101,8 @@ export type {
 } from './components/date-picker'
 export type { TmCascaderProps, TmCascaderExtProps, CascaderProps } from './components/cascader'
 export type { TmTreeSelectProps, TmTreeSelectExtProps, TreeSelectProps } from './components/tree-select'
+export type { TmTagProps, TmTagExtProps, TagProps } from './components/tag'
+export type { TmEmptyProps, EmptyProps } from './components/empty'
+export type { TmBadgeProps, BadgeProps } from './components/badge'
 
 export default { install }

@@ -63,7 +63,12 @@ export default defineConfig({
         },
         {
           text: '数据展示',
-          items: [{ text: 'Table 表格', link: '/components/table' }],
+          items: [
+            { text: 'Table 表格', link: '/components/table' },
+            { text: 'Tag 标签', link: '/components/tag' },
+            { text: 'Badge 徽标', link: '/components/badge' },
+            { text: 'Empty 空状态', link: '/components/empty' },
+          ],
         },
         {
           text: '全局配置',
