@@ -455,8 +455,9 @@ describe('TmSelect FormContext 级联', () => {
     expect(select.props('disabled')).toBeUndefined()
   })
 
-  // ant Select 无 readonly prop，readonly 通过「受控 open=false 锁死下拉 + allowClear=false 禁清空」实现
-  it('TmForm readonly 时 ASelect 受控 open=false（下拉无法打开）', async () => {
+  // ant Select 无 readonly prop，readonly 通过「受控 open=false 锁下拉 + showSearch=false 禁输入
+  // + allowClear=false 禁清空」三连实现只读
+  it('TmForm readonly 时 ASelect 锁死（open=false / showSearch=false / allowClear=false）', async () => {
     const formState = reactive({ fruit: undefined })
     const wrapper = mount(TmForm, {
       props: { model: formState, readonly: true },
@@ -471,15 +472,18 @@ describe('TmSelect FormContext 级联', () => {
     const select = wrapper.findComponent({ name: 'ASelect' })
     // 受控 open=false：BaseSelect 内部 open 恒等于 props.open，用户点击无法打开
     expect(select.props('open')).toBe(false)
+    // showSearch=false：关闭内嵌 combobox 输入框，防止只读状态下仍可打字
+    expect(select.props('showSearch')).toBe(false)
     // 只读语义禁止清空：allowClear 强制关闭
     expect(select.props('allowClear')).toBe(false)
   })
 
-  it('非 readonly 时 open 走 ant 内部管理（undefined）、allowClear 保留默认', async () => {
+  it('非 readonly 时 open/showSearch/allowClear 走默认（undefined / true / true）', async () => {
     const wrapper = mount(TmSelect, { props: { options: [] } })
     const select = wrapper.findComponent({ name: 'ASelect' })
-    // 未受控：open undefined（ant 内部管理），allowClear 默认 true
+    // 未受控：open undefined（ant 内部管理），showSearch / allowClear 默认 true
     expect(select.props('open')).toBeUndefined()
+    expect(select.props('showSearch')).toBe(true)
     expect(select.props('allowClear')).toBe(true)
   })
 
@@ -497,6 +501,7 @@ describe('TmSelect FormContext 级联', () => {
     await nextTick()
     const select = wrapper.findComponent({ name: 'ASelect' })
     expect(select.props('open')).toBe(false) // readonly 锁下拉
+    expect(select.props('showSearch')).toBe(false) // readonly 禁输入
     expect(select.props('disabled')).toBe(true) // disabled 仍生效
   })
 })

@@ -195,6 +195,9 @@ const antProps = computed(() => {
     open: isReadonly ? false : props.open || undefined,
     // allowClear：readonly 时不显示清除按钮（只读语义禁止清空值）；非 readonly 走业务/默认
     allowClear: isReadonly ? false : rest.allowClear,
+    // showSearch：readonly 时关闭搜索输入框（ant Select 无 readonly prop，只设 open:false
+    // 锁下拉不够——showSearch 的内嵌 combobox 输入框仍可聚焦打字，必须一并关闭搜索入口）
+    showSearch: isReadonly ? false : rest.showSearch,
     // FormContext 级联：业务显式传优先；否则取 TmForm context；两者皆无走 ant 默认
     disabled: rest.disabled ?? formContext?.value?.disabled,
     // readonly 非 ant Select 声明 prop（ant Select 运行时只认 disabled 与受控 open），
