@@ -12,6 +12,10 @@ import { TmSelect } from './components/select'
 import { TmForm, TmFormItem } from './components/form'
 import { TmTable } from './components/table'
 import { TmConfigProvider } from './config-provider'
+import { TmRadioGroup } from './components/radio-group'
+import { TmCheckboxGroup } from './components/checkbox-group'
+import { TmSwitch } from './components/switch'
+import { TmInputNumber } from './components/input-number'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -28,6 +32,10 @@ export const install = (app: App): void => {
   app.use(TmFormItem as unknown as { install: (app: App) => void })
   app.use(TmTable as unknown as { install: (app: App) => void })
   app.use(TmConfigProvider as unknown as { install: (app: App) => void })
+  app.use(TmRadioGroup as unknown as { install: (app: App) => void })
+  app.use(TmCheckboxGroup as unknown as { install: (app: App) => void })
+  app.use(TmSwitch as unknown as { install: (app: App) => void })
+  app.use(TmInputNumber as unknown as { install: (app: App) => void })
 }
 
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@tm/ui'
@@ -37,6 +45,10 @@ export { TmSelect } from './components/select'
 export { TmForm, TmFormItem } from './components/form'
 export { TmTable } from './components/table'
 export { TmConfigProvider } from './config-provider'
+export { TmRadioGroup } from './components/radio-group'
+export { TmCheckboxGroup } from './components/checkbox-group'
+export { TmSwitch } from './components/switch'
+export { TmInputNumber } from './components/input-number'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
@@ -52,5 +64,13 @@ export type {
   VxeColumnProps,
   VxeGridListeners,
 } from './components/table'
+export type { TmRadioGroupProps, TmRadioGroupExtProps, RadioGroupProps } from './components/radio-group'
+export type {
+  TmCheckboxGroupProps,
+  TmCheckboxGroupExtProps,
+  CheckboxGroupProps,
+} from './components/checkbox-group'
+export type { TmSwitchProps, TmSwitchExtProps, SwitchProps } from './components/switch'
+export type { TmInputNumberProps, TmInputNumberExtProps, InputNumberProps } from './components/input-number'
 
 export default { install }
