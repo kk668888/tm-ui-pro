@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<TmCheckboxGroupProps>(), {
   modelValue: undefined,
   readonly: undefined,
   disabled: undefined,
-  // 公司默认值统一来自 defaults.ts（当前为空，保持 ant 原生默认；未来新增默认自然生效）
+  // 公司默认值统一来自 defaults.ts（当前为空，as const 类型不引入 ant 键，避免 InferDefaults 冲突）
   ...tmCheckboxGroupDefaults,
 })
 
