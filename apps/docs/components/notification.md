@@ -27,12 +27,7 @@ TmNotification.info({ message: '系统升级', description: '今晚 02:00-04:00'
 
 ## 关闭
 
-方法返回销毁函数，可提前关闭：
-
-```ts
-const close = TmNotification.success({ message: '任务完成', description: 'xxx' })
-close()
-```
+各方法返回销毁函数，可提前关闭（调用 `close()`）。
 
 ## API
 

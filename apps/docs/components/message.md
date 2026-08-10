@@ -28,13 +28,7 @@ TmMessage.loading('加载中...')`
 
 ## 配置与销毁
 
-方法签名与 ant Message 一致：`success(content, config)`，`config` 支持 `duration` 等；返回销毁函数。
-
-```ts
-const close = TmMessage.success('3 秒后自动关闭', { duration: 3 })
-// 需要提前关闭时
-close()
-```
+方法签名与 ant Message 一致：`success(content, config)`，`config` 支持 `duration` 等；各方法返回销毁函数，可提前关闭（调用 `close()`）。
 
 ## API
 
