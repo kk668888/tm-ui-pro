@@ -22,6 +22,11 @@ import { TmTreeSelect } from './components/tree-select'
 import { TmTag } from './components/tag'
 import { TmEmpty } from './components/empty'
 import { TmBadge } from './components/badge'
+import { TmApp } from './components/app'
+import { TmModal } from './components/modal'
+import { TmDrawer } from './components/drawer'
+import { TmMessage } from './components/message'
+import { TmNotification } from './components/notification'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -49,6 +54,10 @@ export const install = (app: App): void => {
   app.use(TmTag as unknown as { install: (app: App) => void })
   app.use(TmEmpty as unknown as { install: (app: App) => void })
   app.use(TmBadge as unknown as { install: (app: App) => void })
+  app.use(TmApp as unknown as { install: (app: App) => void })
+  app.use(TmModal as unknown as { install: (app: App) => void })
+  app.use(TmDrawer as unknown as { install: (app: App) => void })
+  // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@tm/ui'
@@ -68,6 +77,12 @@ export { TmTreeSelect } from './components/tree-select'
 export { TmTag } from './components/tag'
 export { TmEmpty } from './components/empty'
 export { TmBadge } from './components/badge'
+export { TmApp } from './components/app'
+export { TmModal } from './components/modal'
+export { TmDrawer } from './components/drawer'
+// 函数式 API（非组件）：全局消息/通知命令式调用
+export { TmMessage } from './components/message'
+export { TmNotification } from './components/notification'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@tm/ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
@@ -104,5 +119,7 @@ export type { TmTreeSelectProps, TmTreeSelectExtProps, TreeSelectProps } from '.
 export type { TmTagProps, TmTagExtProps, TagProps } from './components/tag'
 export type { TmEmptyProps, EmptyProps } from './components/empty'
 export type { TmBadgeProps, BadgeProps } from './components/badge'
+export type { TmModalProps, TmModalExtProps, ModalProps } from './components/modal'
+export type { TmDrawerProps, TmDrawerExtProps, DrawerProps } from './components/drawer'
 
 export default { install }

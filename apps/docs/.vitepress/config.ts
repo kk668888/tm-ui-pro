@@ -71,6 +71,16 @@ export default defineConfig({
           ],
         },
         {
+          text: '全局反馈',
+          items: [
+            { text: 'App 全局反馈桥接', link: '/components/app' },
+            { text: 'Message 全局消息', link: '/components/message' },
+            { text: 'Notification 通知提醒', link: '/components/notification' },
+            { text: 'Modal 对话框', link: '/components/modal' },
+            { text: 'Drawer 抽屉', link: '/components/drawer' },
+          ],
+        },
+        {
           text: '全局配置',
           items: [{ text: 'ConfigProvider', link: '/components/config-provider' }],
         },

@@ -1,0 +1,85 @@
+<!-- packages/ui/src/components/drawer/src/Drawer.vue -->
+<!--
+  TmDrawer 组件式薄封装：ant Drawer + v-model:open 桥接
+  核心机制：
+  1. v-model 桥接：业务 modelValue ↔ ant Drawer 的 open（v-model:open="inner"）
+  2. 陷阱剥离：visible（deprecated Boolean，类型化 defineProps 默认 false 会锁死）、
+     open/onUpdate:open（v-model 单点写入的数值通道）从透传对象剔除
+  3. ant 原生透传：width/placement/closable 等 + 插槽全透传
+  4. $attrs 合并 + useForwardRef 方法透传
+-->
+<script setup lang="ts">
+import { computed, useAttrs, useSlots } from 'vue'
+import { Drawer as ADrawer } from 'ant-design-vue'
+import type { TmDrawerProps } from './props'
+import { useForwardRef } from '../../../composables/useForwardRef'
+
+/** ant Drawer 实例类型（ant 未导出 DrawerInstance，用 InstanceType 推导） */
+type DrawerInstance = InstanceType<typeof ADrawer>
+
+defineOptions({ name: 'TmDrawer', inheritAttrs: false })
+
+/** 组件 props：TmDrawerProps = DrawerProps（ant 原生）+ { modelValue? }
+ * closable/mask/maskClosable 显式兜底 true（2026-08-10）：ant DrawerProps 的这三个 Boolean
+ * 属性默认 true，类型化 defineProps 会把未传时默认成 false（Boolean 陷阱）→ 关闭 X 图标
+ * 与遮罩消失。必须 withDefaults 显式兜底；业务显式传 false 仍可覆盖 */
+const props = withDefaults(defineProps<TmDrawerProps>(), {
+  modelValue: undefined,
+  closable: true,
+  mask: true,
+  maskClosable: true,
+})
+
+/** v-model 桥接事件：computed setter 在 v-model:open 中转换发回 */
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: boolean): void
+}>()
+
+// inheritAttrs:false 下手动取 $attrs
+const $attrs = useAttrs()
+
+// slot keys 快照（mount 后稳定，无需响应式）
+const slotNames = Object.keys(useSlots()) as string[]
+
+/** 方法透传：父组件 ref 可直接访问内部 ant Drawer 实例 */
+const { innerRef, exposed } = useForwardRef<DrawerInstance>()
+defineExpose(exposed)
+
+/**
+ * 扩展属性剥离：
+ * - modelValue：公司扩展键，ant 不识别，必须剔除
+ * - visible：ant deprecated Boolean prop（默认 undefined），类型化 defineProps 默认成 false，
+ *   传给 ant 会锁死抽屉——必须剥离（2026-08-10 同类陷阱）
+ * - open/onUpdate:open：v-model:open="inner" 单点写入的数值通道，必须剥离避免冲突
+ */
+const antProps = computed(() => {
+  const {
+    modelValue: _mv,
+    visible: _v,
+    open: _o,
+    'onUpdate:open': _uo,
+    ...rest
+  } = props
+  return rest
+})
+
+/** 合并透传对象：$attrs + 已剥离冲突项的 ant 原生 props（单一 v-bind） */
+const forwardBindings = computed(() => ({
+  ...$attrs,
+  ...antProps.value,
+}))
+
+/** v-model 双向桥接：modelValue ↔ ant open（computed get/set） */
+const inner = computed<boolean>({
+  get: () => props.modelValue ?? false,
+  set: (v: boolean) => emit('update:modelValue', v),
+})
+</script>
+
+<template>
+  <ADrawer ref="innerRef" v-bind="forwardBindings" v-model:open="inner">
+    <template v-for="name in slotNames" :key="name" #[name]="slotData">
+      <slot :name="name" v-bind="slotData ?? {}" />
+    </template>
+  </ADrawer>
+</template>
