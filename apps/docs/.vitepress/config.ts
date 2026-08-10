@@ -32,6 +32,10 @@ export default defineConfig({
     },
   },
   themeConfig: {
+    // 本地全文搜索：VitePress 内置 local search，构建期索引全站，客户端零请求检索
+    search: {
+      provider: 'local',
+    },
     nav: [{ text: '组件', link: '/components/button' }],
     sidebar: {
       // /components/ 前缀的页面统一展示组件侧边栏
@@ -51,6 +55,10 @@ export default defineConfig({
         {
           text: '数据展示',
           items: [{ text: 'Table 表格', link: '/components/table' }],
+        },
+        {
+          text: '全局配置',
+          items: [{ text: 'ConfigProvider', link: '/components/config-provider' }],
         },
       ],
     },
