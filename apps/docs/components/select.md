@@ -18,29 +18,72 @@
 
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步
+// ?raw 取源码字符串传给 DemoBlock 做代码折叠展示
 import SelectDemo from '../../../packages/ui/src/components/select/demos/basic.vue'
+import SelectDemoCode from '../../../packages/ui/src/components/select/demos/basic.vue?raw'
+
+// TmPropsTable 数据：TmSelect Props 表格（类型含单引号，用双引号字符串）
+const selectProps = [
+  {
+    prop: 'modelValue',
+    desc: '业务侧 `v-model` 绑定值；内部桥接到 ant Select 的 `value`（单选/多选/labelInValue 模式自动跟随 ant `SelectValue` 类型）',
+    type: "SelectProps['value']",
+    default: '-',
+  },
+  {
+    prop: 'remote',
+    desc: '远程搜索函数；传入则启用远程模式，输入经 `debounce` / `minLength` 过滤后调用，自动维护 options / loading',
+    type: '(query: string) => Promise<TmSelectOption[]>',
+    default: '-',
+  },
+  {
+    prop: 'api',
+    desc: '挂载加载函数；传入则挂载时调用一次 `api({})` 获取初始列表，响应自动映射为 options',
+    type: '(params: Record<string, unknown>) => Promise<unknown>',
+    default: '-',
+  },
+  {
+    prop: 'debounce',
+    desc: '远程搜索防抖毫秒（仅 `remote` 生效）',
+    type: 'number',
+    default: '300',
+  },
+  {
+    prop: 'minLength',
+    desc: '远程搜索最小输入长度（仅 `remote` 生效，低于则不发起请求）',
+    type: 'number',
+    default: '1',
+  },
+  {
+    prop: 'fieldNames',
+    desc: '响应数组字段名映射（取 label / value 的字段），透传 ant 原生 fieldNames',
+    type: '{ label?, value?, options? }',
+    default: "{ label: 'label', value: 'value' }",
+  },
+  {
+    prop: 'resultMap',
+    desc: '完全自定义响应 → 选项映射，优先级最高；未提供时按常见格式智能识别',
+    type: '(res: unknown) => TmSelectOption[]',
+    default: '-',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 ant Select 全部 props / slots / events（如 `options` / `placeholder` / `allowClear` / `mode` / `labelInValue`）',
+    type: 'SelectProps',
+    default: '-',
+  },
+]
 </script>
 
-<DemoBlock>
+<DemoBlock :code="SelectDemoCode">
   <SelectDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/select/demos/basic.vue
 
 ## API
 
 ### TmSelect Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 业务侧 `v-model` 绑定值；内部桥接到 ant Select 的 `value`（单选/多选/labelInValue 模式自动跟随 ant `SelectValue` 类型） | `SelectProps['value']` | `-` |
-| remote | 远程搜索函数；传入则启用远程模式，输入经 `debounce` / `minLength` 过滤后调用，自动维护 options / loading | `(query: string) => Promise<TmSelectOption[]>` | `-` |
-| api | 挂载加载函数；传入则挂载时调用一次 `api({})` 获取初始列表，响应自动映射为 options | `(params: Record<string, unknown>) => Promise<unknown>` | `-` |
-| debounce | 远程搜索防抖毫秒（仅 `remote` 生效） | `number` | `300` |
-| minLength | 远程搜索最小输入长度（仅 `remote` 生效，低于则不发起请求） | `number` | `1` |
-| fieldNames | 响应数组字段名映射（取 label / value 的字段），透传 ant 原生 fieldNames | `{ label?, value?, options? }` | `{ label: 'label', value: 'value' }` |
-| resultMap | 完全自定义响应 → 选项映射，优先级最高；未提供时按常见格式智能识别 | `(res: unknown) => TmSelectOption[]` | `-` |
-| 其余属性 | 透传 ant Select 全部 props / slots / events（如 `options` / `placeholder` / `allowClear` / `mode` / `labelInValue`） | `SelectProps` | `-` |
+<TmPropsTable :data="selectProps" />
 
 > `api` 与 `remote` 可共存：`api` 提供常驻初始列表，输入搜索时 `remote` 结果临时覆盖，清空输入回退到初始列表。二者写入互不覆盖，loading 合并。
 

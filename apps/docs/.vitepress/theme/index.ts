@@ -31,6 +31,8 @@ import { install as tmInstall } from '@tm/ui'
 
 // 自定义 demo 容器组件
 import DemoBlock from './components/DemoBlock.vue'
+// 自定义 API 表格组件（内部用 TmTable 渲染组件 Props）
+import TmPropsTable from './components/TmPropsTable.vue'
 // 自定义 Layout：用 ant cssinjs StyleProvider(hash-priority="high") 包裹默认主题，
 // 修复 antd 4 默认 :where() 低优先级样式被 VitePress 主题 reset 覆盖的问题（2026-08-06）
 import Layout from './Layout.vue'
@@ -65,6 +67,8 @@ const theme: Theme = {
     app.use(tmInstall)
     // 5) 自定义容器组件（markdown demo 用 <DemoBlock> 包裹）
     app.component('DemoBlock', DemoBlock)
+    // 6) 自定义 API 表格（<TmPropsTable>，数据驱动渲染组件 Props）
+    app.component('TmPropsTable', TmPropsTable)
   },
 }
 

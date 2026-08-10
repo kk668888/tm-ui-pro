@@ -13,24 +13,42 @@
 
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步
+// ?raw 取源码字符串传给 DemoBlock 做代码折叠展示
 import ButtonDemo from '../../../packages/ui/src/components/button/demos/basic.vue'
+import ButtonDemoCode from '../../../packages/ui/src/components/button/demos/basic.vue?raw'
+
+// TmPropsTable 数据：TmButton Props 表格（数据驱动渲染，替代手写 markdown）
+const buttonProps = [
+  {
+    prop: 'debounce',
+    desc: '点击防抖间隔（ms），`>0` 启用；未设置或 `0` 表示零开销透传',
+    type: 'number',
+    default: '0',
+  },
+  {
+    prop: 'confirm',
+    desc: '点击前二次确认文案，传入则用 `Popconfirm` 包裹内部按钮',
+    type: 'string',
+    default: '-',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 ant Button 全部 props / slots / events（如 `type` / `danger` / `loading` / `disabled` / `@click`）',
+    type: 'ButtonProps',
+    default: '-',
+  },
+]
 </script>
 
-<DemoBlock>
+<DemoBlock :code="ButtonDemoCode">
   <ButtonDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/button/demos/basic.vue
 
 ## API
 
 ### TmButton Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| debounce | 点击防抖间隔（ms），`>0` 启用；未设置或 `0` 表示零开销透传 | `number` | `0` |
-| confirm | 点击前二次确认文案，传入则用 `Popconfirm` 包裹内部按钮 | `string` | `-` |
-| 其余属性 | 透传 ant Button 全部 props / slots / events（如 `type` / `danger` / `loading` / `disabled` / `@click`） | `ButtonProps` | `-` |
+<TmPropsTable :data="buttonProps" />
 
 ### TmButton Types
 

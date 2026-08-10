@@ -17,47 +17,105 @@
 
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步
+// ?raw 取源码字符串传给 DemoBlock 做代码折叠展示
 import FormDemo from '../../../packages/ui/src/components/form/demos/basic.vue'
+import FormDemoCode from '../../../packages/ui/src/components/form/demos/basic.vue?raw'
 import FormReadonlyDemo from '../../../packages/ui/src/components/form/demos/readonly.vue'
+import FormReadonlyDemoCode from '../../../packages/ui/src/components/form/demos/readonly.vue?raw'
 import FormSubmittingDemo from '../../../packages/ui/src/components/form/demos/submitting.vue'
+import FormSubmittingDemoCode from '../../../packages/ui/src/components/form/demos/submitting.vue?raw'
 import FormDirtyDemo from '../../../packages/ui/src/components/form/demos/dirty.vue'
+import FormDirtyDemoCode from '../../../packages/ui/src/components/form/demos/dirty.vue?raw'
+
+// TmPropsTable 数据：TmForm / TmFormItem Props 表格（数据驱动渲染）
+const formProps = [
+  {
+    prop: 'model',
+    desc: '表单数据对象（与 ant `FormProps.model` 一致）',
+    type: 'Record<string, any>',
+    default: '-',
+  },
+  {
+    prop: 'submitting',
+    desc: '提交 loading 态。经 FormContext 下发，`TmFormItem` 的 slot props 可拿到（业务按钮区可据此禁用/loading）',
+    type: 'boolean',
+    default: 'false',
+  },
+  {
+    prop: 'readonly',
+    desc: '全局只读模式。经 FormContext 级联：`TmInput` 只读不可编辑（业务显式传同名 prop 优先）；`TmSelect` 因 ant 原生无 readonly prop，改为受控 `open:false` 锁死下拉 + 关闭清除按钮实现只读',
+    type: 'boolean',
+    default: 'false',
+  },
+  {
+    prop: 'disabled',
+    desc: '全局禁用模式。透传 ant Form 原生 `disabled`（整表禁用）+ 级联到 `TmInput`/`TmSelect`',
+    type: 'boolean',
+    default: 'false',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 ant Form 全部 props / slots / events（如 `rules` / `layout` / `label-col` / `wrapper-col` / `colon`）',
+    type: 'FormProps',
+    default: '-',
+  },
+]
+
+const formItemProps = [
+  {
+    prop: 'name',
+    desc: '字段名（与父级 `TmForm` 的 `model` 字段对齐，校验时取值路径）',
+    type: 'NamePath',
+    default: '-',
+  },
+  {
+    prop: 'label',
+    desc: '标签文案',
+    type: 'string | VNode',
+    default: '-',
+  },
+  {
+    prop: 'rules',
+    desc: '字段级校验规则（与父级 `TmForm.rules` 二选一，字段级优先）',
+    type: 'Rule[]',
+    default: '-',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 ant FormItem 全部 props / slots（如 `wrapper-col` / `required` / `extra` / `tooltip`）',
+    type: 'FormItemProps',
+    default: '-',
+  },
+]
 </script>
 
-<DemoBlock>
+<DemoBlock :code="FormDemoCode">
   <FormDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/form/demos/basic.vue
 
 ## 只读 / 禁用
 
 `readonly` 与 `disabled` 两种全局级联模式：点击按钮在「编辑 / 只读 / 禁用」间切换。`readonly` 级联到 `TmInput`（可选中但不可编辑，保留文字与底色），`TmSelect` 锁死下拉不可选择；`disabled` 透传 ant Form 原生整表禁用 + 级联到 `TmInput`/`TmSelect`（灰底不可操作）。
 
-<DemoBlock>
+<DemoBlock :code="FormReadonlyDemoCode">
   <FormReadonlyDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/form/demos/readonly.vue
 
 ## 提交 loading
 
 `submitting` 经 FormContext 下发到 `TmFormItem` 的 slot props。表单触发点不在表单内时（弹窗 / 抽屉 footer 按钮），业务在调用处自行控制 `submitting`；本 demo 用表单内按钮演示：提交期间按钮自动 `loading` + 禁用，防止重复提交。
 
-<DemoBlock>
+<DemoBlock :code="FormSubmittingDemoCode">
   <FormSubmittingDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/form/demos/submitting.vue
 
 ## 变更追踪
 
 `isDirty` / `getDirtyFields` / `resetToInitial` / `markInitial` 四个方法基于 `onMounted` 的 model 快照。典型场景：离开页面前确认未保存修改、「模拟保存」后调用 `markInitial` 复位脏标记、一键恢复初始值。
 
-<DemoBlock>
+<DemoBlock :code="FormDirtyDemoCode">
   <FormDirtyDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/form/demos/dirty.vue
 
 ## API
 
@@ -65,13 +123,7 @@ import FormDirtyDemo from '../../../packages/ui/src/components/form/demos/dirty.
 
 `TmForm` 透传 ant Form 全部 props，另增三个公司扩展键：
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| model | 表单数据对象（与 ant `FormProps.model` 一致） | `Record<string, any>` | `-` |
-| submitting | 提交 loading 态。经 FormContext 下发，`TmFormItem` 的 slot props 可拿到（业务按钮区可据此禁用/loading） | `boolean` | `false` |
-| readonly | 全局只读模式。经 FormContext 级联：`TmInput` 只读不可编辑（业务显式传同名 prop 优先）；`TmSelect` 因 ant 原生无 readonly prop，改为受控 `open:false` 锁死下拉 + 关闭清除按钮实现只读 | `boolean` | `false` |
-| disabled | 全局禁用模式。透传 ant Form 原生 `disabled`（整表禁用）+ 级联到 `TmInput`/`TmSelect` | `boolean` | `false` |
-| 其余属性 | 透传 ant Form 全部 props / slots / events（如 `rules` / `layout` / `label-col` / `wrapper-col` / `colon`） | `FormProps` | `-` |
+<TmPropsTable :data="formProps" />
 
 ### TmForm Methods
 
@@ -105,12 +157,7 @@ formRef.value?.markInitial()                   // 提交成功后复位脏标记
 
 `TmFormItem` 同样不引入额外 props，全部透传 ant FormItem：
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| name | 字段名（与父级 `TmForm` 的 `model` 字段对齐，校验时取值路径） | `NamePath` | `-` |
-| label | 标签文案 | `string \| VNode` | `-` |
-| rules | 字段级校验规则（与父级 `TmForm.rules` 二选一，字段级优先） | `Rule[]` | `-` |
-| 其余属性 | 透传 ant FormItem 全部 props / slots（如 `wrapper-col` / `required` / `extra` / `tooltip`） | `FormItemProps` | `-` |
+<TmPropsTable :data="formItemProps" />
 
 **Default slot props（v2 新增）**：`TmFormItem` 的默认插槽会把 FormContext 的 `submitting` / `readonly` / `disabled` 透传给子控件，便于第三方控件（非 `@tm/ui`）消费级联状态：
 

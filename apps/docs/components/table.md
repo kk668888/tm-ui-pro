@@ -12,98 +12,120 @@
 
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步。
+// ?raw 取源码字符串传给 DemoBlock 做代码折叠展示。
 // TmTable 依赖 vxe-table 运行时（VxeGrid 组件）与 ant-design-vue（分页/表单），
 // 文档站已在 theme/index.ts 全量注册 vxe，ant 组件由组件库内按需引入。
 import TableBasicDemo from '../../../packages/ui/src/components/table/demos/basic.vue'
+import TableBasicDemoCode from '../../../packages/ui/src/components/table/demos/basic.vue?raw'
 import TableRemoteDemo from '../../../packages/ui/src/components/table/demos/remote.vue'
+import TableRemoteDemoCode from '../../../packages/ui/src/components/table/demos/remote.vue?raw'
 import TableSearchDemo from '../../../packages/ui/src/components/table/demos/search.vue'
+import TableSearchDemoCode from '../../../packages/ui/src/components/table/demos/search.vue?raw'
 import TableStaticDemo from '../../../packages/ui/src/components/table/demos/static-pagination.vue'
+import TableStaticDemoCode from '../../../packages/ui/src/components/table/demos/static-pagination.vue?raw'
 import TableDensityDemo from '../../../packages/ui/src/components/table/demos/density.vue'
+import TableDensityDemoCode from '../../../packages/ui/src/components/table/demos/density.vue?raw'
 import TableCheckboxDemo from '../../../packages/ui/src/components/table/demos/checkbox.vue'
+import TableCheckboxDemoCode from '../../../packages/ui/src/components/table/demos/checkbox.vue?raw'
 import TableEditDemo from '../../../packages/ui/src/components/table/demos/edit.vue'
+import TableEditDemoCode from '../../../packages/ui/src/components/table/demos/edit.vue?raw'
+
+// TmPropsTable 数据：TmTable Props 表格（类型含单引号，用双引号字符串）
+const tableProps = [
+  {
+    prop: 'request',
+    desc: '远程拉数函数。传入则启用远程模式：`onMounted` 拉首页 + ant 分页器 change 自动 refetch；返回 `{ data, total }` 写入 vxe-grid 与 ant 分页器。未传则退化为静态表格（本地切片分页）',
+    type: '(params: TmTablePageParam & { query?: Record<string, unknown> }) => Promise<TmTableResult>',
+    default: '-',
+  },
+  {
+    prop: 'search',
+    desc: '声明式 ant 搜索表单配置。配置后表格上方渲染搜索区，「查询」收集非空字段为 `query` 触发拉数（页码重置 1），「重置」清空并重拉',
+    type: 'TmTableSearchConfig',
+    default: '-',
+  },
+  {
+    prop: 'density',
+    desc: '行高密度档位：`compact` / `default` / `loose`。未配置使用 vxe 默认行高；业务显式 `row-config.height` 优先',
+    type: "'compact' | 'default' | 'loose'",
+    default: '-',
+  },
+  {
+    prop: 'pagerConfig',
+    desc: 'BREAKING：不再透传 vxe-grid（vxe 不再渲染分页器），改为驱动 ant Pagination。`pageSize` / `pageSizes` 生效，`total` 由内部接管（远程取服务端总数，静态取数据长度）',
+    type: "VxeGridProps['pagerConfig']",
+    default: '{ pageSize: 10, pageSizes: [10, 20, 50] }',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 vxe-grid 全部 props / slots / events（如 `columns` / `data` / `height` / `row-config` / `checkbox-config` / `edit-config` / `sort-config`）',
+    type: 'VxeGridProps',
+    default: '见 defaults.ts（border / stripe / showOverflow）',
+  },
+]
 </script>
 
 ## 基础用法
 
 最小静态 demo：`data` + `columns`，体验公司默认视觉（边框 / 斑马纹 / 溢出省略），底部自动渲染 ant 分页器。
 
-<DemoBlock>
+<DemoBlock :code="TableBasicDemoCode">
   <TableBasicDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/basic.vue
 
 ## 远程分页 + 搜索
 
 传入 `request` 启用远程模式：TmTable 自动在 `onMounted` 拉首页、监听 ant 分页器 `change` 自动 refetch，并维护 `data` / `total`。搭配 `search` 扩展键，搜索区查询 / 重置自动携带条件触发拉数，页码重置为 1。
 
-<DemoBlock>
+<DemoBlock :code="TableRemoteDemoCode">
   <TableRemoteDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/remote.vue
 
 ## 搜索表单
 
 `search` 扩展键声明式生成 ant 搜索表单（支持 `input` / `select` / `date` 字段），点「查询」收集非空字段为 `query` 触发拉数，「重置」清空字段并重拉。
 
-<DemoBlock>
+<DemoBlock :code="TableSearchDemoCode">
   <TableSearchDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/search.vue
 
 ## 静态分页
 
 未传 `request` 时 TmTable 退化为静态表格：`data` 本地切片渲染当前页，ant 分页器 `total` 等于数据长度，翻页不发起任何请求。
 
-<DemoBlock>
+<DemoBlock :code="TableStaticDemoCode">
   <TableStaticDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/static-pagination.vue
 
 ## 密度切换
 
 `density` 扩展键控制行高：`compact`（紧凑 36px）/ `default`（默认 48px）/ `loose`（宽松 56px）。业务显式传 `row-config.height` 时优先于 `density`。
 
-<DemoBlock>
+<DemoBlock :code="TableDensityDemoCode">
   <TableDensityDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/density.vue
 
 ## 勾选
 
 vxe 原生勾选能力经薄封装直接透传：`checkbox-config` + checkbox 列 + `getCheckboxRecords()` 实例方法。
 
-<DemoBlock>
+<DemoBlock :code="TableCheckboxDemoCode">
   <TableCheckboxDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/checkbox.vue
 
 ## 行编辑
 
 vxe 原生行编辑经薄封装直接透传：`edit-config` + 列 `editRender`（需 vxe-pc-ui 运行时注册）。
 
-<DemoBlock>
+<DemoBlock :code="TableEditDemoCode">
   <TableEditDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/table/demos/edit.vue
 
 ## API
 
 ### TmTable Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| request | 远程拉数函数。传入则启用远程模式：`onMounted` 拉首页 + ant 分页器 change 自动 refetch；返回 `{ data, total }` 写入 vxe-grid 与 ant 分页器。未传则退化为静态表格（本地切片分页） | `(params: TmTablePageParam & { query?: Record<string, unknown> }) => Promise<TmTableResult>` | `-` |
-| search | 声明式 ant 搜索表单配置。配置后表格上方渲染搜索区，「查询」收集非空字段为 `query` 触发拉数（页码重置 1），「重置」清空并重拉 | `TmTableSearchConfig` | `-` |
-| density | 行高密度档位：`compact` / `default` / `loose`。未配置使用 vxe 默认行高；业务显式 `row-config.height` 优先 | `'compact' \| 'default' \| 'loose'` | `-` |
-| pagerConfig | **BREAKING**：不再透传 vxe-grid（vxe 不再渲染分页器），改为驱动 ant Pagination。`pageSize` / `pageSizes` 生效，`total` 由内部接管（远程取服务端总数，静态取数据长度） | `VxeGridProps['pagerConfig']` | `{ pageSize: 10, pageSizes: [10, 20, 50] }` |
-| 其余属性 | 透传 vxe-grid 全部 props / slots / events（如 `columns` / `data` / `height` / `row-config` / `checkbox-config` / `edit-config` / `sort-config`） | `VxeGridProps` | 见 defaults.ts（`border` / `stripe` / `showOverflow`） |
+<TmPropsTable :data="tableProps" />
 
 ### TmTableSearchConfig
 

@@ -13,23 +13,36 @@
 
 <script setup>
 // 直接 import packages/ui 的 demo 源文件，确保文档与组件库 demo 同步
+// ?raw 取源码字符串传给 DemoBlock 做代码折叠展示
 import InputDemo from '../../../packages/ui/src/components/input/demos/basic.vue'
+import InputDemoCode from '../../../packages/ui/src/components/input/demos/basic.vue?raw'
+
+// TmPropsTable 数据：TmInput Props 表格（数据驱动渲染）
+const inputProps = [
+  {
+    prop: 'modelValue',
+    desc: '业务侧 `v-model` 绑定值；内部 computed 桥接到 ant Input 的 `value`',
+    type: 'string | number',
+    default: '-',
+  },
+  {
+    prop: '其余属性',
+    desc: '透传 ant Input 全部 props / slots / events（如 `placeholder` / `size` / `allowClear` / `disabled` / `maxlength`）',
+    type: 'InputProps',
+    default: '-',
+  },
+]
 </script>
 
-<DemoBlock>
+<DemoBlock :code="InputDemoCode">
   <InputDemo />
 </DemoBlock>
-
-<<< ../../../packages/ui/src/components/input/demos/basic.vue
 
 ## API
 
 ### TmInput Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 业务侧 `v-model` 绑定值；内部 computed 桥接到 ant Input 的 `value` | `string \| number` | `-` |
-| 其余属性 | 透传 ant Input 全部 props / slots / events（如 `placeholder` / `size` / `allowClear` / `disabled` / `maxlength`） | `InputProps` | `-` |
+<TmPropsTable :data="inputProps" />
 
 ### TmInput Events
 
