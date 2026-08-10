@@ -50,6 +50,19 @@ describe('TmTreeSelect', () => {
     expect(inner.props('readonly')).toBeUndefined()
   })
 
+  it('公司默认：bordered=true 真实下发（Boolean 陷阱兜底回归）', () => {
+    const wrapper = mount(TmTreeSelect, { props: { modelValue: '0-0', treeData } })
+    const inner = wrapper.findComponent({ name: 'ATreeSelect' })
+    expect(inner.props('bordered')).toBe(true)
+  })
+
+  it('未传 open 时 ant 收到 open 为 undefined（未受控，点击可开，不被 Boolean 解析锁死）', () => {
+    const wrapper = mount(TmTreeSelect, { props: { modelValue: '0-0', treeData } })
+    const inner = wrapper.findComponent({ name: 'ATreeSelect' })
+    // ant TreeSelect 的 open 必须为 undefined（未受控）否则面板锁死（2026-08-10 回归修复）
+    expect(inner.props('open')).toBeUndefined()
+  })
+
   it('readonly 锁：TmForm readonly=true 时 open:false / allowClear:false / showSearch:false（searchable）', () => {
     const wrapper = mount(TmForm, {
       props: { readonly: true },

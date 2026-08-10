@@ -54,6 +54,15 @@ describe('TmTag', () => {
     expect(closeSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('未传 visible 时 ant 收到 undefined（不被 Boolean 解析为 false 导致 ant-tag-hidden）', () => {
+    const wrapper = mount(TmTag)
+    const inner = wrapper.findComponent({ name: 'ATag' })
+    // 2026-08-10 回归：ant deprecated `visible` Boolean prop 被类型化 defineProps 默认成 false，
+    // ant 内部 `if (props.visible !== undefined) visible.value = false` → 标签隐藏。
+    // 剥离后 ant 收到 undefined，保持默认可见。
+    expect(inner.props('visible')).toBeUndefined()
+  })
+
   it('插槽透传：default 插槽转发到内部 ant Tag', () => {
     const wrapper = mount(TmTag, { slots: { default: '<span class="tag-label">状态</span>' } })
     expect(wrapper.find('.tag-label').exists()).toBe(true)

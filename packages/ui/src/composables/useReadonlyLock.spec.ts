@@ -66,6 +66,15 @@ describe('useReadonlyLock', () => {
     expect(antProps.value.open).toBe(false)
   })
 
+  it('未传 open 时不包含 open 键（bug 修复：ant 纯受控组件透传 undefined 会被 Boolean 解析为 false 锁死）', () => {
+    const { antProps } = useReadonlyLock(
+      { ...baseProps, showSearch: true },
+      undefined,
+      { searchable: true },
+    )
+    expect('open' in antProps.value).toBe(false)
+  })
+
   it('showSearch 对象透传：非只读时对象原样保留（TreeSelect 场景）', () => {
     const obj = { treeNodeFilterProp: 'title' as const }
     const { antProps } = useReadonlyLock(

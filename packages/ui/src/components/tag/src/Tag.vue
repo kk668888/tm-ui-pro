@@ -43,7 +43,13 @@ defineExpose(exposed)
  * - color：业务显式传优先，否则取 status 映射（未知 status → undefined → ant 默认色）
  */
 const antProps = computed(() => {
-  const { status, ...rest } = props
+  const {
+    status,
+    // visible 剥离（2026-08-10）：ant Tag 的 deprecated `visible` Boolean prop（ant 内部默认 undefined），
+    // 类型化 defineProps 会默认成 false，传给 ant 后 `visible.value = false` → 标签渲染成 ant-tag-hidden
+    visible: _v,
+    ...rest
+  } = props
   return {
     ...rest,
     color: rest.color ?? (status ? TAG_STATUS_COLOR[status] : undefined),

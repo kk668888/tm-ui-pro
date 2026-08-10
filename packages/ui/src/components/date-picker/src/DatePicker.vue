@@ -79,7 +79,7 @@ const { antProps: lockAntProps } = useReadonlyLock(props, formContext)
  * 其余 ant 能力（placeholder/showTime/disabledDate/...）本就来自 $attrs，无需在此处理。
  */
 const antProps = computed(() => {
-  const { modelValue: _mv, valueFormat: _vf, readonly: _ro, ...rest } = props
+  const { modelValue: _mv, valueFormat: _vf, readonly: _ro, open: _open, ...rest } = props
   return {
     ...rest,
     ...lockAntProps.value,

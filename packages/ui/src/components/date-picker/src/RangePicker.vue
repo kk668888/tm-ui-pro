@@ -71,7 +71,7 @@ const { antProps: lockAntProps } = useReadonlyLock(props, formContext)
 
 /** 扩展属性剥离（同 TmDatePicker）：仅剔除公司扩展键，disabled/allowClear/open 留 lockAntProps 覆盖 */
 const antProps = computed(() => {
-  const { modelValue: _mv, valueFormat: _vf, readonly: _ro, ...rest } = props
+  const { modelValue: _mv, valueFormat: _vf, readonly: _ro, open: _open, ...rest } = props
   return {
     ...rest,
     ...lockAntProps.value,

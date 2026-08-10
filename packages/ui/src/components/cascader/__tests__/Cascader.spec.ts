@@ -50,10 +50,28 @@ describe('TmCascader', () => {
     expect(inner.props('readonly')).toBeUndefined()
   })
 
-  it('公司默认：allowClear=true 真实下发', () => {
+  it('公司默认：allowClear=true / bordered=true 真实下发', () => {
     const wrapper = mount(TmCascader, { props: { modelValue: ['zhejiang'], options } })
     const inner = wrapper.findComponent({ name: 'ACascader' })
     expect(inner.props('allowClear')).toBe(true)
+    // bordered 回归（2026-08-10）：Boolean 陷阱兜底，未传时必须有边框
+    expect(inner.props('bordered')).toBe(true)
+  })
+
+  it('未传 open 时 ant 收到 open 为 undefined（未受控，点击可开，不被 Boolean 解析锁死）', () => {
+    const wrapper = mount(TmCascader, { props: { modelValue: ['zhejiang'], options } })
+    const inner = wrapper.findComponent({ name: 'ACascader' })
+    // ant Cascader 的 mergedOpen = props.open !== undefined ? props.open : 内部态；
+    // open 必须为 undefined（未受控）否则面板锁死（2026-08-10 回归修复）
+    expect(inner.props('open')).toBeUndefined()
+  })
+
+  it('未传 popupVisible 时 ant 收到 undefined（不被 Boolean 解析为 false 锁死弹层）', () => {
+    const wrapper = mount(TmCascader, { props: { modelValue: ['zhejiang'], options } })
+    const inner = wrapper.findComponent({ name: 'ACascader' })
+    // 2026-08-10 根因回归：ant deprecated popupVisible Boolean prop 被类型化 defineProps
+    // 默认成 false，传给 ant 后 vc-cascader mergedOpen = false → 弹层打不开。剥离后 ant 收到 undefined。
+    expect(inner.props('popupVisible')).toBeUndefined()
   })
 
   it('readonly 锁：TmForm readonly=true 时 open:false / allowClear:false', () => {

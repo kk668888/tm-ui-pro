@@ -64,12 +64,15 @@ export function useReadonlyLock(
   )
 
   // 锁调整字段：readonly 时锁死交互，否则按业务透传
-  // open 直透（非 `|| undefined`）：配合各控件 withDefaults 置 open: undefined——
-  // 未传时 undefined 走 ant 内部管理（不受控），显式 open={false} 保留为受控关闭（修复 review MEDIUM #1）
+  // open 条件下发（bug 修复）：readonly → false 锁死；业务显式传 open → 保留受控值；
+  // 未传 → 【不包含 open 键】。ant Cascader/TreeSelect 的 open 是纯受控 prop
+  // （mergedOpen = props.open !== undefined ? props.open : 内部态），透传 undefined 会被
+  // Vue Boolean prop 解析为 false，导致面板永远打不开（2026-08-10 回归修复）。
   const antProps = computed(() => {
     const readonly = isReadonly.value
+    const open = readonly ? false : props.open
     return {
-      open: readonly ? false : props.open,
+      ...(open !== undefined ? { open } : {}),
       allowClear: readonly ? false : props.allowClear,
       // 仅 searchable 控件锁搜索输入框；readonly 时强制 false，否则回传业务值（ant 均接受 boolean/对象）
       ...(options?.searchable

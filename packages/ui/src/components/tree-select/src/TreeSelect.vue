@@ -32,6 +32,8 @@ const props = withDefaults(defineProps<TmTreeSelectProps>(), {
   readonly: undefined,
   disabled: undefined,
   allowClear: tmTreeSelectDefaults.allowClear,
+  // bordered Boolean 陷阱兜底（ant 默认 true，否则渲染成无边框）
+  bordered: tmTreeSelectDefaults.bordered,
   // open 显式置 undefined：ant TreeSelectProps 的 open 是 Boolean prop，类型化 defineProps 会让
   // 未传时默认 false（受控关闭），useReadonlyLock 直透后无法区分「未传」与「显式 false」。
   open: undefined,
@@ -71,6 +73,9 @@ const antProps = computed(() => {
     value: _v,
     defaultValue: _dv,
     readonly: _ro,
+    // open 剥离：由 lockAntProps 统一决定是否下发——未传时不含 open 键（ant TreeSelect 纯受控
+    // open 透传 undefined 会被 Boolean 解析为 false 锁死弹层，2026-08-10 回归修复）
+    open: _open,
     'onUpdate:value': _ouv,
     ...rest
   } = props

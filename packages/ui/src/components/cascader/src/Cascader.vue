@@ -31,6 +31,8 @@ const props = withDefaults(defineProps<TmCascaderProps>(), {
   readonly: undefined,
   disabled: undefined,
   allowClear: tmCascaderDefaults.allowClear,
+  // bordered Boolean 陷阱兜底（ant 默认 true，否则渲染成无边框）
+  bordered: tmCascaderDefaults.bordered,
   // open 显式置 undefined：ant CascaderProps 的 open 是 Boolean prop，类型化 defineProps 会让
   // 未传时默认 false（受控关闭），useReadonlyLock 直透后无法区分「未传」与「显式 false」。
   open: undefined,
@@ -70,6 +72,13 @@ const antProps = computed(() => {
     value: _v,
     defaultValue: _dv,
     readonly: _ro,
+    // popupVisible 剥离（2026-08-10 根因）：ant CascaderProps 的 popupVisible 是 deprecated
+    // Boolean prop，Vue 类型化 defineProps 会把未传时默认 false（ant 内部默认 undefined），
+    // 传给 ant 后 vc-cascader `mergedOpen = props.popupVisible = false` → 弹层永远打不开。
+    popupVisible: _pv,
+    // open 剥离：由 lockAntProps 统一决定是否下发——未传时不含 open 键（ant Cascader 纯受控
+    // open 透传 undefined 会被 Boolean 解析为 false 锁死弹层）
+    open: _open,
     'onUpdate:value': _ouv,
     ...rest
   } = props
