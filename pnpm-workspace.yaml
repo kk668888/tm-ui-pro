@@ -15,4 +15,5 @@ packages:
 allowBuilds:
   core-js: false
   esbuild: false
+  msw: true
   vue-demi: false

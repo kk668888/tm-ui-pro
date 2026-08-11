@@ -266,7 +266,7 @@ git commit -m "feat(demo): 新增 tm-components 陈列页骨架（路由/菜单/
 ### Task 2: 通用 General section（TmButton）
 
 **Files:**
-- Create: `apps/demo/src/pages/tm-components/features/components/test-utils.ts`
+- Create: `apps/demo/src/pages/tm-components/features/test-utils.ts`
 - Create: `apps/demo/src/pages/tm-components/features/components/General.section.vue`
 - Create: `apps/demo/src/pages/tm-components/features/components/General.section.spec.ts`
 - Modify: `apps/demo/src/pages/tm-components/features/components/views/Components.view.vue`
@@ -300,13 +300,14 @@ describe('GeneralSection', () => {
 
 ```ts
 import { mount } from '@vue/test-utils';
+import type { Component } from 'vue';
 import { Card as ACard, Space as ASpace, Tag as ATag, Divider as ADivider } from 'ant-design-vue';
 
 /** sections 依赖 unplugin-vue-components 解析 `a-xxx`；单测需手动注册 antd 标签 */
 const antComponents = { ACard, ASpace, ATag, ADivider };
 
 export function mountSection(
-  component: never,
+  component: Component,
   options: Parameters<typeof mount>[1] = {},
 ) {
   return mount(component, {
@@ -383,7 +384,7 @@ function fakeAsync() {
 script 块加：
 
 ```ts
-import GeneralSection from '../components/General.section.vue';
+import GeneralSection from '../General.section.vue';
 ```
 
 模板中 `<!-- @scaffold:tm-sections ... -->` 位置改为：
@@ -643,7 +644,7 @@ function onReset() {
 
 - [ ] **Step 3: 挂到容器 `Components.view.vue`**
 
-script 加 `import FormSection from '../components/Form.section.vue';`；模板在 `<GeneralSection />` 后加：
+script 加 `import FormSection from '../Form.section.vue';`；模板在 `<GeneralSection />` 后加：
 
 ```vue
     <FormSection />
@@ -1014,7 +1015,7 @@ git commit -m "feat(demo): tm-components 全局配置区（ConfigProvider 主题
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import { mountSection } from '../test-utils';
+import { mountSection } from '../../test-utils';
 import ComponentsView from './Components.view.vue';
 
 describe('ComponentsView', () => {

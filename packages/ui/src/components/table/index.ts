@@ -14,3 +14,4 @@ export const TmTable = withInstall(Table, 'TmTable')
 export * from './src/props'
 
 export default TmTable
+
