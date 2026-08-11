@@ -1,0 +1,21 @@
+import { request } from '@/core/http';
+import type { {{featurePascal}}, Create{{featurePascal}}Params, {{featurePascal}}ListParams, {{featurePascal}}ListResult } from '../models/{{featurePascal}}';
+
+// 统一使用 core/http 默认实例：自动注入 token、解包业务信封、处理 401/超时/网络错误。
+// 每个方法返回 ApiResponse<T>，调用方直接 res.data 取业务数据。
+
+export const get{{featurePascal}}List = (params: {{featurePascal}}ListParams) => {
+  return request.get<{{featurePascal}}ListResult>('/{{domainKebab}}/{{featureKebab}}/list', { params });
+};
+
+export const create{{featurePascal}} = (data: Create{{featurePascal}}Params) => {
+  return request.post<{{featurePascal}}>('/{{domainKebab}}/{{featureKebab}}', data);
+};
+
+export const update{{featurePascal}} = (id: string, data: Partial<Create{{featurePascal}}Params>) => {
+  return request.put<{{featurePascal}}>(`/{{domainKebab}}/{{featureKebab}}/${id}`, data);
+};
+
+export const delete{{featurePascal}} = (id: string) => {
+  return request.delete(`/{{domainKebab}}/{{featureKebab}}/${id}`);
+};

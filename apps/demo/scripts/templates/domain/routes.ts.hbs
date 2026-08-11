@@ -1,0 +1,14 @@
+/**
+ * {{chineseName}} - 路由配置
+ * @domain {{domainKebab}}
+ */
+import type { RouteRecordRaw } from 'vue-router';
+
+export const {{domainCamel}}Routes: RouteRecordRaw[] = [
+  {
+    path: '/{{domainKebab}}',
+    name: '{{domainPascal}}',
+    component: () => import('./pages/{{domainPascal}}List.page.vue'),
+    meta: { code: '{{domainPascal}}', title: '{{chineseName}}列表', keepAlive: true },
+  },
+];

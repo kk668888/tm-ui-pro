@@ -1,0 +1,57 @@
+import { reactive } from 'vue';
+import { message } from 'ant-design-vue';
+import { get{{featurePascal}}List, delete{{featurePascal}} } from '../api/{{featureCamel}}.api';
+import { COPY } from '@/shared/constants/copy';
+
+export function use{{featurePascal}}List() {
+  const gridOptions = reactive({
+    columns: [
+      { field: 'name', title: '名称' },
+      {
+        field: 'status',
+        title: '状态',
+        slots: { default: 'status_default' },
+      },
+      { field: 'createdAt', title: '创建时间' },
+      {
+        title: '操作',
+        width: 200,
+        slots: { default: 'actions_default' },
+      },
+    ],
+    // 当前脚手架列表页未使用 VXE 内置查询表单和工具栏；显式关闭可覆盖 vxe-table 4.20.x 的默认启用项，
+    // 避免 grid 在按需渲染时查找空 renderer 并抛出 "Renderer 'undefined' is not imported"。
+    formConfig: { enabled: false },
+    toolbarConfig: { enabled: false },
+    pagerConfig: { pageSize: 10 },
+    proxyConfig: {
+      // vxe-table 4.20.x 已将 proxyConfig.props 重命名为 proxyConfig.response，
+      // 沿用 props 会触发 delProp 废弃警告，且新版无法据此解析列表与总数字段。
+      response: {
+        result: 'list',
+        total: 'total',
+      },
+      ajax: {
+        query: async ({ page }: { page: { currentPage: number; pageSize: number } }) => {
+          // 封装后直接返回 ApiResponse<{{featurePascal}}ListResult>，res.data 即列表数据
+          const res = await get{{featurePascal}}List({
+            page: page.currentPage,
+            pageSize: page.pageSize,
+          });
+          return res.data;
+        },
+      },
+    },
+  });
+
+  async function handleDelete(id: string) {
+    try {
+      await delete{{featurePascal}}(id);
+      message.success(COPY.COMMON.SUCCESS);
+    } catch {
+      message.error(COPY.COMMON.FAILED);
+    }
+  }
+
+  return { gridOptions, handleDelete };
+}

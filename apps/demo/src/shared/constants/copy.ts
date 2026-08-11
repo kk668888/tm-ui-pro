@@ -1,0 +1,28 @@
+export const COPY = {
+  COMMON: {
+    CONFIRM: '确认',
+    CANCEL: '取消',
+    CREATE: '新建',
+    EDIT: '编辑',
+    DELETE: '删除',
+    SEARCH: '搜索',
+    RESET: '重置',
+    SUCCESS: '操作成功',
+    FAILED: '操作失败',
+  },
+  LOGIN: {
+    TITLE: '登录',
+    USERNAME: '用户名',
+    USERNAME_REQUIRED: '请输入用户名',
+    PASSWORD: '密码',
+    PASSWORD_REQUIRED: '请输入密码',
+    CAPTCHA: '验证码',
+    CAPTCHA_REQUIRED: '请输入验证码',
+    CAPTCHA_REFRESH: '点击刷新验证码',
+    LOGIN_FAILED: '登录失败',
+    CAPTCHA_ERROR: '验证码错误',
+    ENCRYPT_FAILED: '密码加密失败',
+    FETCH_USER_FAILED: '获取用户信息失败',
+    API_ERROR: '接口返回错误',
+  },
+} as const;
