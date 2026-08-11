@@ -115,6 +115,21 @@ describe('TmTable', () => {
     expect(innerProps.pagerConfig).toBeUndefined()
   })
 
+  it('pagination=false 时不渲染 ant 分页器，静态数据全量透传 VxeGrid（不切片）', () => {
+    const data = Array.from({ length: 25 }, (_, i) => ({ id: i + 1 }))
+    const wrapper = mount(TmTable, { props: { data, pagination: false } })
+    expect(wrapper.findComponent({ name: 'APagination' }).exists()).toBe(false)
+    expect(wrapper.find('.tm-table__pager').exists()).toBe(false)
+    // 25 条全量渲染，不按默认 10 条切片
+    expect(wrapper.findComponent({ name: 'VxeGrid' }).props('data')).toHaveLength(25)
+  })
+
+  it('pagination 扩展属性剥离：不下发到内部 VxeGrid', () => {
+    const wrapper = mount(TmTable, { props: { data: [], pagination: false } })
+    const innerProps = wrapper.findComponent({ name: 'VxeGrid' }).props() as Record<string, unknown>
+    expect(innerProps.pagination).toBeUndefined()
+  })
+
   it('远程模式：mount 触发 onMounted → request 用首页参数调用', async () => {
     const request = vi.fn().mockResolvedValue({ data: [{ id: 1 }], total: 1 })
     mount(TmTable, { props: { request } })

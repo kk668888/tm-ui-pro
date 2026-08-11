@@ -200,4 +200,29 @@ describe('usePagination（静态模式）', () => {
     expect(total.value).toBe(4)
     expect(data.value).toHaveLength(4)
   })
+
+  it('getEnabled=false 时静态数据全量渲染、不按页切片', () => {
+    const staticData = Array.from({ length: 25 }, (_, i) => ({ id: i + 1 }))
+    const { data, total, loading } = usePagination({
+      getRequest: () => undefined,
+      getStaticData: () => staticData,
+      getEnabled: () => false,
+    })
+    expect(data.value).toHaveLength(25)
+    expect(data.value[24]).toEqual({ id: 25 })
+    expect(total.value).toBe(25)
+    expect(loading.value).toBe(false)
+  })
+
+  it('getEnabled=false 时翻页操作不改变渲染数据（仍为全量）', () => {
+    const staticData = Array.from({ length: 25 }, (_, i) => ({ id: i + 1 }))
+    const { data, onChange } = usePagination({
+      getRequest: () => undefined,
+      getStaticData: () => staticData,
+      getEnabled: () => false,
+    })
+    void onChange(3, 10)
+    expect(data.value).toHaveLength(25)
+    expect(data.value[0]).toEqual({ id: 1 })
+  })
 })

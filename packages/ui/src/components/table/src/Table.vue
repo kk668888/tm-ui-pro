@@ -6,9 +6,10 @@
      - 分页器改用 ant-design-vue <a-pagination>，pagerConfig 不再下发 vxe（vxe 不渲染分页器）
      - data = usePagination.data（远程=拉取结果；静态=当前页本地切片）
      - total 写入 a-pagination.total（ant Pagination 标准）
-  2. 扩展属性剥离：request / search / density / pagerConfig 不下发 vxe
+  2. 扩展属性剥离：request / search / density / pagerConfig / pagination 不下发 vxe
      - request 仅在内部驱动 onMounted + a-pagination change
      - search 驱动表格上方 ant 搜索表单；density 合并进 row-config
+     - pagination=false 时隐藏 ant 分页器且静态数据不切片（全量渲染）
   3. 方法透传：useForwardRef + defineExpose(exposed)
   4. ant Pagination change 事件驱动远程拉数（v2 替代 vxe page-change）
   5. race condition 防护：usePagination 内部 token 守卫
@@ -49,9 +50,11 @@ defineOptions({ name: 'TmTable', inheritAttrs: false })
  */
 const props = withDefaults(defineProps<TmTableProps>(), {
   border: tmTableDefaults.border,
+  showHeader: tmTableDefaults.showHeader,
   stripe: tmTableDefaults.stripe,
   showOverflow: tmTableDefaults.showOverflow,
   fit: tmTableDefaults.fit,
+  pagination: tmTableDefaults.pagination,
   pagerConfig: () => ({
     pageSize: tmTableDefaults.pagerConfig.pageSize,
     pageSizes: [...tmTableDefaults.pagerConfig.pageSizes],
@@ -79,6 +82,7 @@ defineExpose(exposed)
 const pagination = usePagination({
   getRequest: () => props.request,
   getStaticData: () => props.data,
+  getEnabled: () => props.pagination,
 })
 
 /** 搜索控制器：search 扩展键声明式 ant 表单（未配置时 no-op） */
@@ -132,7 +136,7 @@ const gridHeight = computed(() => props.height)
  * - rowConfig / height 按上述策略注入
  */
 const forwardBindings = computed(() => {
-  const { request: _r, search: _s, density: _d, pagerConfig: _pc, data: _data, loading: _loading, height: _height, ...rest } = props
+  const { request: _r, search: _s, density: _d, pagerConfig: _pc, pagination: _pagination, data: _data, loading: _loading, height: _height, ...rest } = props
   return {
     ...$attrs,
     ...rest,
@@ -156,32 +160,14 @@ onMounted(() => {
     <div v-if="props.search" class="tm-table__search">
       <a-form :model="search.model" @finish="search.handleSearch">
         <a-row :gutter="16">
-          <a-col
-            v-for="field in search.fields"
-            :key="field.field"
-            :span="field.span ?? 8"
-          >
+          <a-col v-for="field in search.fields" :key="field.field" :span="field.span ?? 8">
             <a-form-item :label="field.label" :name="field.field">
-              <a-input
-                v-if="(field.type ?? 'input') === 'input'"
-                v-model:value="search.model[field.field]"
-                :placeholder="field.placeholder"
-                allow-clear
-              />
-              <a-select
-                v-else-if="field.type === 'select'"
-                v-model:value="search.model[field.field]"
-                :options="field.options"
-                :placeholder="field.placeholder"
-                allow-clear
-                style="width: 100%"
-              />
-              <a-date-picker
-                v-else-if="field.type === 'date'"
-                v-model:value="search.model[field.field]"
-                :placeholder="field.placeholder"
-                style="width: 100%"
-              />
+              <a-input v-if="(field.type ?? 'input') === 'input'" v-model:value="search.model[field.field]"
+                :placeholder="field.placeholder" allow-clear />
+              <a-select v-else-if="field.type === 'select'" v-model:value="search.model[field.field]"
+                :options="field.options" :placeholder="field.placeholder" allow-clear style="width: 100%" />
+              <a-date-picker v-else-if="field.type === 'date'" v-model:value="search.model[field.field]"
+                :placeholder="field.placeholder" style="width: 100%" />
             </a-form-item>
           </a-col>
           <a-col>
@@ -210,19 +196,11 @@ onMounted(() => {
       </VxeGrid>
     </div>
 
-    <!-- ant 分页器：固定底部，change 事件驱动远程拉数 / 静态切页 -->
-    <div class="tm-table__pager">
-      <a-pagination
-        :current="pagination.page.currentPage"
-        :page-size="pagination.page.pageSize"
-        :total="pagination.total.value"
-        :page-size-options="pageSizeOptions"
-        :show-total="(total: number) => `共 ${total} 条`"
-        show-size-changer
-        @change="pagination.onChange"
-      />
+    <!-- ant 分页器：固定底部，change 事件驱动远程拉数 / 静态切页；pagination=false 时整体隐藏 -->
+    <div v-if="props.pagination" class="tm-table__pager">
+      <a-pagination :current="pagination.page.currentPage" :page-size="pagination.page.pageSize"
+        :total="pagination.total.value" :page-size-options="pageSizeOptions"
+        :show-total="(total: number) => `共 ${total} 条`" show-size-changer @change="pagination.onChange" />
     </div>
   </div>
 </template>
-
-<style src="../style/vxe-align.css"></style>

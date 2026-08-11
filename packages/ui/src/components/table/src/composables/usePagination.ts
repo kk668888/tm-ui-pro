@@ -19,10 +19,13 @@ import type { TmTableExtProps, TmTableResult } from '../props'
  * usePagination 输入配置
  * @property getRequest    取 request 函数的 getter（传函数以保持响应式最新引用，避免闭包陈旧）
  * @property getStaticData 取静态数据的 getter（未配置 request 时用于本地切片；可省略）
+ * @property getEnabled    分页是否启用的 getter（响应式跟随；默认 true）
+ *   - false 时静态模式数据不切片、全量渲染（配合隐藏分页器，避免数据被截断）
  */
 export interface UsePaginationOptions {
   getRequest: () => TmTableExtProps['request']
   getStaticData?: () => unknown[] | undefined
+  getEnabled?: () => boolean
 }
 
 /**
@@ -54,7 +57,7 @@ export interface UsePaginationReturn {
  * @returns {@link UsePaginationReturn}
  */
 export function usePagination(options: UsePaginationOptions): UsePaginationReturn {
-  const { getRequest, getStaticData } = options
+  const { getRequest, getStaticData, getEnabled } = options
 
   // 分页状态：reactive 通过 mutate 触发响应（Vue 响应式系统的标准用法，
   // 与「immutability（针对函数式纯数据）」规则不冲突——reactive 本身就是为 mutate 设计）
@@ -118,14 +121,18 @@ export function usePagination(options: UsePaginationOptions): UsePaginationRetur
   const staticData = computed<unknown[]>(() => getStaticData?.() ?? [])
   // 是否静态模式：request 未配置即静态
   const isStatic = computed<boolean>(() => !getRequest())
+  // 分页是否启用：false 时静态数据不切片、全量渲染（配合隐藏分页器，避免数据被截断）
+  const enabled = computed<boolean>(() => getEnabled?.() ?? true)
 
   /**
    * 渲染数据：
-   * - 静态模式：按当前页切片（page 变化时 computed 自动重算）
+   * - 静态模式 + 分页关闭：直接返回全量静态数据（不切片）
+   * - 静态模式 + 分页开启：按当前页切片（page 变化时 computed 自动重算）
    * - 远程模式：直接返回拉取结果
    */
   const data = computed<unknown[]>(() => {
     if (isStatic.value) {
+      if (!enabled.value) return staticData.value
       const start = (page.currentPage - 1) * page.pageSize
       return staticData.value.slice(start, start + page.pageSize)
     }

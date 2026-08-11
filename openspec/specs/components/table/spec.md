@@ -60,6 +60,20 @@ TmTable SHALL 在表格底部自动渲染 ant-design-vue 的 Pagination 组件�
 - **WHEN** 静态数据不足一页（如 3 条，页大小 10）
 - **THEN** 表格渲染全部 3 条，分页器仅显示单页
 
+### Requirement: 分页器可关闭
+
+配置 `pagination: false` 时，TmTable SHALL 不渲染底部 ant Pagination 分页器；静态模式下 SHALL 全量渲染传入的 `data` 而不按页切片，避免数据被截断且无翻页入口。未配置 `pagination`（默认 true）时 SHALL 保持原有分页行为。
+
+#### Scenario: 关闭分页后隐藏分页器并全量渲染
+
+- **WHEN** 配置 `pagination: false` 且传入静态 `data`
+- **THEN** 表格底部不渲染分页器，全部数据行一次性渲染（不按页切片）
+
+#### Scenario: 默认开启分页行为不变
+
+- **WHEN** 未配置 `pagination`
+- **THEN** 渲染分页器，静态数据按页切片，远程数据按页请求
+
 ### Requirement: search 声明式搜索表单
 
 配置 `search` 时，TmTable SHALL 在表格上方按声明字段渲染 ant-design-vue 搜索表单（栅格布局，支持输入框 / 下拉选择 / 日期等字段类型）。点击「查询」SHALL 收集各字段当前值为查询条件并触发一次数据请求；点击「重置」SHALL 清空全部字段值并触发一次数据请求。未配置 `search` 时 SHALL 不渲染搜索表单，也不影响表格其他行为。

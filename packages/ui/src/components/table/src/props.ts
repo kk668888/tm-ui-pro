@@ -86,6 +86,9 @@ export type TmTableDensity = 'compact' | 'default' | 'loose'
  *   - 配置后表格上方渲染搜索区，「查询」收集字段为 query 触发 fetchData(query)
  * @property density 行高密度档位（可选）：compact / default / loose
  *   - 未配置使用 vxe 默认行高；业务显式传 row-config.height 优先于 density
+ * @property pagination 是否渲染 ant 分页器（可选，默认 true）
+ *   - false 时：不渲染分页器，且静态模式（未配置 request）数据全量渲染、不按页切片
+ *   - 典型场景：API 文档属性表、纯展示的静态小表格（无需翻页能力）
  */
 export interface TmTableExtProps {
   request?: (
@@ -93,6 +96,7 @@ export interface TmTableExtProps {
   ) => Promise<TmTableResult>
   search?: TmTableSearchConfig
   density?: TmTableDensity
+  pagination?: boolean
 }
 
 /**
