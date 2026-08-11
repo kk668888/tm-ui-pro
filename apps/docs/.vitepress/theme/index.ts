@@ -33,13 +33,15 @@ import { install as tmInstall } from '@tm/ui'
 import DemoBlock from './components/DemoBlock.vue'
 // 自定义 API 表格组件（内部用 TmTable 渲染组件 Props）
 import TmPropsTable from './components/TmPropsTable.vue'
+// 自定义命令式 API 方法表格组件（内部用 TmTable 渲染方法签名）
+import TmMethodsTable from './components/TmMethodsTable.vue'
 // 自定义 Layout：用 ant cssinjs StyleProvider(hash-priority="high") 包裹默认主题，
 // 修复 antd 4 默认 :where() 低优先级样式被 VitePress 主题 reset 覆盖的问题（2026-08-06）
 import Layout from './Layout.vue'
 
 // 全量样式：ant reset + vxe 主题（vxe-pc-ui 必须 + vxe-table 必须）
 import 'ant-design-vue/dist/reset.css'
-import 'vxe-pc-ui/lib/style.css'
+// import 'vxe-pc-ui/lib/style.css'
 import 'vxe-table/lib/style.css'
 // 文档站布局微调：主内容区左右两侧只保留 100px 间距（2026-08-06）
 import './custom.css'
@@ -69,7 +71,10 @@ const theme: Theme = {
     app.component('DemoBlock', DemoBlock)
     // 6) 自定义 API 表格（<TmPropsTable>，数据驱动渲染组件 Props）
     app.component('TmPropsTable', TmPropsTable)
-  },
+    // 7) 自定义方法表格（<TmMethodsTable>，数据驱动渲染命令式 API 方法签名）
+    app.component('TmMethodsTable', TmMethodsTable)
+  }
 }
 
 export default theme
+

@@ -1,5 +1,13 @@
 # App 全局反馈桥接
 
+<script setup>
+// TmApp 是纯桥接组件：无 props、无方法，仅提供 default slot（业务子树）。
+// Slots 契约用 TmPropsTable 渲染，与其他组件页 API 表格视觉统一。
+const appSlots = [
+  { prop: 'default', desc: '业务子树（被包裹的应用内容）', type: 'slot', default: '-' },
+]
+</script>
+
 `TmApp` 是全局反馈层的基础：业务**根组件**用 `<TmApp>` 包裹后，`TmMessage` / `TmNotification` / `TmModal.confirm()` 等命令式 API 自动绑定 `TmConfigProvider` 下发的 locale / token（主题跟随）。
 
 ## 为什么需要
@@ -31,8 +39,8 @@ ant 4.x 的全局反馈（message / notification / modal）是**命令式 API**�
 
 ### TmApp Props
 
-透传 ant App 原生 props（`rootClassName` / `message` / `notification` 配置）。
+`TmApp` 为纯桥接组件，**不接收任何 props**——内部仅渲染反馈 holder 挂载点 + 业务子树（透传 ant `<App>` 原生 props 的说法不适用）。
 
-### Slots
+### TmApp Slots
 
-- `default`：业务子树（被包裹的应用内容）
+<TmPropsTable :data="appSlots" />

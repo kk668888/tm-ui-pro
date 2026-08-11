@@ -9,6 +9,15 @@
 <script setup>
 import MessageDemo from '../../../packages/ui/src/components/message/demos/basic.vue'
 import MessageDemoCode from '../../../packages/ui/src/components/message/demos/basic.vue?raw'
+
+// 命令式 API 方法表格数据（TmMethodsTable 渲染，替代手写 markdown 表格）
+const messageMethods = [
+  { method: 'success(content, config?)', desc: '成功提示', returns: 'close: () => void' },
+  { method: 'info(content, config?)', desc: '信息提示', returns: 'close: () => void' },
+  { method: 'warning(content, config?)', desc: '警告提示', returns: 'close: () => void' },
+  { method: 'error(content, config?)', desc: '错误提示', returns: 'close: () => void' },
+  { method: 'loading(content, config?)', desc: '加载提示', returns: 'close: () => void' },
+]
 </script>
 
 <DemoBlock :code="MessageDemoCode">
@@ -23,13 +32,7 @@ import MessageDemoCode from '../../../packages/ui/src/components/message/demos/b
 
 ### TmMessage 方法
 
-| 方法                        | 说明     | 返回                |
-| --------------------------- | -------- | ------------------- |
-| `success(content, config?)` | 成功提示 | `close: () => void` |
-| `info(content, config?)`    | 信息提示 | `close: () => void` |
-| `warning(content, config?)` | 警告提示 | `close: () => void` |
-| `error(content, config?)`   | 错误提示 | `close: () => void` |
-| `loading(content, config?)` | 加载提示 | `close: () => void` |
+<TmMethodsTable :data="messageMethods" />
 
 ### 行为
 

@@ -36,3 +36,89 @@
     width: calc(100% - 100px) !important;
   }
 }
+
+/*
+  vxe-table 与 VitePress 内置表格样式隔离（2026-08-11）
+
+  背景：
+  VitePress 默认主题对 markdown 内容容器 .vp-doc 内的 table 施加通用样式
+  （vitepress/dist/client/theme-default/styles/components/vp-doc.css）：
+    .vp-doc table { display:block; margin:20px 0; overflow-x:auto }
+    .vp-doc th,.vp-doc td { border:1px solid var(--vp-c-divider); padding:8px 16px }
+    .vp-doc tr { background-color:var(--vp-c-bg); border-top:1px solid var(--vp-c-divider) }
+    .vp-doc tr:nth-child(2n) { background-color:var(--vp-c-bg-soft) }
+    .vp-doc th { font-size:14px; font-weight:600; color:var(--vp-c-text-2); background-color:var(--vp-c-bg-soft) }
+    .vp-doc td { font-size:14px }
+  这些选择器特异性为 (0,1,1)/(0,2,1)。TmTable（vxe-grid）在 markdown 中渲染的
+  真实 <table>/<th>/<td>/<tr> 同样嵌套在 .vp-doc 内，被上述样式命中；而 vxe-table
+  自身样式（.vxe-table--render-default ...，特异性 (0,2,0)）对多数属性未声明或
+  优先级更低，导致：
+    - display:block 破坏 vxe 的 table-layout:fixed 列宽布局（表头表体错位/塌缩）
+    - 单元格多出 8px 16px 内边距与 vitepress 网格线、表头被加背景
+    - 行被加 vitepress 背景/分隔线/斑马纹，覆盖 vxe stripe
+
+  修复：用更高特异性选择器（.vp-doc .vxe-table ...，(0,2,1)+）把上述属性还原为
+  vxe 语义值；vxe 自身声明的类样式（border/table-layout/line-height/text-align 等）
+  未被触碰，markdown 手写表格（无 .vxe-table 祖先）不受影响。
+*/
+.vp-doc .vxe-table table {
+  /* vxe 内部 table 未显式声明 display，依赖浏览器默认 table 布局；
+     vitepress 强制 display:block 使 table-layout:fixed 失效、列宽塌缩，这里还原 */
+  display: table;
+  /* vitepress 给内部 table 加 margin:20px 0 造成间距错乱，vxe 间距/滚动由 wrapper 管理 */
+  margin: 0;
+  /* vitepress 给 table 加 overflow-x:auto 形成双重滚动条，vxe 滚动由 header/body wrapper 管理 */
+  overflow: visible;
+}
+
+.vp-doc .vxe-table th,
+.vp-doc .vxe-table td {
+  /* vxe 单元格内边距声明在 .vxe-cell 上，th/td 自身为 0；
+     vitepress 的 8px 16px 会造成内边距叠加与表头表体错位 */
+  padding: 4px 10px;
+  /* vxe 单元格边框用 background-image 渐变 / 伪元素绘制，不在 th/td 上用 border 简写，
+     清除 vitepress 网格线不会破坏 vxe 边框表格 */
+  border: 0;
+  /* 还原字号/字重/颜色继承，不被 vitepress 固定为 14px/600/主题灰 */
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  /* vxe 表头背景声明在 .vxe-table--header-wrapper 上，th 自身透明；
+     清除 vitepress 单元格背景块 */
+  background-color: transparent;
+}
+
+.vp-doc .vxe-table tr {
+  /* vxe 行背景由 stripe/row 类控制，清除 vitepress 行背景、分隔线与 hover 过渡 */
+  background-color: transparent;
+  border-top: 0;
+  transition: none;
+}
+
+.vp-doc .vxe-table tr:nth-child(2n) {
+  /* 清除 vitepress 斑马纹，vxe stripe 由 stripe 类控制 */
+  background-color: transparent;
+}
+
+/*
+  vxe 表格单元格内 markdown 渲染元素样式（2026-08-11）
+
+  背景：
+  TmPropsTable / TmMethodsTable 用 column slots + v-html 输出 markdown-it 内联产物
+  （反引号代码 / 链接等）。vxe 单元格不在 VitePress 的 `.vp-doc code` 常规路径下
+  （嵌套结构 / 特异性差异），需显式补充 code / a 的文档式样式，且仅作用于 vxe 表格内，
+  不影响手写 markdown 表格。
+*/
+.vp-doc .vxe-table code {
+  background-color: var(--vp-code-bg);
+  color: var(--vp-code-color);
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 0.9em;
+}
+
+.vp-doc .vxe-table a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
