@@ -54,6 +54,14 @@ import { TmTabs, TmTabPane } from './components/tabs'
 import { TmAffix } from './components/affix'
 import { TmAnchor, TmAnchorLink } from './components/anchor'
 import { TmPageHeader } from './components/page-header'
+import { TmSlider } from './components/slider'
+import { TmRate } from './components/rate'
+import { TmTree, TmDirectoryTree } from './components/tree'
+import { TmAutoComplete } from './components/auto-complete'
+import { TmMentions, TmMentionsOption } from './components/mentions'
+import { TmTransfer } from './components/transfer'
+import { TmCheckbox } from './components/checkbox'
+import { TmRadio } from './components/radio'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -124,6 +132,16 @@ export const install = (app: App): void => {
   app.use(TmAnchor as unknown as { install: (app: App) => void })
   app.use(TmAnchorLink as unknown as { install: (app: App) => void })
   app.use(TmPageHeader as unknown as { install: (app: App) => void })
+  app.use(TmSlider as unknown as { install: (app: App) => void })
+  app.use(TmRate as unknown as { install: (app: App) => void })
+  app.use(TmTree as unknown as { install: (app: App) => void })
+  app.use(TmDirectoryTree as unknown as { install: (app: App) => void })
+  app.use(TmAutoComplete as unknown as { install: (app: App) => void })
+  app.use(TmMentions as unknown as { install: (app: App) => void })
+  app.use(TmMentionsOption as unknown as { install: (app: App) => void })
+  app.use(TmTransfer as unknown as { install: (app: App) => void })
+  app.use(TmCheckbox as unknown as { install: (app: App) => void })
+  app.use(TmRadio as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -174,6 +192,14 @@ export { TmTabs, TmTabPane } from './components/tabs'
 export { TmAffix } from './components/affix'
 export { TmAnchor, TmAnchorLink } from './components/anchor'
 export { TmPageHeader } from './components/page-header'
+export { TmSlider } from './components/slider'
+export { TmRate } from './components/rate'
+export { TmTree, TmDirectoryTree } from './components/tree'
+export { TmAutoComplete } from './components/auto-complete'
+export { TmMentions, TmMentionsOption } from './components/mentions'
+export { TmTransfer } from './components/transfer'
+export { TmCheckbox } from './components/checkbox'
+export { TmRadio } from './components/radio'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -274,5 +300,18 @@ export type { TmTabsProps, TmTabPaneProps, TabsProps, TabPaneProps } from './com
 export type { TmAffixProps, AffixProps } from './components/affix'
 export type { TmAnchorProps, TmAnchorLinkProps, AnchorProps, AnchorLinkProps } from './components/anchor'
 export type { TmPageHeaderProps, PageHeaderProps } from './components/page-header'
+export type { TmSliderProps, SliderProps } from './components/slider'
+export type { TmRateProps, RateProps } from './components/rate'
+export type {
+  TmTreeProps,
+  TmDirectoryTreeProps,
+  TreeProps,
+  DirectoryTreeProps,
+} from './components/tree'
+export type { TmAutoCompleteProps, AutoCompleteProps } from './components/auto-complete'
+export type { TmMentionsProps, TmMentionsOptionProps, MentionsProps } from './components/mentions'
+export type { TmTransferProps, TransferProps } from './components/transfer'
+export type { TmCheckboxProps, CheckboxProps } from './components/checkbox'
+export type { TmRadioProps, RadioProps } from './components/radio'
 
 export default { install }
