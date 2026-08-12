@@ -28,13 +28,14 @@ describe('TmDrawer', () => {
     }
   })
 
-  it('公司默认 closable/mask=true 真实下发（Boolean 陷阱兜底回归，2026-08-10）', () => {
+  it('公司默认 closable/mask/keyboard=true 真实下发（Boolean 陷阱兜底回归，2026-08-10 / 2026-08-12）', () => {
     const wrapper = mount(TmDrawer, { props: { modelValue: true }, attachTo: document.body })
     try {
       const inner = wrapper.findComponent({ name: 'ADrawer' })
-      // ant 默认 true 的 Boolean prop 被类型化 defineProps 默认成 false → 关闭 X 与遮罩消失
+      // ant 默认 true 的 Boolean prop 被类型化 defineProps 默认成 false → 关闭 X 与遮罩消失、Esc 失效
       expect(inner.props('closable')).toBe(true)
       expect(inner.props('mask')).toBe(true)
+      expect(inner.props('keyboard')).toBe(true)
     } finally {
       wrapper.unmount()
     }

@@ -20,14 +20,16 @@ type DrawerInstance = InstanceType<typeof ADrawer>
 defineOptions({ name: 'TmDrawer', inheritAttrs: false })
 
 /** 组件 props：TmDrawerProps = DrawerProps（ant 原生）+ { modelValue? }
- * closable/mask/maskClosable 显式兜底 true（2026-08-10）：ant DrawerProps 的这三个 Boolean
- * 属性默认 true，类型化 defineProps 会把未传时默认成 false（Boolean 陷阱）→ 关闭 X 图标
- * 与遮罩消失。必须 withDefaults 显式兜底；业务显式传 false 仍可覆盖 */
+ * closable/mask/maskClosable/keyboard 显式兜底 true（2026-08-10 / 2026-08-12）：
+ * ant DrawerProps 的这四个 Boolean 属性默认启用（keyboard 默认 Esc 关闭），类型化
+ * defineProps 会把未传时默认成 false（Boolean 陷阱）→ 关闭 X 图标与遮罩消失、
+ * 键盘 Esc 无法关闭。必须 withDefaults 显式兜底；业务显式传 false 仍可覆盖 */
 const props = withDefaults(defineProps<TmDrawerProps>(), {
   modelValue: undefined,
   closable: true,
   mask: true,
   maskClosable: true,
+  keyboard: true,
 })
 
 /** v-model 桥接事件：computed setter 在 v-model:open 中转换发回 */
