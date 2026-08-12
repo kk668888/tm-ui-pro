@@ -27,6 +27,13 @@ import { TmModal } from './components/modal'
 import { TmDrawer } from './components/drawer'
 import { TmMessage } from './components/message'
 import { TmNotification } from './components/notification'
+import { TmAlert } from './components/alert'
+import { TmPopconfirm } from './components/popconfirm'
+import { TmSpin } from './components/spin'
+import { TmPopover } from './components/popover'
+import { TmResult } from './components/result'
+import { TmTimePicker } from './components/time-picker'
+import { TmUpload } from './components/upload'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -57,6 +64,13 @@ export const install = (app: App): void => {
   app.use(TmApp as unknown as { install: (app: App) => void })
   app.use(TmModal as unknown as { install: (app: App) => void })
   app.use(TmDrawer as unknown as { install: (app: App) => void })
+  app.use(TmAlert as unknown as { install: (app: App) => void })
+  app.use(TmPopconfirm as unknown as { install: (app: App) => void })
+  app.use(TmSpin as unknown as { install: (app: App) => void })
+  app.use(TmPopover as unknown as { install: (app: App) => void })
+  app.use(TmResult as unknown as { install: (app: App) => void })
+  app.use(TmTimePicker as unknown as { install: (app: App) => void })
+  app.use(TmUpload as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -80,6 +94,13 @@ export { TmBadge } from './components/badge'
 export { TmApp } from './components/app'
 export { TmModal } from './components/modal'
 export { TmDrawer } from './components/drawer'
+export { TmAlert } from './components/alert'
+export { TmPopconfirm } from './components/popconfirm'
+export { TmSpin } from './components/spin'
+export { TmPopover } from './components/popover'
+export { TmResult } from './components/result'
+export { TmTimePicker } from './components/time-picker'
+export { TmUpload } from './components/upload'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -121,5 +142,12 @@ export type { TmEmptyProps, EmptyProps } from './components/empty'
 export type { TmBadgeProps, BadgeProps } from './components/badge'
 export type { TmModalProps, TmModalExtProps, ModalProps } from './components/modal'
 export type { TmDrawerProps, TmDrawerExtProps, DrawerProps } from './components/drawer'
+export type { TmAlertProps, TmAlertExtProps, AlertProps } from './components/alert'
+export type { TmPopconfirmProps, TmPopconfirmExtProps, PopconfirmProps } from './components/popconfirm'
+export type { TmSpinProps, SpinProps } from './components/spin'
+export type { TmPopoverProps, PopoverProps } from './components/popover'
+export type { TmResultProps, ResultProps } from './components/result'
+export type { TmTimePickerProps, TmTimePickerExtProps, TimePickerProps } from './components/time-picker'
+export type { TmUploadProps, UploadProps, UploadFile, UploadChangeParam } from './components/upload'
 
 export default { install }

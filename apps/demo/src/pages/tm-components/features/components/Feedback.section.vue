@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount } from 'vue';
-import { TmButton, TmMessage, TmModal, TmDrawer, TmNotification } from '@tm/ui';
+import {
+  TmButton,
+  TmMessage,
+  TmModal,
+  TmDrawer,
+  TmNotification,
+  TmAlert,
+  TmSpin,
+  TmPopconfirm,
+  TmPopover,
+  TmResult,
+} from '@tm/ui';
 
 defineOptions({ name: 'FeedbackSection' });
 
@@ -72,6 +83,33 @@ onBeforeUnmount(() => {
           <TmButton @click="notify('warning')">警告</TmButton>
           <TmButton danger @click="notify('error')">错误</TmButton>
         </a-space>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-secondary">TmAlert / TmSpin</span>
+        <div class="flex flex-col gap-2">
+          <TmAlert status="success" message="操作成功" description="数据已保存" />
+          <TmAlert status="warning" message="磁盘空间不足" description="请及时清理" />
+          <TmSpin :spinning="true" tip="加载中...">
+            <div class="rounded border border-dashed border-secondary p-4">加载内容区域</div>
+          </TmSpin>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-secondary">TmPopconfirm / TmPopover / TmResult</span>
+        <a-space wrap>
+          <TmPopconfirm title="确定删除该记录吗？" danger>
+            <TmButton danger>危险确认</TmButton>
+          </TmPopconfirm>
+          <TmPopconfirm title="这是一条普通确认">
+            <TmButton>普通确认</TmButton>
+          </TmPopconfirm>
+          <TmPopover title="气泡标题" content="气泡卡片内容">
+            <TmButton>悬停气泡</TmButton>
+          </TmPopover>
+        </a-space>
+        <TmResult status="success" title="提交成功" sub-title="等待审核，可在列表查看进度" />
       </div>
 
       <TmModal v-model="modalOpen" title="基础弹窗" @ok="modalOpen = false" @cancel="modalOpen = false">

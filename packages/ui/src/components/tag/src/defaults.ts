@@ -1,22 +1,14 @@
 // packages/ui/src/components/tag/src/defaults.ts
-// 公司默认 props + status 状态→语义色映射表
+// 公司默认 props（语义色映射已上提共享 constants/status，见下方 re-export）
 import type { TagProps } from 'ant-design-vue'
+import {
+  STATUS_COLOR as TAG_STATUS_COLOR,
+  type StatusValue as TagStatus,
+} from '../../../constants/status'
 
-/**
- * status 状态 → ant 预设语义色 映射
- * ant Tag 的 color 支持预设语义色（success/processing/error/warning/default），
- * 直接映射到预设名，零自定义 CSS，随 ConfigProvider 主题联动。
- * 业务枚举 `failed` 对应 ant 的 `error`（ant 命名差异，映射表显式处理）。
- */
-export const TAG_STATUS_COLOR = {
-  success: 'success',
-  processing: 'processing',
-  failed: 'error',
-  warning: 'warning',
-} as const
-
-/** status 合法枚举值（用于类型收窄） */
-export type TagStatus = keyof typeof TAG_STATUS_COLOR
+// 兼容既有内部引用：TmTag 的语义色映射指向共享源（单一真相，TmAlert 等复用）
+export { TAG_STATUS_COLOR }
+export type { TagStatus }
 
 /**
  * 公司默认 props 集合

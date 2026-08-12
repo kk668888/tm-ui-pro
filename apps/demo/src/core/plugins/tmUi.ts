@@ -1,6 +1,5 @@
 import type { App } from 'vue';
 import TmUI from '@tm/ui';
-import '@tm/ui/style.css';
 
 /**
  * 注册内部组件库。

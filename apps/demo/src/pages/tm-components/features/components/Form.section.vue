@@ -15,7 +15,10 @@ import {
   TmRangePicker,
   TmCascader,
   TmTreeSelect,
+  TmTimePicker,
+  TmUpload,
   TmMessage,
+  type UploadFile,
 } from '@tm/ui';
 
 defineOptions({ name: 'FormSection' });
@@ -76,6 +79,15 @@ const treeData = [
     children: [{ title: 'Child Node3', value: '0-1-1' }],
   },
 ];
+
+// ── 新增控件：TimePicker（value-format 字符串模式）+ Upload（受控 fileList）──
+const timeStr = ref('09:30:00');
+const uploadList = ref<UploadFile[]>([]);
+
+/** 演示 beforeUpload 拦截：超过 1MB 拒绝入列表 */
+function beforeUpload(file: { size?: number }): boolean {
+  return !(file.size && file.size > 1024 * 1024);
+}
 
 // ── TmForm 手动模式：校验 / 提交 / 脏追踪（0.1.0 无 schema，勿用 auto-generate）──
 const formState = reactive<{ username: string; email: string; dept: string | undefined }>({
@@ -166,6 +178,16 @@ function onReset() {
         <div>
           <TmTreeSelect v-model="treeValue" :tree-data="treeData" style="width: 240px" />
           <span class="ml-2 text-secondary">tree={{ treeValue }}</span>
+        </div>
+        <div>
+          <TmTimePicker v-model="timeStr" value-format="HH:mm:ss" style="width: 200px" />
+          <span class="ml-2 text-secondary">time={{ timeStr }}</span>
+        </div>
+        <div>
+          <TmUpload v-model:file-list="uploadList" action="/api/upload" :before-upload="beforeUpload">
+            <TmButton>上传文件（限 1MB）</TmButton>
+          </TmUpload>
+          <span class="ml-2 text-secondary">files={{ uploadList.length }}</span>
         </div>
       </div>
 

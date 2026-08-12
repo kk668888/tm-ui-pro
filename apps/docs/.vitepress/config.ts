@@ -57,8 +57,10 @@ export default defineConfig({
           items: [
             { text: 'Form 表单', link: '/components/form' },
             { text: 'DatePicker 日期选择', link: '/components/date-picker' },
+            { text: 'TimePicker 时间选择', link: '/components/time-picker' },
             { text: 'Cascader 级联选择', link: '/components/cascader' },
             { text: 'TreeSelect 树选择', link: '/components/tree-select' },
+            { text: 'Upload 文件上传', link: '/components/upload' },
           ],
         },
         {
@@ -73,6 +75,11 @@ export default defineConfig({
         {
           text: '全局反馈',
           items: [
+            { text: 'Alert 警告提示', link: '/components/alert' },
+            { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
+            { text: 'Popover 气泡卡片', link: '/components/popover' },
+            { text: 'Result 结果页', link: '/components/result' },
+            { text: 'Spin 加载中', link: '/components/spin' },
             { text: 'App 全局反馈桥接', link: '/components/app' },
             { text: 'Message 全局消息', link: '/components/message' },
             { text: 'Notification 通知提醒', link: '/components/notification' },
