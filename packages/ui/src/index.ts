@@ -45,6 +45,15 @@ import {
   TmTypographyText,
   TmTypographyLink,
 } from './components/typography'
+import { TmBreadcrumb, TmBreadcrumbItem, TmBreadcrumbSeparator } from './components/breadcrumb'
+import { TmDropdown, TmDropdownButton } from './components/dropdown'
+import { TmMenu, TmMenuItem, TmSubMenu, TmMenuItemGroup, TmMenuDivider } from './components/menu'
+import { TmPagination } from './components/pagination'
+import { TmSteps, TmStep } from './components/steps'
+import { TmTabs, TmTabPane } from './components/tabs'
+import { TmAffix } from './components/affix'
+import { TmAnchor, TmAnchorLink } from './components/anchor'
+import { TmPageHeader } from './components/page-header'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -96,6 +105,25 @@ export const install = (app: App): void => {
   app.use(TmTypographyParagraph as unknown as { install: (app: App) => void })
   app.use(TmTypographyText as unknown as { install: (app: App) => void })
   app.use(TmTypographyLink as unknown as { install: (app: App) => void })
+  app.use(TmBreadcrumb as unknown as { install: (app: App) => void })
+  app.use(TmBreadcrumbItem as unknown as { install: (app: App) => void })
+  app.use(TmBreadcrumbSeparator as unknown as { install: (app: App) => void })
+  app.use(TmDropdown as unknown as { install: (app: App) => void })
+  app.use(TmDropdownButton as unknown as { install: (app: App) => void })
+  app.use(TmMenu as unknown as { install: (app: App) => void })
+  app.use(TmMenuItem as unknown as { install: (app: App) => void })
+  app.use(TmSubMenu as unknown as { install: (app: App) => void })
+  app.use(TmMenuItemGroup as unknown as { install: (app: App) => void })
+  app.use(TmMenuDivider as unknown as { install: (app: App) => void })
+  app.use(TmPagination as unknown as { install: (app: App) => void })
+  app.use(TmSteps as unknown as { install: (app: App) => void })
+  app.use(TmStep as unknown as { install: (app: App) => void })
+  app.use(TmTabs as unknown as { install: (app: App) => void })
+  app.use(TmTabPane as unknown as { install: (app: App) => void })
+  app.use(TmAffix as unknown as { install: (app: App) => void })
+  app.use(TmAnchor as unknown as { install: (app: App) => void })
+  app.use(TmAnchorLink as unknown as { install: (app: App) => void })
+  app.use(TmPageHeader as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -137,6 +165,15 @@ export {
   TmTypographyText,
   TmTypographyLink,
 } from './components/typography'
+export { TmBreadcrumb, TmBreadcrumbItem, TmBreadcrumbSeparator } from './components/breadcrumb'
+export { TmDropdown, TmDropdownButton } from './components/dropdown'
+export { TmMenu, TmMenuItem, TmSubMenu, TmMenuItemGroup, TmMenuDivider } from './components/menu'
+export { TmPagination } from './components/pagination'
+export { TmSteps, TmStep } from './components/steps'
+export { TmTabs, TmTabPane } from './components/tabs'
+export { TmAffix } from './components/affix'
+export { TmAnchor, TmAnchorLink } from './components/anchor'
+export { TmPageHeader } from './components/page-header'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -208,5 +245,34 @@ export type {
   TextProps,
   LinkProps,
 } from './components/typography'
+export type {
+  TmBreadcrumbProps,
+  TmBreadcrumbItemProps,
+  TmBreadcrumbSeparatorProps,
+  BreadcrumbProps,
+  BreadcrumbItemProps,
+  BreadcrumbSeparatorProps,
+} from './components/breadcrumb'
+export type { TmDropdownProps, TmDropdownButtonProps, DropdownProps } from './components/dropdown'
+export type {
+  TmMenuProps,
+  TmMenuItemProps,
+  TmSubMenuProps,
+  TmMenuItemGroupProps,
+  TmMenuDividerProps,
+  MenuProps,
+  MenuItemProps,
+  SubMenuProps,
+  MenuItemGroupProps,
+  MenuDividerProps,
+  MenuTheme,
+  MenuMode,
+} from './components/menu'
+export type { TmPaginationProps, PaginationProps } from './components/pagination'
+export type { TmStepsProps, TmStepProps, StepsProps, StepProps } from './components/steps'
+export type { TmTabsProps, TmTabPaneProps, TabsProps, TabPaneProps } from './components/tabs'
+export type { TmAffixProps, AffixProps } from './components/affix'
+export type { TmAnchorProps, TmAnchorLinkProps, AnchorProps, AnchorLinkProps } from './components/anchor'
+export type { TmPageHeaderProps, PageHeaderProps } from './components/page-header'
 
 export default { install }

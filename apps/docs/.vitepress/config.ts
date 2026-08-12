@@ -64,6 +64,20 @@ export default defineConfig({
           ],
         },
         {
+          text: '导航',
+          items: [
+            { text: 'Menu 导航菜单', link: '/components/menu' },
+            { text: 'Tabs 标签页', link: '/components/tabs' },
+            { text: 'Breadcrumb 面包屑', link: '/components/breadcrumb' },
+            { text: 'Dropdown 下拉菜单', link: '/components/dropdown' },
+            { text: 'Steps 步骤条', link: '/components/steps' },
+            { text: 'Pagination 分页', link: '/components/pagination' },
+            { text: 'PageHeader 页头', link: '/components/page-header' },
+            { text: 'Anchor 锚点', link: '/components/anchor' },
+            { text: 'Affix 固钉', link: '/components/affix' },
+          ],
+        },
+        {
           text: '表单',
           items: [
             { text: 'Form 表单', link: '/components/form' },
