@@ -53,6 +53,17 @@ export default defineConfig({
           ],
         },
         {
+          text: '通用与布局',
+          items: [
+            { text: 'Typography 排版', link: '/components/typography' },
+            { text: 'Space 间距', link: '/components/space' },
+            { text: 'Flex 弹性布局', link: '/components/flex' },
+            { text: 'Grid 栅格', link: '/components/grid' },
+            { text: 'Divider 分割线', link: '/components/divider' },
+            { text: 'Layout 布局', link: '/components/layout' },
+          ],
+        },
+        {
           text: '表单',
           items: [
             { text: 'Form 表单', link: '/components/form' },

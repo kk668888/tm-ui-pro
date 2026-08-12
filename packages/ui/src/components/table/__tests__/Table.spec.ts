@@ -47,7 +47,8 @@ describe('TmTable', () => {
     const wrapper = mount(TmTable, { props: { data: [] } })
     const inner = wrapper.findComponent({ name: 'VxeGrid' })
     expect(inner.props('border')).toBe(true)
-    expect(inner.props('stripe')).toBe(true)
+    // stripe 默认 false（commit 33e6475 决策：斑马纹默认关闭），业务可显式 true 覆盖
+    expect(inner.props('stripe')).toBe(false)
     expect(inner.props('showOverflow')).toBe(true)
   })
 

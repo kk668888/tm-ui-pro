@@ -34,6 +34,17 @@ import { TmPopover } from './components/popover'
 import { TmResult } from './components/result'
 import { TmTimePicker } from './components/time-picker'
 import { TmUpload } from './components/upload'
+import { TmSpace } from './components/space'
+import { TmDivider } from './components/divider'
+import { TmFlex } from './components/flex'
+import { TmRow, TmCol } from './components/grid'
+import { TmLayout, TmSider, TmHeader, TmContent, TmFooter } from './components/layout'
+import {
+  TmTypographyTitle,
+  TmTypographyParagraph,
+  TmTypographyText,
+  TmTypographyLink,
+} from './components/typography'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -71,6 +82,20 @@ export const install = (app: App): void => {
   app.use(TmResult as unknown as { install: (app: App) => void })
   app.use(TmTimePicker as unknown as { install: (app: App) => void })
   app.use(TmUpload as unknown as { install: (app: App) => void })
+  app.use(TmSpace as unknown as { install: (app: App) => void })
+  app.use(TmDivider as unknown as { install: (app: App) => void })
+  app.use(TmFlex as unknown as { install: (app: App) => void })
+  app.use(TmRow as unknown as { install: (app: App) => void })
+  app.use(TmCol as unknown as { install: (app: App) => void })
+  app.use(TmLayout as unknown as { install: (app: App) => void })
+  app.use(TmSider as unknown as { install: (app: App) => void })
+  app.use(TmHeader as unknown as { install: (app: App) => void })
+  app.use(TmContent as unknown as { install: (app: App) => void })
+  app.use(TmFooter as unknown as { install: (app: App) => void })
+  app.use(TmTypographyTitle as unknown as { install: (app: App) => void })
+  app.use(TmTypographyParagraph as unknown as { install: (app: App) => void })
+  app.use(TmTypographyText as unknown as { install: (app: App) => void })
+  app.use(TmTypographyLink as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -101,6 +126,17 @@ export { TmPopover } from './components/popover'
 export { TmResult } from './components/result'
 export { TmTimePicker } from './components/time-picker'
 export { TmUpload } from './components/upload'
+export { TmSpace } from './components/space'
+export { TmDivider } from './components/divider'
+export { TmFlex } from './components/flex'
+export { TmRow, TmCol } from './components/grid'
+export { TmLayout, TmSider, TmHeader, TmContent, TmFooter } from './components/layout'
+export {
+  TmTypographyTitle,
+  TmTypographyParagraph,
+  TmTypographyText,
+  TmTypographyLink,
+} from './components/typography'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -149,5 +185,28 @@ export type { TmPopoverProps, PopoverProps } from './components/popover'
 export type { TmResultProps, ResultProps } from './components/result'
 export type { TmTimePickerProps, TmTimePickerExtProps, TimePickerProps } from './components/time-picker'
 export type { TmUploadProps, UploadProps, UploadFile, UploadChangeParam } from './components/upload'
+export type { TmSpaceProps, SpaceProps } from './components/space'
+export type { TmDividerProps, DividerProps } from './components/divider'
+export type { TmFlexProps, FlexProps } from './components/flex'
+export type { TmRowProps, TmColProps, RowProps, ColProps } from './components/grid'
+export type {
+  TmLayoutProps,
+  TmSiderProps,
+  TmHeaderProps,
+  TmContentProps,
+  TmFooterProps,
+  LayoutProps,
+  SiderProps,
+} from './components/layout'
+export type {
+  TmTypographyTitleProps,
+  TmTypographyParagraphProps,
+  TmTypographyTextProps,
+  TmTypographyLinkProps,
+  TitleProps,
+  ParagraphProps,
+  TextProps,
+  LinkProps,
+} from './components/typography'
 
 export default { install }
