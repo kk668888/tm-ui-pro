@@ -1,8 +1,8 @@
-// packages/ui/src/utils/withInstall.spec.ts
+// packages/ui/src/utils/__tests__/withInstall.spec.ts
 // withInstall 工具的单测：验证 install 方法注入与原组件属性保留
 import { describe, it, expect, vi } from 'vitest'
 import { createApp, defineComponent } from 'vue'
-import { withInstall } from './withInstall'
+import { withInstall } from '../withInstall'
 
 describe('withInstall', () => {
   it('为组件附加 install 方法，app.use 时全局注册', () => {

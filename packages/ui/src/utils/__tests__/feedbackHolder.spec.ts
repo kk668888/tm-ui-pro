@@ -1,7 +1,7 @@
-// packages/ui/src/utils/feedbackHolder.spec.ts
+// packages/ui/src/utils/__tests__/feedbackHolder.spec.ts
 // feedbackHolder 单测：set/get/覆盖/复位
 import { describe, it, expect, beforeEach } from 'vitest'
-import { setHolder, getHolder, resetHolder, type FeedbackHolder } from './feedbackHolder'
+import { setHolder, getHolder, resetHolder, type FeedbackHolder } from '../feedbackHolder'
 
 function makeHolder(): FeedbackHolder {
   return {

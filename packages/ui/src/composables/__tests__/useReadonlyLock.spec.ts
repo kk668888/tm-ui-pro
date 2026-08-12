@@ -1,9 +1,9 @@
-// packages/ui/src/composables/useReadonlyLock.spec.ts
+// packages/ui/src/composables/__tests__/useReadonlyLock.spec.ts
 // useReadonlyLock 单测：readonly 锁闭、disabled 级联、searchable 分支、无 context 容错
 import { describe, it, expect } from 'vitest'
 import { computed, type ComputedRef } from 'vue'
-import { useReadonlyLock } from './useReadonlyLock'
-import type { FormContext } from '../components/form/src/composables/useFormContext'
+import { useReadonlyLock } from '../useReadonlyLock'
+import type { FormContext } from '../../components/form/src/composables/useFormContext'
 
 function formContext(readonly?: boolean, disabled?: boolean): ComputedRef<FormContext> {
   return computed(() => ({ readonly, disabled }))

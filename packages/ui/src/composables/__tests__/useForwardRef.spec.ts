@@ -1,7 +1,7 @@
-// packages/ui/src/composables/useForwardRef.spec.ts
+// packages/ui/src/composables/__tests__/useForwardRef.spec.ts
 // useForwardRef 的单测：验证 Proxy 透传内部实例方法/属性，且空实例访问不报错
 import { describe, it, expect } from 'vitest'
-import { useForwardRef } from './useForwardRef'
+import { useForwardRef } from '../useForwardRef'
 import { ref } from 'vue'
 
 describe('useForwardRef', () => {

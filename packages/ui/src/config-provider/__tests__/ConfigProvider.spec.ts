@@ -1,10 +1,10 @@
-// packages/ui/src/config-provider/ConfigProvider.spec.ts
+// packages/ui/src/config-provider/__tests__/ConfigProvider.spec.ts
 // TmConfigProvider 单测：验证插槽渲染 + vxe CSS 变量桥接通道存在 + locale 默认中文
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
-import ConfigProvider from './ConfigProvider.vue'
+import ConfigProvider from '../ConfigProvider.vue'
 
 describe('TmConfigProvider', () => {
   it('默认渲染插槽内容', () => {

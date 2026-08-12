@@ -1,8 +1,8 @@
-// packages/ui/src/composables/useForwardBindings.spec.ts
+// packages/ui/src/composables/__tests__/useForwardBindings.spec.ts
 // useForwardBindings 单测：幻影 false 跳过、显式 props 转发、公司默认转发、computed 源适配
 import { computed, defineComponent, h, type ComponentPublicInstance } from 'vue'
 import { mount, type VueWrapper } from '@vue/test-utils'
-import { useForwardBindings } from './useForwardBindings'
+import { useForwardBindings } from '../useForwardBindings'
 
 // 简单宿主：直接传 withDefaults 的 props（reactive），结果渲染到 data-fwd 供断言
 const Host = defineComponent({
