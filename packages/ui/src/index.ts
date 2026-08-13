@@ -62,6 +62,21 @@ import { TmMentions, TmMentionsOption } from './components/mentions'
 import { TmTransfer } from './components/transfer'
 import { TmCheckbox } from './components/checkbox'
 import { TmRadio } from './components/radio'
+import { TmCard } from './components/card'
+import { TmCollapse, TmCollapsePanel } from './components/collapse'
+import { TmDescriptions, TmDescriptionsItem } from './components/descriptions'
+import { TmTimeline } from './components/timeline'
+import { TmAvatar, TmAvatarGroup } from './components/avatar'
+import { TmImage, TmImagePreviewGroup } from './components/image'
+import { TmList, TmListItem, TmListItemMeta } from './components/list'
+import { TmSegmented } from './components/segmented'
+import { TmStatistic, TmCountdown } from './components/statistic'
+import { TmCalendar } from './components/calendar'
+import { TmCarousel } from './components/carousel'
+import { TmQRCode } from './components/qrcode'
+import { TmTooltip } from './components/tooltip'
+import { TmComment } from './components/comment'
+import { TmWatermark } from './components/watermark'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -142,6 +157,28 @@ export const install = (app: App): void => {
   app.use(TmTransfer as unknown as { install: (app: App) => void })
   app.use(TmCheckbox as unknown as { install: (app: App) => void })
   app.use(TmRadio as unknown as { install: (app: App) => void })
+  app.use(TmCard as unknown as { install: (app: App) => void })
+  app.use(TmCollapse as unknown as { install: (app: App) => void })
+  app.use(TmCollapsePanel as unknown as { install: (app: App) => void })
+  app.use(TmDescriptions as unknown as { install: (app: App) => void })
+  app.use(TmDescriptionsItem as unknown as { install: (app: App) => void })
+  app.use(TmTimeline as unknown as { install: (app: App) => void })
+  app.use(TmAvatar as unknown as { install: (app: App) => void })
+  app.use(TmAvatarGroup as unknown as { install: (app: App) => void })
+  app.use(TmImage as unknown as { install: (app: App) => void })
+  app.use(TmImagePreviewGroup as unknown as { install: (app: App) => void })
+  app.use(TmList as unknown as { install: (app: App) => void })
+  app.use(TmListItem as unknown as { install: (app: App) => void })
+  app.use(TmListItemMeta as unknown as { install: (app: App) => void })
+  app.use(TmSegmented as unknown as { install: (app: App) => void })
+  app.use(TmStatistic as unknown as { install: (app: App) => void })
+  app.use(TmCountdown as unknown as { install: (app: App) => void })
+  app.use(TmCalendar as unknown as { install: (app: App) => void })
+  app.use(TmCarousel as unknown as { install: (app: App) => void })
+  app.use(TmQRCode as unknown as { install: (app: App) => void })
+  app.use(TmTooltip as unknown as { install: (app: App) => void })
+  app.use(TmComment as unknown as { install: (app: App) => void })
+  app.use(TmWatermark as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -200,6 +237,21 @@ export { TmMentions, TmMentionsOption } from './components/mentions'
 export { TmTransfer } from './components/transfer'
 export { TmCheckbox } from './components/checkbox'
 export { TmRadio } from './components/radio'
+export { TmCard } from './components/card'
+export { TmCollapse, TmCollapsePanel } from './components/collapse'
+export { TmDescriptions, TmDescriptionsItem } from './components/descriptions'
+export { TmTimeline } from './components/timeline'
+export { TmAvatar, TmAvatarGroup } from './components/avatar'
+export { TmImage, TmImagePreviewGroup } from './components/image'
+export { TmList, TmListItem, TmListItemMeta } from './components/list'
+export { TmSegmented } from './components/segmented'
+export { TmStatistic, TmCountdown } from './components/statistic'
+export { TmCalendar } from './components/calendar'
+export { TmCarousel } from './components/carousel'
+export { TmQRCode } from './components/qrcode'
+export { TmTooltip } from './components/tooltip'
+export { TmComment } from './components/comment'
+export { TmWatermark } from './components/watermark'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -313,5 +365,36 @@ export type { TmMentionsProps, TmMentionsOptionProps, MentionsProps } from './co
 export type { TmTransferProps, TransferProps } from './components/transfer'
 export type { TmCheckboxProps, CheckboxProps } from './components/checkbox'
 export type { TmRadioProps, RadioProps } from './components/radio'
+export type { TmCardProps, CardProps } from './components/card'
+export type {
+  TmCollapseProps,
+  TmCollapsePanelProps,
+  CollapseProps,
+  CollapsePanelProps,
+} from './components/collapse'
+export type {
+  TmDescriptionsProps,
+  TmDescriptionsItemProps,
+  DescriptionsProps,
+} from './components/descriptions'
+export type { TmTimelineProps, TimelineProps } from './components/timeline'
+export type { TmAvatarProps, TmAvatarGroupProps, AvatarProps, AvatarGroupProps } from './components/avatar'
+export type { TmImageProps, TmImagePreviewGroupProps, ImageProps } from './components/image'
+export type {
+  TmListProps,
+  TmListItemProps,
+  TmListItemMetaProps,
+  ListProps,
+  ListItemProps,
+  ListItemMetaProps,
+} from './components/list'
+export type { TmSegmentedProps, SegmentedProps } from './components/segmented'
+export type { TmStatisticProps, TmCountdownProps, StatisticProps } from './components/statistic'
+export type { TmCalendarProps, CalendarProps } from './components/calendar'
+export type { TmCarouselProps, CarouselProps, CarouselRef } from './components/carousel'
+export type { TmQRCodeProps, QRCodeProps } from './components/qrcode'
+export type { TmTooltipProps, TooltipProps, TooltipPlacement } from './components/tooltip'
+export type { TmCommentProps, CommentProps } from './components/comment'
+export type { TmWatermarkProps, WatermarkProps } from './components/watermark'
 
 export default { install }
