@@ -10,10 +10,11 @@
   6. 结构扩展：confirm 模式下用 Popconfirm 包裹
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Button as AButton, Popconfirm } from 'ant-design-vue'
 import type { TmButtonProps } from './props'
 import { tmButtonDefaults } from './defaults'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useDebounceClick } from './composables/useDebounceClick'
 
 // name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传，改为手动 $attrs 绑定
@@ -29,9 +30,6 @@ const props = withDefaults(defineProps<TmButtonProps>(), {
 
 // click 事件透传：业务方仍按原生 click 监听
 const emit = defineEmits<{ (e: 'click', ev: MouseEvent): void }>()
-
-// inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
-const $attrs = useAttrs()
 
 // 行为扩展：防抖点击（未配置时零开销透传）
 const { onClick } = useDebounceClick(props, emit)
@@ -54,13 +52,9 @@ const antProps = computed(() => {
   return rest
 })
 
-// 合并透传对象：$attrs（class/style/id/外部监听器等）+ antProps（已剥离扩展属性的原生 ant props）
-// Vue 模板不支持同一元素写两个 v-bind，因此预先合并为单个对象
-// 顺序：antProps 覆盖 $attrs（props 优先级高于外部透传属性，避免业务误覆盖）
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认 type（幻影 false 跳过，见 useForwardBindings）
+ * onClick 由 antProps 剥离（模板 @click="onClick" 防抖是 click 唯一入口，避免双触发） */
+const forwardBindings = useForwardBindings(antProps, ['type'])
 </script>
 
 <template>

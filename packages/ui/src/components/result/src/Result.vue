@@ -7,10 +7,11 @@
   3. 无 Boolean 陷阱：ant Result 无可覆盖默认 true 的 Boolean prop，无需 withDefaults 兜底
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { useSlots } from 'vue'
 import { Result as AResult } from 'ant-design-vue'
 import type { TmResultProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Result 实例类型（ant 未导出 ResultInstance，用 InstanceType 推导） */
 type ResultInstance = InstanceType<typeof AResult>
@@ -20,9 +21,6 @@ defineOptions({ name: 'TmResult', inheritAttrs: false })
 /** 组件 props：TmResultProps = ResultProps（无公司默认覆盖） */
 const props = defineProps<TmResultProps>()
 
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
-
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
 
@@ -30,11 +28,8 @@ const slotNames = Object.keys(useSlots()) as string[]
 const { innerRef, exposed } = useForwardRef<ResultInstance>()
 defineExpose(exposed)
 
-/** 合并透传对象：$attrs + ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...props,
-}))
+/** 透传对象：$attrs + 业务显式 props（幻影 false 跳过，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(props, [])
 </script>
 
 <template>

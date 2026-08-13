@@ -16,7 +16,7 @@
   6. 布局：外层 flex column，grid 占剩余高度，a-pagination 固定底部
 -->
 <script setup lang="ts">
-import { computed, onMounted, useAttrs, useSlots, watch } from 'vue'
+import { computed, onMounted, useSlots, watch } from 'vue'
 import {
   Pagination as APagination,
   Form as AForm,
@@ -36,6 +36,7 @@ import { useColumns } from './composables/useColumns'
 import { usePagination } from './composables/usePagination'
 import { useSearch } from './composables/useSearch'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 // name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传，改为手动 forwardBindings 合并
 defineOptions({ name: 'TmTable', inheritAttrs: false })
@@ -60,9 +61,6 @@ const props = withDefaults(defineProps<TmTableProps>(), {
     pageSizes: [...tmTableDefaults.pagerConfig.pageSizes],
   }),
 })
-
-// inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
-const $attrs = useAttrs()
 
 // slot keys 显式抽出并断言为 string[]：让 vue-tsc/vite:dts 双路径对 v-for + 动态 #[name]
 // 不再触发 TS7022 circular inference（T14 收口 2）
@@ -129,16 +127,14 @@ const rowConfig = computed(() => {
 const gridHeight = computed(() => props.height)
 
 /**
- * 单一合并透传对象：$attrs + 已剥离扩展键的 vxe 原生 props
- * - 剥离 request / search / density / pagerConfig（vxe 不识别或不渲染分页）
+ * 扩展属性剥离 + 合成：剥离 request/search/density/pagerConfig/pagination/data/loading/height
  * - data = pagination.data（远程拉取结果 / 静态当前页切片）
  * - loading = 业务 loading ∪ 远程 loading
- * - rowConfig / height 按上述策略注入
+ * - rowConfig / height 按策略注入（null 时不含键）
  */
-const forwardBindings = computed(() => {
-  const { request: _r, search: _s, density: _d, pagerConfig: _pc, pagination: _pagination, data: _data, loading: _loading, height: _height, ...rest } = props
+const antProps = computed(() => {
+  const { request: _r, search: _s, density: _d, pagerConfig: _pc, pagination: _pagination, data: _data, loading: _loading, height: _height, rowConfig: _rc, ...rest } = props
   return {
-    ...$attrs,
     ...rest,
     columns: columns.value,
     data: pagination.data.value,
@@ -147,6 +143,12 @@ const forwardBindings = computed(() => {
     ...(gridHeight.value != null ? { height: gridHeight.value } : {}),
   }
 })
+
+/** 透传对象：$attrs + 业务显式 props + 公司默认与合成键（border/stripe/showOverflow 等 + columns/data/loading/rowConfig/height，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, [
+  'border', 'showHeader', 'stripe', 'showOverflow', 'fit',
+  'columns', 'data', 'loading', 'rowConfig', 'height',
+])
 
 /** 远程模式：挂载时自动拉首页 */
 onMounted(() => {

@@ -13,16 +13,15 @@
   注：FormItem 无需 ref 方法透传（ant FormItem 暴露的方法通常由 ant Form 内部调度）
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { FormItem as AFormItem, type FormItemProps } from 'ant-design-vue'
 import { useFormContext } from './composables/useFormContext'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 // name 用于全局注册与 devtools 识别；inheritAttrs:false 关闭自动透传
 defineOptions({ name: 'TmFormItem', inheritAttrs: false })
 
 const props = defineProps<FormItemProps>()
-
-const $attrs = useAttrs()
 const slotNames = Object.keys(useSlots()) as string[]
 
 /**
@@ -47,14 +46,8 @@ const slotScope = computed(() => ({
   disabled: formContext?.value?.disabled,
 }))
 
-/**
- * 合并透传对象：$attrs + props（单一 v-bind）
- * 顺序：props 覆盖 $attrs——同名时受控 props 优先
- */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...props,
-}))
+/** 透传对象：$attrs + 业务显式 props（幻影 false 跳过，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(props, [])
 </script>
 
 <template>

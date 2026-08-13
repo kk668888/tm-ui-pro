@@ -9,11 +9,12 @@
   5. slots 全透传（default/icon/closeIcon）+ useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Tag as ATag } from 'ant-design-vue'
 import type { TmTagProps } from './props'
 import { TAG_STATUS_COLOR, tmTagDefaults } from './defaults'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Tag 实例类型（ant 未导出 TagInstance，用 InstanceType 推导） */
 type TagInstance = InstanceType<typeof ATag>
@@ -26,9 +27,6 @@ const props = withDefaults(defineProps<TmTagProps>(), {
   status: undefined,
   bordered: tmTagDefaults.bordered,
 })
-
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
 
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
@@ -56,11 +54,8 @@ const antProps = computed(() => {
   }
 })
 
-/** 合并透传对象：$attrs + 已剥离 status 的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 合成 color / 公司默认 bordered（antProps 源，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['color', 'bordered'])
 </script>
 
 <template>

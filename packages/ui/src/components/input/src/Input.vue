@@ -12,10 +12,11 @@
   6. 公司默认值：allowClear / size 兜底，业务可覆盖
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Input as AInput } from 'ant-design-vue'
 import type { TmInputProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 import { tmInputDefaults } from './defaults'
 
@@ -66,9 +67,6 @@ const emit = defineEmits<{
   (e: 'update:modelValue', v: string | number): void
 }>()
 
-// inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象（class/style/id/data-*等）
-const $attrs = useAttrs()
-
 /** 注入祖先 TmForm 联动上下文（无祖先时返回 undefined，不影响独立使用） */
 const formContext = useFormContext()
 
@@ -116,16 +114,8 @@ const antProps = computed(() => {
   }
 })
 
-/**
- * 合并透传对象：$attrs（class/style/id/外部监听器/data-* 等）+ antProps（已剥离 v-model 冲突项）
- * Vue 模板不支持同一元素写两个 v-bind，因此预先合并为单个对象
- * 顺序：antProps 覆盖 $attrs——同名时受控 props 优先，保证 v-model 桥接不被外部 attrs 覆盖
- * （$attrs 与 props 同源于父组件，正常使用很少重叠；该优先级仅作受控写法的兜底保护）
- */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认（allowClear/size/bordered）与级联合成键（readonly/disabled，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['allowClear', 'size', 'bordered', 'readonly', 'disabled'])
 
 /**
  * v-model 双向桥接：用 computed get/set 实现 ant v-model:value 与业务 v-model(modelValue) 的转换

@@ -10,10 +10,11 @@
   5. slots 全透传 + useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { CheckboxGroup as ACheckboxGroup, type CheckboxGroupProps } from 'ant-design-vue'
 import type { TmCheckboxGroupProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 import { tmCheckboxGroupDefaults } from './defaults'
 
@@ -38,9 +39,6 @@ const props = withDefaults(defineProps<TmCheckboxGroupProps>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', v: CheckboxGroupProps['value']): void
 }>()
-
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
 
 /** 注入祖先 TmForm 联动上下文（无祖先时 undefined，不影响独立使用） */
 const formContext = useFormContext()
@@ -74,11 +72,8 @@ const antProps = computed(() => {
   }
 })
 
-/** 合并透传对象：$attrs + 已剥离冲突项的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 级联合成 disabled（见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['disabled'])
 
 /**
  * v-model 双向桥接：modelValue ↔ ant value（数组）

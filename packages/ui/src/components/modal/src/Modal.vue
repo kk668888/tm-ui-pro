@@ -9,10 +9,11 @@
   4. $attrs 合并 + useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Modal as AModal } from 'ant-design-vue'
 import type { TmModalProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Modal 实例类型（ant 未导出 ModalInstance，用 InstanceType 推导） */
 type ModalInstance = InstanceType<typeof AModal>
@@ -36,9 +37,6 @@ const props = withDefaults(defineProps<TmModalProps>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', v: boolean): void
 }>()
-
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
 
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
@@ -65,11 +63,8 @@ const antProps = computed(() => {
   return rest
 })
 
-/** 合并透传对象：$attrs + 已剥离冲突项的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认（closable/mask/maskClosable/keyboard 兜底，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['closable', 'mask', 'maskClosable', 'keyboard'])
 
 /** v-model 双向桥接：modelValue ↔ ant open（computed get/set） */
 const inner = computed<boolean>({

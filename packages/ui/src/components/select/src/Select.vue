@@ -14,13 +14,14 @@
   7. 公司默认值：showSearch / allowClear 兜底；filterOption 按 remote 模式自适应
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Select as ASelect, type SelectProps } from 'ant-design-vue'
 import type { TmSelectProps } from './props'
 import { tmSelectDefaults } from './defaults'
 import { useRemoteSearch } from './composables/useRemoteSearch'
 import { useApiLoader } from './composables/useApiLoader'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useReadonlyLock } from '../../../composables/useReadonlyLock'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 
@@ -84,9 +85,6 @@ const props = withDefaults(defineProps<TmSelectProps>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', v: SelectProps['value']): void
 }>()
-
-// inheritAttrs:false 下需手动取 $attrs；useAttrs 显式拿到外部透传对象
-const $attrs = useAttrs()
 
 /** 注入祖先 TmForm 联动上下文（无祖先时返回 undefined，不影响独立使用） */
 const formContext = useFormContext()
@@ -210,15 +208,11 @@ const antProps = computed(() => {
   }
 })
 
-/**
- * 合并透传对象：$attrs（class/style/id/外部监听器/data-* 等）+ antProps（已剥离冲突项）
- * Vue 模板不支持同一元素写两个 v-bind，因此预先合并为单个对象（plan-bug #1 修正）。
- * 顺序：antProps 覆盖 $attrs——同名时受控 props 优先，保证 v-model 桥接不被外部 attrs 覆盖
- */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认与合成键（options/loading/filterOption + 锁调整，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, [
+  'showSearch', 'allowClear', 'bordered', 'showArrow', 'virtual', 'autoClearSearchValue', 'defaultActiveFirstOption',
+  'options', 'loading', 'filterOption', 'open', 'disabled', 'readonly',
+])
 
 /**
  * v-model 双向桥接：computed get/set 实现 ant v-model:value 与业务 v-model(modelValue) 的转换

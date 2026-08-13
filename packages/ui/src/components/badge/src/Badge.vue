@@ -7,11 +7,12 @@
   3. slots 全透传（default 包裹内容 / count 插槽）+ useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { useSlots } from 'vue'
 import { Badge as ABadge } from 'ant-design-vue'
 import type { TmBadgeProps } from './props'
 import { tmBadgeDefaults } from './defaults'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Badge 实例类型（ant 未导出 BadgeInstance，用 InstanceType 推导） */
 type BadgeInstance = InstanceType<typeof ABadge>
@@ -23,9 +24,6 @@ const props = withDefaults(defineProps<TmBadgeProps>(), {
   ...tmBadgeDefaults,
 })
 
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
-
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
 
@@ -33,11 +31,8 @@ const slotNames = Object.keys(useSlots()) as string[]
 const { innerRef, exposed } = useForwardRef<BadgeInstance>()
 defineExpose(exposed)
 
-/** 合并透传对象：$attrs + ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...props,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认（幻影 false 跳过，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(props, [])
 </script>
 
 <template>

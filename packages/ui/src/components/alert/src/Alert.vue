@@ -10,11 +10,12 @@
   5. slots 全透传（message / description / icon / closeIcon / action）+ useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Alert as AAlert } from 'ant-design-vue'
 import type { TmAlertProps } from './props'
 import { ALERT_STATUS_TYPE } from './defaults'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Alert 实例类型（ant 未导出 AlertInstance，用 InstanceType 推导） */
 type AlertInstance = InstanceType<typeof AAlert>
@@ -26,9 +27,6 @@ const props = withDefaults(defineProps<TmAlertProps>(), {
   // status 显式置 undefined：自文档化意图（与其余组件 withDefaults 一致）
   status: undefined,
 })
-
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
 
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
@@ -50,11 +48,8 @@ const antProps = computed(() => {
   }
 })
 
-/** 合并透传对象：$attrs + 已剥离 status 的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 合成 type（antProps 源，type 列入公司默认保证 status 映射转发，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['type'])
 </script>
 
 <template>

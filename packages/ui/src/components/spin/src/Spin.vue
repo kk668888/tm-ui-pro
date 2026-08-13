@@ -7,11 +7,12 @@
   3. slots 全透传（default 包裹内容）+ useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { useSlots } from 'vue'
 import { Spin as ASpin } from 'ant-design-vue'
 import type { TmSpinProps } from './props'
 import { tmSpinDefaults } from './defaults'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 
 /** ant Spin 实例类型（ant 未导出 SpinInstance，用 InstanceType 推导） */
 type SpinInstance = InstanceType<typeof ASpin>
@@ -23,9 +24,6 @@ const props = withDefaults(defineProps<TmSpinProps>(), {
   spinning: tmSpinDefaults.spinning,
 })
 
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
-
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]
 
@@ -33,11 +31,8 @@ const slotNames = Object.keys(useSlots()) as string[]
 const { innerRef, exposed } = useForwardRef<SpinInstance>()
 defineExpose(exposed)
 
-/** 合并透传对象：$attrs + 含公司默认的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...props,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认 spinning（幻影 false 跳过，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(props, ['spinning'])
 </script>
 
 <template>

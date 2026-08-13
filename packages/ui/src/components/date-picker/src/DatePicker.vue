@@ -14,11 +14,12 @@
   （能力不丢，仅 IDE 对未声明键弱提示）。完整类型仍由 props.ts 的 TmDatePickerProps 提供。
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots, type PropType } from 'vue'
+import { computed, useSlots, type PropType } from 'vue'
 import { DatePicker as ADatePicker } from 'ant-design-vue'
 import type { Dayjs } from 'dayjs'
 import type { DatePickerProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useReadonlyLock } from '../../../composables/useReadonlyLock'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 import { tmDatePickerDefaults } from './defaults'
@@ -57,9 +58,6 @@ const emit = defineEmits<{
   (e: 'update:modelValue', v: Dayjs | string | null): void
 }>()
 
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
-
 /** 注入祖先 TmForm 联动上下文（无祖先时 undefined，不影响独立使用） */
 const formContext = useFormContext()
 
@@ -86,11 +84,8 @@ const antProps = computed(() => {
   }
 })
 
-/** 合并透传对象：$attrs（ant 未声明能力的透传通道）+ 已剥离扩展键的 props + 锁调整 */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认（allowClear/size）与锁调整合成键（disabled/open/readonly，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['allowClear', 'size', 'disabled', 'open', 'readonly'])
 
 /** v-model 双向桥接：modelValue ↔ ant value，valueFormat 时 string↔Dayjs 自动转换 */
 const inner = useValueFormat(props, (v) => emit('update:modelValue', v))

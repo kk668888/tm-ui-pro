@@ -67,4 +67,9 @@ describe('TmTag', () => {
     const wrapper = mount(TmTag, { slots: { default: '<span class="tag-label">状态</span>' } })
     expect(wrapper.find('.tag-label').exists()).toBe(true)
   })
+
+  it('公司默认 bordered 兜底 true 透传（useForwardBindings companyDefaults 生效）', () => {
+    const wrapper = mount(TmTag)
+    expect(wrapper.findComponent({ name: 'ATag' }).props('bordered')).toBe(true)
+  })
 })

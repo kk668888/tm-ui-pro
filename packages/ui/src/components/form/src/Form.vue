@@ -17,9 +17,10 @@
   7. 公司默认值：layout=horizontal / hideRequiredMark=false 兜底，业务可覆盖
 -->
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs, useSlots } from 'vue'
+import { computed, onMounted, ref, useSlots } from 'vue'
 import { Form as AForm, type FormInstance } from 'ant-design-vue'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { tmFormDefaults } from './defaults'
 import type { TmFormProps } from './props'
 import { provideForm, type FormContext } from './composables/useFormContext'
@@ -39,7 +40,6 @@ const props = withDefaults(defineProps<TmFormProps>(), {
   disabled: undefined,
 })
 
-const $attrs = useAttrs()
 const slotNames = Object.keys(useSlots()) as string[]
 
 // ============================================================
@@ -131,15 +131,14 @@ provideForm(formContext)
 // 透传合并（剥离公司扩展键，只把 ant 认识的 props 传给 AForm）
 // ============================================================
 
-const forwardBindings = computed(() => {
-  // disabled 是 ant Form 原生 prop（整表禁用），需透传给 AForm——不剥离。
-  // submitting / readonly 为纯公司扩展键，ant 无对应 prop，剥离避免 ant 警告。
-  const { submitting: _s, readonly: _r, ...antProps } = props
-  return {
-    ...$attrs,
-    ...antProps,
-  }
+// 扩展属性剥离：仅剔除纯公司扩展键（submitting/readonly），disabled 是 ant 原生 prop 保留透传
+const antProps = computed(() => {
+  const { submitting: _s, readonly: _r, ...rest } = props
+  return rest
 })
+
+/** 透传对象：$attrs + 业务显式 props + 公司默认（layout/hideRequiredMark，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['layout', 'hideRequiredMark'])
 </script>
 
 <template>

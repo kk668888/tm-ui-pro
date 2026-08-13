@@ -9,10 +9,11 @@
   5. 扩展键剥离 + $attrs 合并 + slots 全透传 + useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { computed, useAttrs, useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
 import { Cascader as ACascader, type CascaderProps } from 'ant-design-vue'
 import type { TmCascaderProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
+import { useForwardBindings } from '../../../composables/useForwardBindings'
 import { useReadonlyLock } from '../../../composables/useReadonlyLock'
 import { useFormContext } from '../../form/src/composables/useFormContext'
 import { tmCascaderDefaults } from './defaults'
@@ -42,9 +43,6 @@ const props = withDefaults(defineProps<TmCascaderProps>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', v: CascaderProps['value']): void
 }>()
-
-// inheritAttrs:false 下手动取 $attrs
-const $attrs = useAttrs()
 
 /** 注入祖先 TmForm 联动上下文（无祖先时 undefined，不影响独立使用） */
 const formContext = useFormContext()
@@ -88,11 +86,8 @@ const antProps = computed(() => {
   }
 })
 
-/** 合并透传对象：$attrs + 已剥离冲突项的 ant 原生 props（单一 v-bind） */
-const forwardBindings = computed(() => ({
-  ...$attrs,
-  ...antProps.value,
-}))
+/** 透传对象：$attrs + 业务显式 props + 公司默认（allowClear/bordered/open/disabled/readonly 兜底，见 useForwardBindings） */
+const forwardBindings = useForwardBindings(antProps, ['allowClear', 'bordered', 'open', 'disabled', 'readonly'])
 
 /** v-model 双向桥接：modelValue ↔ ant value，类型复用 CascaderProps['value'] */
 const inner = computed<CascaderProps['value']>({
