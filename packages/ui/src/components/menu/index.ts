@@ -15,6 +15,8 @@ export const TmMenuDivider = withInstall(MenuDivider, 'TmMenuDivider')
 
 // 类型透传：业务方可直接 import { MenuProps, TmMenuProps, ... } from '@tm/ui'
 export type { MenuProps, SubMenuProps, MenuItemProps, MenuDividerProps, MenuTheme, MenuMode } from 'ant-design-vue'
+// MenuItemGroupProps 未从 ant 顶层导出，从模块级深层导入（ant 无 exports map，路径稳定）
+export type { MenuItemGroupProps } from 'ant-design-vue/es/menu'
 export type {
   TmMenuProps,
   TmMenuItemProps,

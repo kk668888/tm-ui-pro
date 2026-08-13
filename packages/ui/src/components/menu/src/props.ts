@@ -33,8 +33,9 @@ export type {
   MenuProps,
   MenuItemProps,
   SubMenuProps,
-  MenuItemGroupProps,
   MenuDividerProps,
   MenuTheme,
   MenuMode,
 } from 'ant-design-vue'
+// MenuItemGroupProps 未从 ant 顶层导出，从模块级深层导入（ant 无 exports map，路径稳定）
+export type { MenuItemGroupProps } from 'ant-design-vue/es/menu'
