@@ -24,7 +24,7 @@ TmApp SHALL 透传 ant App 原生 props（`rootClassName` / `message` / `notific
 
 ### Requirement: holder 空时容错
 
-holder 为空（业务未包裹 TmApp）时，TmApp 不抛错；命令式 API 由各组件自行降级到 ant 全局 API（见 message/modal spec）。
+holder 为空（业务未包裹 TmApp）时，TmApp SHALL 不抛错；命令式 API 由各组件自行降级到 ant 全局 API（见 message/modal spec）。
 
 #### Scenario: 未包裹 TmApp 不报错
 
