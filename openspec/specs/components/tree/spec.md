@@ -2,7 +2,7 @@
 
 Defines TmTree, thin ant-design-vue Tree wrappers (TmTree/TmTreeNode/TmDirectoryTree) for directory and permission trees.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 树形子组件族
 

@@ -2,7 +2,7 @@
 
 Defines TmRadio, a thin ant-design-vue Radio wrapper (single) that complements the existing TmRadioGroup with consistent value semantics.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 单选框
 

@@ -2,7 +2,7 @@
 
 Defines TmTransfer, a thin ant-design-vue Transfer wrapper for shuttle selection with company default titles.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 公司默认标题
 

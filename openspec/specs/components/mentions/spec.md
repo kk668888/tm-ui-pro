@@ -2,7 +2,7 @@
 
 Defines TmMentions, thin ant-design-vue Mentions wrappers (TmMentions/TmMentionsOption) for @-mention input with data-source aligned to TmSelect.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 提及子组件族
 

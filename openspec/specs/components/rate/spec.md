@@ -2,7 +2,7 @@
 
 Defines TmRate, a thin ant-design-vue Rate wrapper for star/score input, keeping ant's default character and tooltip behavior.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 默认星形与文案
 

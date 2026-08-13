@@ -2,7 +2,7 @@
 
 Defines TmSlider, a thin ant-design-vue Slider wrapper for range/step inputs, keeping ant's value-hint tooltip behavior.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: tooltip 显示当前值
 

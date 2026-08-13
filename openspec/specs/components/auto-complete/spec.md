@@ -2,7 +2,7 @@
 
 Defines TmAutoComplete, a thin ant-design-vue AutoComplete wrapper with option data-source semantics aligned to TmSelect.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 数据源对齐 TmSelect
 

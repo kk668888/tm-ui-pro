@@ -2,7 +2,7 @@
 
 Defines TmCheckbox, a thin ant-design-vue Checkbox wrapper (single) that complements the existing TmCheckboxGroup with consistent value semantics.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 单复选框
 
