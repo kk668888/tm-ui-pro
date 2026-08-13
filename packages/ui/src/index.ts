@@ -77,6 +77,20 @@ import { TmQRCode } from './components/qrcode'
 import { TmTooltip } from './components/tooltip'
 import { TmComment } from './components/comment'
 import { TmWatermark } from './components/watermark'
+import { TmProgress } from './components/progress'
+import {
+  TmSkeleton,
+  TmSkeletonAvatar,
+  TmSkeletonImage,
+  TmSkeletonInput,
+  TmSkeletonButton,
+} from './components/skeleton'
+import { TmTour } from './components/tour'
+import {
+  TmFloatButton,
+  TmFloatButtonGroup,
+  TmFloatButtonBackTop,
+} from './components/float-button'
 
 /**
  * Vue 插件 install：app.use(@tm/ui) 全量注册
@@ -179,6 +193,16 @@ export const install = (app: App): void => {
   app.use(TmTooltip as unknown as { install: (app: App) => void })
   app.use(TmComment as unknown as { install: (app: App) => void })
   app.use(TmWatermark as unknown as { install: (app: App) => void })
+  app.use(TmProgress as unknown as { install: (app: App) => void })
+  app.use(TmSkeleton as unknown as { install: (app: App) => void })
+  app.use(TmSkeletonAvatar as unknown as { install: (app: App) => void })
+  app.use(TmSkeletonImage as unknown as { install: (app: App) => void })
+  app.use(TmSkeletonInput as unknown as { install: (app: App) => void })
+  app.use(TmSkeletonButton as unknown as { install: (app: App) => void })
+  app.use(TmTour as unknown as { install: (app: App) => void })
+  app.use(TmFloatButton as unknown as { install: (app: App) => void })
+  app.use(TmFloatButtonGroup as unknown as { install: (app: App) => void })
+  app.use(TmFloatButtonBackTop as unknown as { install: (app: App) => void })
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
@@ -252,6 +276,20 @@ export { TmQRCode } from './components/qrcode'
 export { TmTooltip } from './components/tooltip'
 export { TmComment } from './components/comment'
 export { TmWatermark } from './components/watermark'
+export { TmProgress } from './components/progress'
+export {
+  TmSkeleton,
+  TmSkeletonAvatar,
+  TmSkeletonImage,
+  TmSkeletonInput,
+  TmSkeletonButton,
+} from './components/skeleton'
+export { TmTour } from './components/tour'
+export {
+  TmFloatButton,
+  TmFloatButtonGroup,
+  TmFloatButtonBackTop,
+} from './components/float-button'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -396,5 +434,27 @@ export type { TmQRCodeProps, QRCodeProps } from './components/qrcode'
 export type { TmTooltipProps, TooltipProps, TooltipPlacement } from './components/tooltip'
 export type { TmCommentProps, CommentProps } from './components/comment'
 export type { TmWatermarkProps, WatermarkProps } from './components/watermark'
+export type { TmProgressProps, TmProgressStatus, ProgressProps } from './components/progress'
+export type {
+  TmSkeletonProps,
+  TmSkeletonAvatarProps,
+  TmSkeletonImageProps,
+  TmSkeletonInputProps,
+  TmSkeletonButtonProps,
+  SkeletonProps,
+  SkeletonAvatarProps,
+  SkeletonImageProps,
+  SkeletonInputProps,
+  SkeletonButtonProps,
+} from './components/skeleton'
+export type { TmTourProps, TourProps } from './components/tour'
+export type {
+  TmFloatButtonProps,
+  TmFloatButtonGroupProps,
+  TmFloatButtonBackTopProps,
+  FloatButtonProps,
+  FloatButtonGroupProps,
+  BackTopProps,
+} from './components/float-button'
 
 export default { install }

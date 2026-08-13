@@ -133,6 +133,10 @@ export default defineConfig({
             { text: 'Notification 通知提醒', link: '/components/notification' },
             { text: 'Modal 对话框', link: '/components/modal' },
             { text: 'Drawer 抽屉', link: '/components/drawer' },
+            { text: 'Progress 进度条', link: '/components/progress' },
+            { text: 'Skeleton 骨架屏', link: '/components/skeleton' },
+            { text: 'Tour 引导', link: '/components/tour' },
+            { text: 'FloatButton 浮动按钮', link: '/components/float-button' },
           ],
         },
         {
