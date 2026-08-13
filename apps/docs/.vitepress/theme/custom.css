@@ -122,3 +122,77 @@
   text-decoration: none;
 }
 
+/*
+  ant Calendar 内部表格与 VitePress .vp-doc 通用表格样式隔离（2026-08-13）
+
+  背景：
+  VitePress 默认主题对 .vp-doc 内 table 施加通用样式（.vp-doc table{display:block;
+  margin:20px 0;overflow-x:auto}，th/td/tr 加边框、内边距、背景），特异性 (0,1,1)/(0,2,1)。
+  这些规则会命中 ant Calendar 内部的真实 <table class="ant-picker-content">；ant 未在
+  table 上声明 display/margin/overflow，导致 .vp-doc 的 display:block 生效、表格布局塌缩
+  （呈现为纯表格、行错位）。
+
+  修复：用更高特异性选择器（.vp-doc .ant-picker-calendar ...，(0,3,1)+）把关键属性还原为
+  table 语义值；ant 自身声明的类样式（cell 内边距 / hover / ::before 网格线等）特异性更高，
+  未被触碰。markdown 手写表格（无 .ant-picker-calendar 祖先）不受影响。
+*/
+.vp-doc .ant-picker-calendar .ant-picker-content {
+  display: table;
+  margin: 0;
+  overflow: visible;
+}
+
+.vp-doc .ant-picker-calendar th,
+.vp-doc .ant-picker-calendar td {
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background-color: transparent;
+}
+
+.vp-doc .ant-picker-calendar tr {
+  background-color: transparent;
+  border-top: 0;
+}
+
+.vp-doc .ant-picker-calendar tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+/*
+  ant Descriptions 内部表格与 VitePress .vp-doc 通用表格样式隔离（2026-08-13）
+
+  背景同 Calendar（见上方 ant-picker-calendar 规则）：Descriptions 内部渲染真实 <table>
+  （外层 .ant-descriptions-view），ant 只声明了 tableLayout，未声明 display/margin，
+  .vp-doc table{display:block} 命中后表格布局塌缩。tr 的 VitePress 背景/斑马纹同样误伤。
+  这里用 .vp-doc .ant-descriptions-view 前缀（(0,2,1)+，高于 .vp-doc 的 (0,1,1)）还原；
+  ant 自己声明的 cell 样式（item-label/content 的 padding/font 等）特异性更高，未被触碰。
+*/
+.vp-doc .ant-descriptions-view table {
+  display: table;
+  margin: 0;
+  overflow: visible;
+}
+
+.vp-doc .ant-descriptions-view th,
+.vp-doc .ant-descriptions-view td {
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background-color: transparent;
+}
+
+.vp-doc .ant-descriptions-view tr {
+  background-color: transparent;
+  border-top: 0;
+}
+
+.vp-doc .ant-descriptions-view tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+
