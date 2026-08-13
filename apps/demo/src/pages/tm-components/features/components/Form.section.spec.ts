@@ -10,4 +10,14 @@ describe('FormSection', () => {
     expect(text).toContain('fruit=apple');
     expect(text).toContain('TmForm手动模式');
   });
+
+  it('渲染补充控件（自动完成/复选框/评分/滑块/树）', () => {
+    const wrapper = mountSection(FormSection);
+    const text = wrapper.text().replace(/\s+/g, '');
+    expect(text).toContain('同意协议');
+    expect(text).toContain('3.5');
+    expect(text).toContain('40');
+    expect(text).toContain('内容一');
+    expect(text).toContain('checked=0-0-1');
+  });
 });

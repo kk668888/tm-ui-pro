@@ -11,12 +11,30 @@ import {
   TmPopconfirm,
   TmPopover,
   TmResult,
+  TmProgress,
+  TmSkeleton,
+  TmTour,
 } from '@tm/ui';
 
 defineOptions({ name: 'FeedbackSection' });
 
 const modalOpen = ref(false);
 const drawerOpen = ref(false);
+const progressPercent = ref(66);
+const skeletonLoading = ref(true);
+const tourOpen = ref(false);
+const tourSteps = [
+  {
+    title: '进度反馈',
+    description: 'TmProgress 支持业务 status 语义映射与动态百分比。',
+    target: () => document.querySelector('.tour-anchor-1') as HTMLElement,
+  },
+  {
+    title: '骨架屏',
+    description: 'TmSkeleton 在加载态展示占位，可点击按钮切换真实内容。',
+    target: () => document.querySelector('.tour-anchor-2') as HTMLElement,
+  },
+];
 
 // 加载态定时器句柄：组件卸载时清理，避免卸载后仍关闭已脱离的 message 实例
 let loadingTimer: ReturnType<typeof setTimeout>;
@@ -110,6 +128,38 @@ onBeforeUnmount(() => {
           </TmPopover>
         </a-space>
         <TmResult status="success" title="提交成功" sub-title="等待审核，可在列表查看进度" />
+      </div>
+
+      <div class="tour-anchor-1 flex flex-col gap-2">
+        <span class="text-sm text-secondary">TmProgress（业务 status 映射 + 动态百分比）</span>
+        <a-space direction="vertical" class="w-full">
+          <TmProgress :percent="progressPercent" status="success" />
+          <TmProgress :percent="progressPercent" status="processing" />
+          <TmProgress :percent="progressPercent" status="failed" />
+          <TmProgress :percent="progressPercent" status="warning" />
+          <TmProgress :percent="progressPercent" type="circle" status="success" style="width: 80px" />
+        </a-space>
+        <a-space>
+          <TmButton size="small" :disabled="progressPercent <= 0" @click="progressPercent -= 10">-10%</TmButton>
+          <TmButton size="small" :disabled="progressPercent >= 100" @click="progressPercent += 10">+10%</TmButton>
+          <span class="text-secondary">{{ progressPercent }}%</span>
+        </a-space>
+      </div>
+
+      <div class="tour-anchor-2 flex flex-col gap-2">
+        <span class="text-sm text-secondary">TmSkeleton（加载态切换）</span>
+        <TmSkeleton :loading="skeletonLoading" :avatar="true" :paragraph="{ rows: 3 }" style="max-width: 360px">
+          <div>真实内容：这里是加载完成后展示的业务信息。</div>
+        </TmSkeleton>
+        <TmButton size="small" @click="skeletonLoading = !skeletonLoading">
+          {{ skeletonLoading ? '加载完成' : '重新加载' }}
+        </TmButton>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-secondary">TmTour（步骤引导，v-model:open 自闭合）</span>
+        <TmButton type="primary" @click="tourOpen = true">开始引导</TmButton>
+        <TmTour v-model:open="tourOpen" :steps="tourSteps" />
       </div>
 
       <TmModal v-model="modalOpen" title="基础弹窗" @ok="modalOpen = false" @cancel="modalOpen = false">
