@@ -1,7 +1,6 @@
 <!-- packages/ui/src/components/table/demos/remote.vue -->
 <!-- TmTable 远程分页 + search 搜索联动 demo -->
 <script setup lang="ts">
-import { ref } from 'vue'
 import { TmTable } from '../index'
 import type { TmTableProps } from '../index'
 
@@ -14,7 +13,7 @@ const mockRows = Array.from({ length: 57 }, (_, i) => ({
 }))
 
 // 列配置
-const columns = [
+const columns: TmTableProps['columns'] = [
   { field: 'id', title: 'ID', width: 80 },
   { field: 'name', title: '姓名' },
   { field: 'age', title: '年龄', width: 100 },
@@ -34,7 +33,8 @@ const request: TmTableProps['request'] = async ({ currentPage, pageSize, query }
 }
 
 // search 声明式 ant 搜索表单（查询/重置自动接 request）
-const search = {
+// 显式类型标注（TmTableSearchConfig）：type 字段需收窄为字面量联合，否则推断为 string
+const search: TmTableProps['search'] = {
   fields: [
     { field: 'name', label: '姓名', type: 'input', placeholder: '请输入姓名' },
     {

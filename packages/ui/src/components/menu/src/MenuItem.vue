@@ -23,7 +23,7 @@ const props = defineProps<TmMenuItemProps>()
 // 关键：ant MenuItem 用 instance.vnode.key 读自身 key 注册/选中（Menu.js child.key + MenuItem.js vnode.key）。
 // 业务在 <TmMenuItem key="a"> 上的 vnode key 不会自动传导到内部 AMenuItem，须显式转发，
 // 否则 AMenuItem 的 key 为 undefined，ant Menu 的选中态失效（多项同时高亮，Bug 2026-08-12）。
-const vnodeKey = getCurrentInstance()?.vnode.key
+const vnodeKey = getCurrentInstance()?.vnode.key ?? undefined
 
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]

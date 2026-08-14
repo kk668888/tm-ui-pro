@@ -3,6 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TmProgress from '../src/Progress.vue'
+import type { TmProgressStatus } from '../src/props'
 
 describe('TmProgress', () => {
   it('percent / showInfo 等原生 props 透传', () => {
@@ -56,7 +57,10 @@ describe('TmProgress', () => {
   })
 
   it('status 传原型链属性名（constructor）时原样透传（Object.hasOwn 防护）', () => {
-    const wrapper = mount(TmProgress, { props: { percent: 50, status: 'constructor' } })
+    // as unknown as：constructor 不属于 TmProgressStatus 联合，测试运行时注入的非法 status
+    const wrapper = mount(TmProgress, {
+      props: { percent: 50, status: 'constructor' as unknown as TmProgressStatus },
+    })
     const inner = wrapper.findComponent({ name: 'AProgress' })
     expect(inner.props('status')).toBe('constructor')
   })

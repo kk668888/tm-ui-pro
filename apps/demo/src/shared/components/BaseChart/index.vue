@@ -35,6 +35,8 @@ import type { EChartsOption } from 'echarts';
 import { useThemeStore } from '@/core/theme';
 import { buildEChartsTheme } from '@/core/theme/bridges/echarts';
 
+type VChartInstance = InstanceType<typeof VChart>;
+
 /**
  * 项目级图表组件：vue-echarts <VChart> 的透明包装。
  *
@@ -56,16 +58,21 @@ const themeObj = computed(() => buildEChartsTheme(themeStore.currentTokens));
 // 默认开启 autoresize，同时允许调用方通过同名 attr 覆盖这个默认值。
 const forwarded = computed(() => ({ autoresize: true, ...attrs }));
 
-const chartRef = ref<InstanceType<typeof VChart>>();
+const chartRef = ref<VChartInstance>();
 
 defineExpose({
   // 仅在 vue-echarts 的 manual-update 模式下建议手动调用 setOption。
   // 常规场景应优先修改 :option，让 Vue 响应式更新驱动图表变化。
-  setOption: (option: EChartsOption, ...args: any[]) => chartRef.value?.setOption(option, ...args),
-  resize: (...args: any[]) => chartRef.value?.resize(...args),
-  dispatchAction: (payload: any) => chartRef.value?.dispatchAction(payload),
+  // 注意：vue-echarts 的 setOption 签名带默认参数重载（option, notMerge?, lazyUpdate?），
+  // Parameters 提取会命中含默认值的重载，这里按实际形态显式声明。
+  setOption: (option: EChartsOption, notMerge?: boolean, lazyUpdate?: boolean) =>
+    chartRef.value?.setOption(option, notMerge, lazyUpdate),
+  resize: (...args: Parameters<VChartInstance['resize']>) => chartRef.value?.resize(...args),
+  dispatchAction: (...args: Parameters<VChartInstance['dispatchAction']>) =>
+    chartRef.value?.dispatchAction(...args),
   clear: () => chartRef.value?.clear(),
-  getDataURL: (opts?: any) => chartRef.value?.getDataURL(opts),
+  getDataURL: (...args: Parameters<VChartInstance['getDataURL']>) =>
+    chartRef.value?.getDataURL(...args),
 
   get vchart() {
     return chartRef.value;

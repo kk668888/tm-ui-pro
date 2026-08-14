@@ -73,8 +73,13 @@ export function setupApp() {
     // 续期彻底失败（refresh token 也过期）/ 未启用续期的 401 → 登出 + 跳登录
     onUnauthorized: () => {
       const authStore = useAuthStore();
-      // 不 await：清态异步进行，不阻塞当前请求的 Promise 链
-      void authStore.logout();
+      // 先同步清空本地凭证（token/refreshToken/user），再跳登录页：
+      // 若 await logout()（内含网络请求）后再跳转，登出请求携带的是即将被清掉的旧 token，
+      // 且跳转被网络往返阻塞；先清态保证 UI 不再使用旧 token，服务端登出通知作为后台任务。
+      authStore.clearLocalSession();
+      void authStore.logout().catch(() => {
+        // 服务端登出通知失败不阻断跳转（本地会话已清）
+      });
       router.push({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } });
     },
     onNetworkError: (error) => {

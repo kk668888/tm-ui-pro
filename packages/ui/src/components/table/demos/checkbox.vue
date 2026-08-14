@@ -14,7 +14,7 @@ const data = ref<TmTableProps['data']>(
 )
 
 // 第一列为 checkbox 勾选列；checkbox-config.highlight 高亮选中行
-const columns = [
+const columns: TmTableProps['columns'] = [
   { type: 'checkbox', width: 60 },
   { field: 'id', title: 'ID', width: 80 },
   { field: 'name', title: '姓名' },

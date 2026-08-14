@@ -5,7 +5,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import TmMenu from '../src/Menu.vue'
 import TmMenuItem from '../src/MenuItem.vue'
-import TmSubMenu from '../src/SubMenu.vue'
 import TmMenuItemGroup from '../src/MenuItemGroup.vue'
 import TmMenuDivider from '../src/MenuDivider.vue'
 

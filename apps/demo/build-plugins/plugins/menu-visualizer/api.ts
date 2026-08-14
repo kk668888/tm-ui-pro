@@ -166,10 +166,11 @@ export const createApiMiddleware = (options: MenuPluginOptions): Connect.NextHan
                     code: arrayCode 
                 }));
 
-            } catch (error: any) {
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : 'Unknown error';
                 console.error(error);
                 res.statusCode = 500;
-                res.end(JSON.stringify({ error: 'Failed to read menu config: ' + error.message }));
+                res.end(JSON.stringify({ error: 'Failed to read menu config: ' + message }));
             }
             return;
         }

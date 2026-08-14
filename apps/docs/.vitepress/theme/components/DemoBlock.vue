@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -- 受信内容渲染：md 源码经 markdown-it 编译（html 已转义） -->
 <!--
   DemoBlock.vue
   文档站 demo 容器（Bug 1 自建方案 + 代码折叠增强）：
@@ -77,7 +78,10 @@ const copyCode = async (): Promise<void> => {
       </span>
     </div>
 
-    <pre v-if="showCode" class="demo-block__code"><code v-html="highlightedCode"></code></pre>
+    <pre v-if="showCode" class="demo-block__code">
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <code v-html="highlightedCode"></code>
+    </pre>
   </div>
 </template>
 

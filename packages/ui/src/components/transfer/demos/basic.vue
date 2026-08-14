@@ -18,7 +18,7 @@ const dataSource = [
   <div style="width: 100%">
     <p>基础穿梭（公司默认标题 + 默认 render 显示选项文案）</p>
     <TmTransfer
-      v-model:targetKeys="targetKeys"
+      v-model:target-keys="targetKeys"
       :data-source="dataSource"
       :list-style="{ width: 260, height: 420 }"
       show-search

@@ -142,6 +142,7 @@ watch(html, emitHeadings);
 </script>
 
 <template>
+  <!-- eslint-disable-next-line vue/no-v-html -- 受信内容渲染：markdown-it html:false 已净化 -->
   <div ref="rootRef" class="markdown-body" @click="handleClick" v-html="html" />
 </template>
 

@@ -11,7 +11,7 @@ const pageSize = ref(10)
 <template>
   <div style="width: 100%">
     <p>公司默认（showSizeChanger + 10/20/50）</p>
-    <TmPagination v-model:current="current" v-model:pageSize="pageSize" :total="100" />
+    <TmPagination v-model:current="current" v-model:page-size="pageSize" :total="100" />
     <p>业务覆盖（隐藏切换器 + 每页 5 条）</p>
     <TmPagination :total="50" :show-size-changer="false" :default-page-size="5" />
     <p>展示总数 show-total</p>

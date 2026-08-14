@@ -7,14 +7,15 @@
   3. default 插槽透传 + useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { useSlots } from 'vue'
+import { useSlots, type ComponentPublicInstance } from 'vue'
 import { TypographyText as ATypographyText } from 'ant-design-vue'
 import type { TmTypographyTextProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
 import { useForwardBindings } from '../../../composables/useForwardBindings'
 
-/** ant Typography.Text 实例类型（ant 未导出 TextInstance，用 InstanceType 推导） */
-type TextInstance = InstanceType<typeof ATypographyText>
+// 注：ant Typography.Text 是 FunctionalComponent（非 defineComponent），无 class 实例，
+// InstanceType 不适用；方法透传回退到通用组件实例类型（useForwardRef 运行时按需转发）。
+type TextInstance = ComponentPublicInstance
 
 defineOptions({ name: 'TmTypographyText', inheritAttrs: false })
 

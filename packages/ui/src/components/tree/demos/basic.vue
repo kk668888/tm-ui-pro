@@ -18,7 +18,7 @@ const checked = ref<string[]>([])
     <p>基础树（treeData）</p>
     <TmTree :tree-data="treeData" default-expand-all style="max-width: 400px" />
     <p>可勾选树（v-model:checkedKeys）</p>
-    <TmTree v-model:checkedKeys="checked" :tree-data="treeData" checkable default-expand-all style="max-width: 400px" />
+    <TmTree v-model:checked-keys="checked" :tree-data="treeData" checkable default-expand-all style="max-width: 400px" />
     <p>目录树</p>
     <TmDirectoryTree :tree-data="treeData" default-expand-all style="max-width: 400px" />
   </div>

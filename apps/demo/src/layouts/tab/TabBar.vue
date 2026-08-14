@@ -50,6 +50,11 @@ function getMenuDisabled(key: string) {
 </script>
 
 <template>
+  <!--
+    标签栏为自绘组件（点击/右键菜单/关闭交互，ant Tabs 无等价能力），
+    标签项 div/span 属合理豁免（AGENTS：优先 ant 组件，无替代时允许原生）。
+    外层结构保持：滚动容器语义。
+  -->
   <div v-if="tabStore.tabs.length > 0" class="tab-bar">
     <div class="tab-bar__list">
       <a-dropdown v-for="tab in tabStore.tabs" :key="tab.key" :trigger="['contextmenu']">

@@ -12,7 +12,7 @@ const imgs = ['1', '2', '3']
     <TmImage width="200" :src="`https://picsum.photos/200/200?random=${imgs[0]}`" />
     <p style="margin-top: 16px">预览组（点击任一可左右切换）</p>
     <TmImagePreviewGroup>
-      <TmImage width="100" v-for="i in imgs" :key="i" :src="`https://picsum.photos/200/200?random=${i}`" style="margin-right: 8px" />
+      <TmImage v-for="i in imgs" :key="i" width="100" :src="`https://picsum.photos/200/200?random=${i}`" style="margin-right: 8px" />
     </TmImagePreviewGroup>
   </div>
 </template>

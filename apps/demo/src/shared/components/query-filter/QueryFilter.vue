@@ -6,7 +6,7 @@ import ASelect from 'ant-design-vue/es/select';
 import ATreeSelect from 'ant-design-vue/es/tree-select';
 import ACascader from 'ant-design-vue/es/cascader';
 import ADatePicker, { RangePicker as ARangePicker } from 'ant-design-vue/es/date-picker';
-import type { FilterItemConfig } from './types';
+import type { FilterItemConfig, FilterFieldValue, FilterModel } from './types';
 import { COPY } from '@/shared/constants/copy';
 
 defineOptions({ name: 'QueryFilter' });
@@ -14,15 +14,15 @@ defineOptions({ name: 'QueryFilter' });
 const props = withDefaults(
   defineProps<{
     config: FilterItemConfig[];
-    modelValue?: Record<string, any>;
+    modelValue?: FilterModel;
     labelWidth?: number | string;
   }>(),
   { modelValue: () => ({}) },
 );
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, any>): void;
-  (e: 'search', value: Record<string, any>): void;
+  (e: 'update:modelValue', value: FilterModel): void;
+  (e: 'search', value: FilterModel): void;
   (e: 'reset'): void;
 }>();
 
@@ -41,7 +41,7 @@ function isDateRange(
   return item.type === 'date-range';
 }
 
-function getFieldValue(item: FilterItemConfig): any {
+function getFieldValue(item: FilterItemConfig): FilterFieldValue {
   if (isDateRange(item)) {
     const start = props.modelValue?.[item.name[0]];
     const end = props.modelValue?.[item.name[1]];
@@ -50,9 +50,9 @@ function getFieldValue(item: FilterItemConfig): any {
   return props.modelValue?.[item.name];
 }
 
-function handleFieldChange(item: FilterItemConfig, value: any) {
+function handleFieldChange(item: FilterItemConfig, value: FilterFieldValue) {
   if (isDateRange(item)) {
-    const [start, end] = value ?? [undefined, undefined];
+    const [start, end] = Array.isArray(value) ? value : [undefined, undefined];
     emit('update:modelValue', {
       ...props.modelValue,
       [item.name[0]]: start,

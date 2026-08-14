@@ -18,7 +18,11 @@ describe('TmBreadcrumb', () => {
   })
 
   it('ant 原生透传：routes / itemRender 下发', () => {
-    const routes = [{ breadcrumbName: '首页' }, { breadcrumbName: '列表' }]
+    // ant Breadcrumb routes 类型为 Route[]（path 必填），测试数据补 path 字段
+    const routes = [
+      { path: '/', breadcrumbName: '首页' },
+      { path: '/list', breadcrumbName: '列表' },
+    ]
     const wrapper = mount(TmBreadcrumb, { props: { routes } })
     const inner = wrapper.findComponent({ name: 'ABreadcrumb' })
     expect(inner.props('routes')).toEqual(routes)

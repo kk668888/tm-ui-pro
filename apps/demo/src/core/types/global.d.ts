@@ -1,9 +1,5 @@
 export {};
 
-declare module 'vue' {
-  function defineRender(fn: () => JSX.Element): void;
-}
-
 declare global {
   // Global type augmentations go here
 }

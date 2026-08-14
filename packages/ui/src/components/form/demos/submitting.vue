@@ -38,7 +38,7 @@ const handleReset = (): void => {
       v-slot="{ submitting }"：从 FormItem 拿 FormContext 下发的 submitting
       提交按钮 loading + 禁用，重置按钮仅禁用——防重复提交
     -->
-    <TmFormItem :wrapper-col="{ offset: 4 }" v-slot="{ submitting: ctxSubmitting }">
+    <TmFormItem v-slot="{ submitting: ctxSubmitting }" :wrapper-col="{ offset: 4 }">
       <Space>
         <TmButton type="primary" :loading="ctxSubmitting" :disabled="ctxSubmitting" @click="handleSubmit">
           提交

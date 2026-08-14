@@ -52,7 +52,8 @@ function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
 }
 
 onMounted(() => {
-  scrollTarget = findScrollParent(btnRef.value);
+  // btnRef.value 在 onMounted 时已挂载（模板 ref 类型为 HTMLElement | undefined，此处收窄）
+  scrollTarget = findScrollParent(btnRef.value ?? null);
   // passive：只读滚动位置，不阻止滚动，提升性能
   scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll(); // 初始判定（刷新时若已停在下方也要显示）

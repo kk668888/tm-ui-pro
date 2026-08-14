@@ -41,7 +41,8 @@ describe('PageWrapper', () => {
         extra: '<div class="right">操作</div>',
       },
     });
-    const header = wrapper.find('.bg-white .flex');
+    // header 为 a-flex（ant 组件），search/extra 作为插槽子节点渲染其中
+    const header = wrapper.find('.bg-white');
     expect(header.find('.left').text()).toBe('搜索');
     expect(header.find('.right').text()).toBe('操作');
   });
@@ -51,7 +52,8 @@ describe('PageWrapper', () => {
       slots: { header: '<div class="custom-header">自定义</div>' },
     });
     expect(wrapper.find('.custom-header').text()).toBe('自定义');
-    expect(wrapper.find('.flex.items-center').exists()).toBe(false);
+    expect(wrapper.find('.left').exists()).toBe(false);
+    expect(wrapper.find('.right').exists()).toBe(false);
   });
 
   it('无 footer 插槽时不渲染 footer 区域', () => {

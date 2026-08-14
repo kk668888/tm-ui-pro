@@ -27,7 +27,9 @@ const rows = ref<OrderRow[]>([
 ]);
 
 // vxe-grid columns 配置：type:'checkbox' 勾选列 / type:'seq' 序号列 / sortable 排序。
-const columns = [
+// 类型标注 VxeGridProps['columns']：type 字段保持字面量（'checkbox' | 'seq'），
+// 且避免 as const 产生 readonly 元组与 vxe 可变数组不兼容。
+const columns: import('vxe-table').VxeGridProps['columns'] = [
   { type: 'checkbox', width: 50 },
   { type: 'seq', title: '#', width: 60 },
   { field: 'name', title: '订单名称', sortable: true, minWidth: 140 },

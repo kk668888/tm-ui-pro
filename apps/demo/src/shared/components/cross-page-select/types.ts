@@ -14,7 +14,7 @@ export type SelectionState =
   | { mode: typeof SELECTION_CURRENT_PAGE; selectedIds: Set<string> }
   | { mode: typeof SELECTION_ALL_PAGES; excludedIds: Set<string> };
 
-export interface UseCrossPageSelectOptions<T = any> {
+export interface UseCrossPageSelectOptions<T = unknown> {
   rowKey: string;
   total: Ref<number>;
   checkableTotal?: Ref<number>;

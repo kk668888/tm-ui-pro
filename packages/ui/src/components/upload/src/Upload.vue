@@ -47,7 +47,8 @@ const forwardBindings = useForwardBindings(props, ['showUploadList'], ['onUpdate
 </script>
 
 <template>
-  <AUpload ref="innerRef" v-bind="forwardBindings"
+  <AUpload
+ref="innerRef" v-bind="forwardBindings"
     @update:file-list="(v: UploadFile[]) => emit('update:fileList', v)">
     <template v-for="name in slotNames" :key="name" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />

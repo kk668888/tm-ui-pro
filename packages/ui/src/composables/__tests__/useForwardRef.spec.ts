@@ -2,11 +2,16 @@
 // useForwardRef 的单测：验证 Proxy 透传内部实例方法/属性，且空实例访问不报错
 import { describe, it, expect } from 'vitest'
 import { useForwardRef } from '../useForwardRef'
-import { ref } from 'vue'
+
+/** 测试用内部实例形状：任意方法/属性均可访问（Proxy 透传的运行时契约） */
+type MockInnerInstance = Record<string, unknown> & {
+  focus: () => string
+  value: number
+}
 
 describe('useForwardRef', () => {
   it('代理内部实例的方法/属性到 exposed', () => {
-    const { innerRef, exposed } = useForwardRef<any>()
+    const { innerRef, exposed } = useForwardRef<MockInnerInstance>()
     // 模拟内部组件挂载后填充实例
     innerRef.value = { focus: () => 'focused', value: 42 }
     expect(exposed.focus()).toBe('focused')
@@ -14,18 +19,18 @@ describe('useForwardRef', () => {
   })
 
   it('内部实例为空时访问不报错（返回 undefined）', () => {
-    const { exposed } = useForwardRef<any>()
+    const { exposed } = useForwardRef<MockInnerInstance>()
     expect(exposed.anyMethod).toBeUndefined()
   })
 
   it('has 拦截器：内部实例存在的 key 返回 true（Vue 3.5+ exposeProxy 兼容）', () => {
     // 回归背景：Vue 3.5+ 的 exposeProxy 在 get 时先校验 `key in target`，
     // 若 useForwardRef 只实现 get、不实现 has，父组件 ref 拿不到 focus/blur 等方法
-    const { innerRef, exposed } = useForwardRef<any>()
+    const { innerRef, exposed } = useForwardRef<MockInnerInstance>()
     // 挂载前：内部实例为 null，has 应返回 false
     expect('focus' in exposed).toBe(false)
     // 挂载后：方法存在返回 true，不存在返回 false
-    innerRef.value = { focus: () => 'focused' }
+    innerRef.value = { focus: () => 'focused', value: 0 }
     expect('focus' in exposed).toBe(true)
     expect('nonExistent' in exposed).toBe(false)
   })
@@ -36,7 +41,7 @@ describe('useForwardRef', () => {
     // 这里针对 4 类排除分支补负面断言，确保即使内部实例上真实存在这些 key，
     // has 也仍然返回 false（防止未来误改导致 wrapper.vm.$emit 等错指到内部实例）。
     const sym = Symbol('test')
-    const { innerRef, exposed } = useForwardRef<any>()
+    const { innerRef, exposed } = useForwardRef<MockInnerInstance>()
     // 挂载前：inst 为 null，in 操作不应抛错，且全部返回 false
     expect('__v_isRef' in exposed).toBe(false)
     expect('$emit' in exposed).toBe(false)
@@ -50,6 +55,7 @@ describe('useForwardRef', () => {
       _internal: 'private',
       [sym]: 'symbol-val',
       focus: () => 'focused',
+      value: 1,
     }
     // 1. `__v_*`：Vue 响应式 marker，若暴露会让 proxyRefs/markRaw 误判 exposed 为 ref/reactive
     expect('__v_isRef' in exposed).toBe(false)

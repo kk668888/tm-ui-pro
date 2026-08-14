@@ -1,6 +1,6 @@
 // packages/ui/src/components/statistic/__tests__/Statistic.spec.ts
 // TmStatistic 单测：title/value 渲染、formatter/precision props 透传、前后缀插槽
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TmStatistic from '../src/Statistic.vue'
 
@@ -12,7 +12,8 @@ describe('TmStatistic', () => {
   })
 
   it('precision / formatter props 透传', () => {
-    const formatter = (value: number | string) => `¥${value}`
+    // ant Statistic formatter 签名 ({ value, config }) => VNodeTypes
+    const formatter = ({ value }: { value: number | string }) => `¥${value}`
     const wrapper = mount(TmStatistic, { props: { value: 123.456, precision: 2, formatter } })
     const inner = wrapper.findComponent({ name: 'AStatistic' })
     expect(inner.props('precision')).toBe(2)

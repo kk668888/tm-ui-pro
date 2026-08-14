@@ -148,7 +148,8 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* 固定在右下角，DEV 工具样式，独立作用域不影响业务 */
+/* 固定在右下角，DEV 工具样式，独立作用域不影响业务。
+   配色统一引用主题 CSS 变量，随亮/暗/预设联动（审查 P1 #8 收口）。 */
 .token-panel {
   position: fixed;
   right: 16px;
@@ -156,9 +157,9 @@ onUnmounted(() => {
   z-index: 9999;
   width: 320px;
   font-size: 12px;
-  color: #1f1f1f;
-  background: #fff;
-  border: 1px solid #d9d9d9;
+  color: var(--text-body);
+  background: var(--bg-container);
+  border: 1px solid var(--border-base);
   border-radius: 8px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -169,22 +170,22 @@ onUnmounted(() => {
   gap: 10px;
   padding: 8px 12px;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-extra-light);
   user-select: none;
 }
 .token-panel__title {
   font-weight: 600;
 }
 .token-panel__remain.is-near {
-  color: #fa8c16;
+  color: var(--color-warning);
   font-weight: 600;
 }
 .token-panel__count {
   margin-left: auto;
-  color: #1677ff;
+  color: var(--color-primary);
 }
 .token-panel__toggle {
-  color: #999;
+  color: var(--text-secondary);
 }
 .token-panel__body {
   padding: 10px 12px;
@@ -199,14 +200,14 @@ onUnmounted(() => {
   padding: 4px 8px;
   font-size: 12px;
   cursor: pointer;
-  background: #f5f5f5;
-  border: 1px solid #d9d9d9;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-base);
   border-radius: 4px;
 }
 .token-panel__row button:hover {
-  background: #e6f4ff;
-  border-color: #1677ff;
-  color: #1677ff;
+  background: var(--color-primary-disabled);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 .token-panel__logs {
   list-style: none;
@@ -218,14 +219,14 @@ onUnmounted(() => {
 .token-panel__logs li {
   padding: 2px 0;
   line-height: 1.5;
-  border-bottom: 1px dashed #f5f5f5;
+  border-bottom: 1px dashed var(--border-extra-light);
 }
 .token-panel__logs .is-empty {
-  color: #999;
+  color: var(--text-secondary);
 }
 .token-panel__tip {
   margin: 0;
-  color: #888;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 </style>

@@ -1,6 +1,6 @@
 // packages/ui/src/components/upload/src/props.ts
 // TmUpload 类型定义：ant 原生 UploadProps（含受控 fileList / beforeUpload），当前无公司扩展键
-import type { UploadProps, UploadFile } from 'ant-design-vue/es/upload'
+import type { UploadProps } from 'ant-design-vue/es/upload'
 
 /**
  * TmUpload = ant 原生 UploadProps

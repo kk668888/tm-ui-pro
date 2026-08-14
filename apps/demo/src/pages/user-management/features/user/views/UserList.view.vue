@@ -2,9 +2,10 @@
 import { computed } from 'vue';
 import { useUserList } from '../composables/useUser';
 import { UserStatuses, UserStatusOptions, UserRoleOptions, type User } from '../models/User';
-import { useCrossPageGrid } from '@/shared/components/cross-page-select';
-import { PageWrapper } from '@/shared/components/page-wrapper';
-import { QueryFilter, type FilterItemConfig } from '@/shared/components/query-filter';
+import { useCrossPageGrid } from '@/shared/components/cross-page-select/useCrossPageGrid';
+import PageWrapper from '@/shared/components/page-wrapper/PageWrapper.vue';
+import QueryFilter from '@/shared/components/query-filter/QueryFilter.vue';
+import type { FilterItemConfig } from '@/shared/components/query-filter/types';
 import { COPY } from '@/shared/constants/copy';
 
 defineOptions({ name: 'UserList' });

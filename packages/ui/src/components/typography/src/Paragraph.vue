@@ -7,14 +7,15 @@
   3. default 插槽透传 + useForwardRef 方法透传
 -->
 <script setup lang="ts">
-import { useSlots } from 'vue'
+import { useSlots, type ComponentPublicInstance } from 'vue'
 import { TypographyParagraph as ATypographyParagraph } from 'ant-design-vue'
 import type { TmTypographyParagraphProps } from './props'
 import { useForwardRef } from '../../../composables/useForwardRef'
 import { useForwardBindings } from '../../../composables/useForwardBindings'
 
-/** ant Typography.Paragraph 实例类型（ant 未导出 ParagraphInstance，用 InstanceType 推导） */
-type ParagraphInstance = InstanceType<typeof ATypographyParagraph>
+// 注：ant Typography.Paragraph 是 FunctionalComponent（非 defineComponent），无 class 实例，
+// InstanceType 不适用；方法透传回退到通用组件实例类型（useForwardRef 运行时按需转发）。
+type ParagraphInstance = ComponentPublicInstance
 
 defineOptions({ name: 'TmTypographyParagraph', inheritAttrs: false })
 

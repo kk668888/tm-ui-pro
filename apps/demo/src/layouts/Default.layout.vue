@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
 import { MenuFoldOutlined, MenuUnfoldOutlined, LogoutOutlined } from '@ant-design/icons-vue';
 import { useAppStore } from '@/modules/app/stores/app';
 import { useAuthStore } from '@/modules/auth/stores/auth';
 import { useTabStore, TabBar } from '@/layouts/tab';
-import { ErrorBoundary } from '@/shared/components/error-boundary';
-import { ThemeSwitcher } from '@/shared/components/theme-switcher';
+import ErrorBoundary from '@/shared/components/error-boundary/ErrorBoundary.vue';
+import ThemeSwitcher from '@/shared/components/theme-switcher/ThemeSwitcher.vue';
 import { useTheme } from '@/core/theme';
 
 defineOptions({ name: 'DefaultLayout' });
@@ -33,8 +34,8 @@ const selectedKeys = computed(() => {
   return name ? [name] : [];
 });
 
-function handleMenuClick({ key }: { key: string }) {
-  router.push({ name: key });
+function handleMenuClick({ key }: MenuInfo) {
+  router.push({ name: key as string });
 }
 
 async function handleLogout() {
@@ -99,11 +100,17 @@ async function handleLogout() {
         <!-- ErrorBoundary 包裹业务内容区：捕获页面渲染异常 → 显示 fallback，保留布局壳不白屏 -->
         <ErrorBoundary>
           <router-view v-slot="{ Component }">
+            <!--
+              keep-alive 按组件 name 缓存（tabStore.cachedNames 与路由 name 对齐）。
+              注意：不能给 <component> 加 :key="$route.fullPath"——key 含 query 时
+              `/list?page=2` 与 `/list` 是两个实例，往返即重建，缓存永远命中不了，
+              标签页切换后筛选/分页状态必然丢失（审查 P0 #5）。
+              用 name（组件类型）+ keep-alive include 即可满足 tab 场景缓存语义。
+            -->
             <keep-alive :include="tabStore.cachedNames">
               <component
                 :is="Component"
                 v-if="!tabStore.isExcluded($route.name as string)"
-                :key="$route.fullPath"
               />
             </keep-alive>
             <div

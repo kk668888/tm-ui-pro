@@ -11,14 +11,15 @@ describe('withInstall', () => {
 
     const app = createApp({})
     const componentSpy = vi.spyOn(app, 'component')
-    ;(TmButton as any).install(app)
+    // withInstall 返回类型已含 install 方法（T & { install }），无需强转
+    TmButton.install(app)
 
     expect(componentSpy).toHaveBeenCalledWith('TmButton', Base)
   })
 
   it('保留原组件的全部属性', () => {
     const Base = defineComponent({ name: 'XButton', props: { foo: {} } })
-    const TmButton = withInstall(Base, 'TmButton') as any
+    const TmButton = withInstall(Base, 'TmButton')
     expect(TmButton.props).toEqual(Base.props)
   })
 })

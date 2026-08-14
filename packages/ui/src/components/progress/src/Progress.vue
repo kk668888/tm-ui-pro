@@ -16,8 +16,15 @@ import { PROGRESS_STATUS_MAP, type ProgressStatusKey } from './status'
 import { useForwardRef } from '../../../composables/useForwardRef'
 import { useForwardBindings } from '../../../composables/useForwardBindings'
 
-/** ant Progress 实例类型（ant 未导出 ProgressInstance，用 InstanceType 推导） */
-type ProgressInstance = InstanceType<typeof AProgress>
+/**
+ * ant Progress 实例类型（ant 未导出 ProgressInstance，用 InstanceType 推导）。
+ * 注意：exposed 类型必须剔除 `$props`——defineExpose(useForwardRef 返回的 exposed) 时
+ * Volar 会把 exposed 的 `$props` 与组件 props 做交叉合并；若保留 ant 原生 `$props`
+ * （status 值域较窄），会把 TmProgressProps 经 Omit 扩展后的 status 值域收窄回 ant 原生，
+ * 导致业务语义值（processing/failed/warning）在模板中报类型错误。
+ * 方法透传不受影响：ant Progress 实例方法均在 `$props` 之外。
+ */
+type ProgressInstance = Omit<InstanceType<typeof AProgress>, '$props'>
 
 defineOptions({ name: 'TmProgress', inheritAttrs: false })
 
@@ -44,7 +51,9 @@ const forwardBindings = useForwardBindings(props, [])
  */
 const antBindings = computed(() => {
   const { status, strokeColor, ...rest } = forwardBindings.value
-  if (typeof status === 'string' && Object.hasOwn(PROGRESS_STATUS_MAP, status)) {
+  // 用 Object.hasOwn 判断命中，避免 status 传入原型链属性名（如 'constructor'）
+  // 时 in 误判为命中并静默丢弃 status
+  if (typeof status === 'string' && Object.prototype.hasOwnProperty.call(PROGRESS_STATUS_MAP, status)) {
     const mapped = PROGRESS_STATUS_MAP[status as ProgressStatusKey]
     return {
       ...rest,

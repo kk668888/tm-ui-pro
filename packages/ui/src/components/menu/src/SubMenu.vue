@@ -22,7 +22,7 @@ const props = defineProps<TmSubMenuProps>()
 
 // 关键：ant SubMenu 用 instance.vnode.key 读自身 key（同 MenuItem），须从 <TmSubMenu key="x">
 // 的 vnode key 显式转发到内部 ASubMenu，否则 key 为 undefined、子菜单状态失效。
-const vnodeKey = getCurrentInstance()?.vnode.key
+const vnodeKey = getCurrentInstance()?.vnode.key ?? undefined
 
 // slot keys 快照（mount 后稳定，无需响应式）
 const slotNames = Object.keys(useSlots()) as string[]

@@ -100,4 +100,54 @@ describe('useForwardBindings', () => {
     const wrapper = mount(ExcludeHost, { attrs: { 'onUpdate:fileList': () => {} } })
     expect(wrapper.find('div').attributes('data-fwd')).toBe('undefined')
   })
+
+  it('同名 style 键（$attrs 与显式 props）合并：mergeProps 合并对象，两值都保留', () => {
+    // 场景：组件 props 未声明 style（走 $attrs 透传），但中间变换/默认 source 也合成 style。
+    // Vue mergeProps 对 style 是「合并对象」而非覆盖，两处样式都应保留。
+    const StyleMergeHost = defineComponent({
+      name: 'StyleMergeHost',
+      inheritAttrs: false,
+      setup() {
+        const forward = useForwardBindings(
+          { style: { color: 'red' } },
+          ['style'],
+        )
+        return () => h('div', { 'data-fwd': JSON.stringify(forward.value) })
+      },
+    })
+    const fwd = readForward(mount(StyleMergeHost, { attrs: { style: { width: '10px' } } }))
+    expect(fwd.style).toEqual({ color: 'red', width: '10px' })
+  })
+
+  it('同名 class 键：$attrs 与显式 source 的 class 经 mergeProps 拼接（不覆盖丢弃）', () => {
+    // Vue mergeProps 对 class 是「拼接字符串」；$attrs.class 与 source.class 都保留
+    const ClassMergeHost = defineComponent({
+      name: 'ClassMergeHost',
+      inheritAttrs: false,
+      setup() {
+        const forward = useForwardBindings({ class: 'tm-base' }, ['class'])
+        return () => h('div', { 'data-fwd': JSON.stringify(forward.value) })
+      },
+    })
+    const fwd = readForward(mount(ClassMergeHost, { attrs: { class: 'outer-class' } }))
+    // mergeProps 拼接顺序：$attrs 值在前、source 值在后
+    expect(fwd.class).toBe('outer-class tm-base')
+  })
+
+  it('同名事件监听器：$attrs 与显式 props 的 onXxx 经 mergeProps 数组化（两者都被调用）', () => {
+    // props 未声明 onClick（走 $attrs），companyDefaults 让显式 onClick 也转发 → 合并为数组
+    const EventMergeHost = defineComponent({
+      name: 'EventMergeHost',
+      inheritAttrs: false,
+      props: {},
+      setup(_props) {
+        const source = { onClick: () => 'from-props' }
+        const forward = useForwardBindings(source, ['onClick'])
+        return () => h('div', { 'data-fwd': String(typeof forward.value.onClick) })
+      },
+    })
+    const wrapper = mount(EventMergeHost, { attrs: { onClick: () => {} } })
+    // mergeProps 数组化后 typeof 为 object（Array）
+    expect(wrapper.find('div').attributes('data-fwd')).toBe('object')
+  })
 })

@@ -60,23 +60,33 @@ const DATE_RANGE_CONFIG = [
 ];
 
 type QueryFilterProps = InstanceType<typeof QueryFilter>['$props'];
+// 注：MountingOptions<QueryFilterProps> 的 props 泛型与 vue-tsc 推断的 slots 索引签名
+// 存在已知不兼容（@vue/test-utils 与 vue-tsc 类型边界），mount 调用处用组件类型直接推断。
 type QueryFilterMountOptions = MountingOptions<QueryFilterProps>;
 
 function mountQueryFilter(options: QueryFilterMountOptions) {
-  return mount(QueryFilter, {
-    ...options,
-    global: {
-      ...options.global,
-      components: {
-        // QueryFilter relies on unplugin-vue-components in the real Vite app.
-        // Unit tests do not run that resolver, so the antd tags must be registered here.
-        AForm,
-        AFormItem,
-        AButton,
-        ...options.global?.components,
+  // 注：@vue/test-utils 的 MountingOptions 与 vue-tsc 推断的 slots 索引签名存在
+  // 已知类型边界不兼容（ComponentMountingOptions 的 slots 为 readonly 索引签名），
+  // 此处整体断言 mount 入参，运行时行为不受影响。
+  return mount(
+    QueryFilter,
+    {
+      ...options,
+      global: {
+        ...options.global,
+        components: {
+          // QueryFilter relies on unplugin-vue-components in the real Vite app.
+          // Unit tests do not run that resolver, so the antd tags must be registered here.
+          AForm,
+          AFormItem,
+          AButton,
+          ...options.global?.components,
+          // 类型断言：注册对象混合 ant 组件与用户组件，vue-tsc 无法精确推断 slots 形状，
+          // 而运行时只需组件可解析（vue-test-utils 宽松处理）。
+        } as unknown as Record<string, object>,
       },
-    },
-  });
+    } as Parameters<typeof mount>[1],
+  );
 }
 
 describe('QueryFilter', () => {

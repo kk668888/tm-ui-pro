@@ -16,8 +16,9 @@ export function getHtmlInterface() {
         return html
             .replace('<!--INJECT_STYLE-->', `<style>${css}</style>`)
             .replace('<!--INJECT_SCRIPT-->', `<script>${js}</script>`);
-    } catch (e: any) {
+    } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Unknown error';
         console.error('Failed to load menu visualizer UI files', e);
-        return `<h1>Error loading UI: ${e.message}</h1>`;
+        return `<h1>Error loading UI: ${message}</h1>`;
     }
 }

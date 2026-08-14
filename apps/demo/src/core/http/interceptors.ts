@@ -157,7 +157,11 @@ export function setupInterceptors(instance: AxiosInstance, options: InterceptorO
   instance.interceptors.response.use(
     (response: AxiosResponse<ApiResponse>) => {
       cleanupPending(response.config, manager);
-      return unwrapBusinessEnvelope(response);
+      // 解包业务信封：返回值不再是 AxiosResponse，而是 ApiResponse<T>。
+      // axios 拦截器类型签名固定要求返回 AxiosResponse，此处经 unwrapBusinessEnvelope
+      // 在运行时替换返回值，类型上用 unknown 中转断言（与 instance.get 等方法的
+      // as unknown as Promise<ApiResponse<T>> 对称，见 instance.ts）。
+      return unwrapBusinessEnvelope(response) as unknown as AxiosResponse<ApiResponse>;
     },
     async (error: unknown) => {
       const axErr = error as {

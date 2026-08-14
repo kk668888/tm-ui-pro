@@ -164,11 +164,14 @@ onMounted(() => {
         <a-row :gutter="16">
           <a-col v-for="field in search.fields" :key="field.field" :span="field.span ?? 8">
             <a-form-item :label="field.label" :name="field.field">
-              <a-input v-if="(field.type ?? 'input') === 'input'" v-model:value="search.model[field.field]"
+              <a-input
+v-if="(field.type ?? 'input') === 'input'" v-model:value="search.model[field.field]"
                 :placeholder="field.placeholder" allow-clear />
-              <a-select v-else-if="field.type === 'select'" v-model:value="search.model[field.field]"
+              <a-select
+v-else-if="field.type === 'select'" v-model:value="search.model[field.field]"
                 :options="field.options" :placeholder="field.placeholder" allow-clear style="width: 100%" />
-              <a-date-picker v-else-if="field.type === 'date'" v-model:value="search.model[field.field]"
+              <a-date-picker
+v-else-if="field.type === 'date'" v-model:value="search.model[field.field]"
                 :placeholder="field.placeholder" style="width: 100%" />
             </a-form-item>
           </a-col>
@@ -200,7 +203,8 @@ onMounted(() => {
 
     <!-- ant 分页器：固定底部，change 事件驱动远程拉数 / 静态切页；pagination=false 时整体隐藏 -->
     <div v-if="props.pagination" class="tm-table__pager">
-      <a-pagination :current="pagination.page.currentPage" :page-size="pagination.page.pageSize"
+      <a-pagination
+:current="pagination.page.currentPage" :page-size="pagination.page.pageSize"
         :total="pagination.total.value" :page-size-options="pageSizeOptions"
         :show-total="(total: number) => `共 ${total} 条`" show-size-changer @change="pagination.onChange" />
     </div>

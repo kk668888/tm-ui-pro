@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import message from 'ant-design-vue/es/message';
 import { useUserList } from './useUser';
 import { deleteUser, getUserList } from '../api/user.api';
+import type { UserStatus, UserRole } from '../models/User';
 import { COPY } from '@/shared/constants/copy';
 
 vi.mock('ant-design-vue/es/message', () => ({

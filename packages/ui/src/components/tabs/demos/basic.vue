@@ -10,7 +10,7 @@ const active = ref('a')
 <template>
   <div style="width: 100%">
     <p>基础标签</p>
-    <TmTabs v-model:activeKey="active">
+    <TmTabs v-model:active-key="active">
       <TmTabPane key="a" tab="标签A"><p>内容 A</p></TmTabPane>
       <TmTabPane key="b" tab="标签B"><p>内容 B</p></TmTabPane>
       <TmTabPane key="c" tab="标签C"><p>内容 C</p></TmTabPane>

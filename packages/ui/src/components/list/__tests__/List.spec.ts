@@ -5,7 +5,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h, ref } from 'vue'
 import TmList from '../src/List.vue'
 import TmListItem from '../src/ListItem.vue'
-import TmListItemMeta from '../src/ListItemMeta.vue'
 
 // Host 组件：dataSource + #renderItem（ant List 渲染数据源的标准用法）
 const Host = defineComponent({

@@ -12,6 +12,15 @@ import { reactive } from 'vue'
 import type { TmTableSearchConfig } from '../props'
 
 /**
+ * 搜索表单 model 的值类型：ant Form model 生态惯例的宽松映射。
+ * 模板 v-model 动态索引绑定（a-input string / a-select SelectValue / a-date-picker Dayjs）
+ * 需要 any 才能通过 vue-tsc 的严格双向类型检查；显式联合反而会因组件 value 类型
+ * 各异而报错。这里保留 any 并集中豁免一处（含 Table.vue 模板三处 v-model 绑定）。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SearchFormModel = Record<string, any>
+
+/**
  * useSearch 输入依赖（由 Table.vue 注入 usePagination 的控制器）
  * @property fetchData     远程拉数函数（来自 usePagination）
  * @property resetToFirst  页码重置 1（来自 usePagination，查询后回到首页）
@@ -31,8 +40,8 @@ export interface UseSearchOptions {
 export interface UseSearchReturn {
   fields: NonNullable<TmTableSearchConfig>['fields']
   // 承载业务任意声明的字段值（input string / select number / date Dayjs...）。
-  // Record<string, any> 是 ant Form model 的生态惯例，模板 v-model 动态索引需宽松读写。
-  model: Record<string, any>
+  // 类型见 SearchFormModel：ant Form model 生态惯例，模板 v-model 动态索引需宽松读写。
+  model: SearchFormModel
   handleSearch: () => void
   resetQuery: () => void
 }
@@ -61,7 +70,7 @@ export function useSearch(
   const configured = Boolean(config)
 
   // Form model：以字段默认值初始化（reactive，表单项 v-model 双向绑定）
-  const model = reactive<Record<string, any>>(
+  const model = reactive<SearchFormModel>(
     Object.fromEntries(fields.map((f) => [f.field, f.defaultValue ?? ''])),
   )
 

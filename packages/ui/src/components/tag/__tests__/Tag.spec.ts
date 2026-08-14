@@ -3,6 +3,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TmTag from '../src/Tag.vue'
+import type { TmTagProps } from '../src/props'
 
 describe('TmTag', () => {
   it('status: success 映射为 ant 预设语义色 success', () => {
@@ -18,8 +19,10 @@ describe('TmTag', () => {
   })
 
   it('未知 status 回退默认色（color undefined → ant 默认），不抛错', () => {
-    // as any 明确表达「运行时注入的非法 status」，突破 TS 枚举约束是有意为之
-    const wrapper = mount(TmTag, { props: { status: 'unknown' as any } })
+    // as unknown as 明确表达「运行时注入的非法 status」，突破 TS 枚举约束是有意为之
+    const wrapper = mount(TmTag, {
+      props: { status: 'unknown' as unknown as TmTagProps['status'] },
+    })
     const inner = wrapper.findComponent({ name: 'ATag' })
     expect(inner.props('color')).toBeUndefined()
   })

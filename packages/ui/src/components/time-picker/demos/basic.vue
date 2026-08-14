@@ -6,8 +6,6 @@ import { TmTimePicker } from '../index'
 
 // 字符串模式（业务零 Dayjs 依赖）
 const timeStr = ref('09:30:00')
-// Dayjs 直通模式
-const timeDayjs = ref<string | null>(null)
 </script>
 
 <template>

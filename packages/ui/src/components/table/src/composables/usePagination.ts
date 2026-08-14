@@ -13,7 +13,7 @@
 // 6. 不做错误吞咽：request reject 时 finally 仍复位 loading，错误沿 await 链向上抛
 //    （调用方为 void 调用，不阻塞 UI；业务可在 request 内部 try/catch）。
 import { computed, reactive, ref, type ComputedRef } from 'vue'
-import type { TmTableExtProps, TmTableResult } from '../props'
+import type { TmTableExtProps } from '../props'
 
 /**
  * usePagination 输入配置

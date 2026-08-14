@@ -3,6 +3,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TmAlert from '../src/Alert.vue'
+import type { TmAlertProps } from '../src/props'
 
 describe('TmAlert', () => {
   it('status: success 映射为 ant 语义类型 success', () => {
@@ -21,8 +22,10 @@ describe('TmAlert', () => {
   })
 
   it('未知 status 回退默认（type undefined → ant 默认 info），不抛错', () => {
-    // as any 明确表达「运行时注入的非法 status」，突破 TS 枚举约束是有意为之
-    const wrapper = mount(TmAlert, { props: { status: 'unknown' as any, message: 'x' } })
+    // as unknown as 明确表达「运行时注入的非法 status」，突破 TS 枚举约束是有意为之
+    const wrapper = mount(TmAlert, {
+      props: { status: 'unknown' as unknown as TmAlertProps['status'], message: 'x' },
+    })
     expect(wrapper.findComponent({ name: 'AAlert' }).props('type')).toBeUndefined()
   })
 

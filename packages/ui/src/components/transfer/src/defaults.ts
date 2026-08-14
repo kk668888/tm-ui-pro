@@ -12,6 +12,8 @@ export const DEFAULT_TRANSFER_TITLES = ['源列表', '目标列表']
 export const DEFAULT_TRANSFER_RENDER = (item: { title?: string }): string => item?.title ?? ''
 
 export const tmTransferDefaults = {
-  titles: (): TransferProps['titles'] => [...DEFAULT_TRANSFER_TITLES],
+  // 显式标注返回类型：ant TransferProps = Partial<ExtractPropTypes>（索引含 undefined），
+  // withDefaults 的 InferDefault 要求无 undefined 的精确类型，否则 TS2345。
+  titles: (): string[] => [...DEFAULT_TRANSFER_TITLES],
   render: DEFAULT_TRANSFER_RENDER as unknown as TransferProps['render'],
 } as const

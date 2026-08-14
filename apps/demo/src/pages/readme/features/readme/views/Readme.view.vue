@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import MarkdownViewer from '@/shared/components/markdown/MarkdownViewer.vue';
 import MarkdownOutline from '@/shared/components/markdown/MarkdownOutline.vue';
-import { BackToTop } from '@/shared/components/back-to-top';
+import BackToTop from '@/shared/components/back-to-top/BackToTop.vue';
 import type { Heading } from '@/shared/components/markdown/heading';
 
 interface MarkdownDocItem {
@@ -204,15 +204,15 @@ watch(currentDocPath, () => {
   <div class="relative h-full min-h-0">
     <aside
       v-if="!isLeftCollapsed"
-      class="absolute left-0 top-0 z-10 h-full w-[260px] overflow-hidden rounded-lg border border-[#d0d7de] bg-white"
+      class="absolute left-0 top-0 z-10 h-full w-[260px] overflow-hidden rounded-lg border border-[var(--border-light)] bg-[var(--bg-container)]"
     >
-      <div class="border-b border-[#d8dee4] px-3 py-3">
+      <div class="border-b border-[var(--border-light)] px-3 py-3">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-semibold text-[#1f2328]">文档目录</span>
+          <span class="text-sm font-semibold text-[var(--text-title)]">文档目录</span>
           <div class="flex items-center gap-2">
             <a-tag color="blue">{{ documents.length }}</a-tag>
             <button
-              class="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-[#57606a] transition hover:border-[#d0d7de] hover:bg-[#f6f8fa] hover:text-[#1f2328]"
+              class="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-[var(--text-secondary)] transition hover:border-[var(--border-light)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-title)]"
               type="button"
               @click="toggleLeftCollapsed"
             >
@@ -220,7 +220,7 @@ watch(currentDocPath, () => {
             </button>
           </div>
         </div>
-        <div class="mt-2 truncate text-xs text-[#57606a]">
+        <div class="mt-2 truncate text-xs text-[var(--text-secondary)]">
           {{ currentDoc?.label ?? '暂无文档' }}
         </div>
       </div>
@@ -239,13 +239,13 @@ watch(currentDocPath, () => {
 
     <aside
       v-if="!isRightCollapsed"
-      class="absolute right-0 top-0 z-10 h-full w-[260px] overflow-hidden rounded-lg border border-[#d0d7de] bg-white"
+      class="absolute right-0 top-0 z-10 h-full w-[260px] overflow-hidden rounded-lg border border-[var(--border-light)] bg-[var(--bg-container)]"
     >
-      <div class="border-b border-[#d8dee4] px-3 py-3">
+      <div class="border-b border-[var(--border-light)] px-3 py-3">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-semibold text-[#1f2328]">文档大纲</span>
+          <span class="text-sm font-semibold text-[var(--text-title)]">文档大纲</span>
           <button
-            class="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-[#57606a] transition hover:border-[#d0d7de] hover:bg-[#f6f8fa] hover:text-[#1f2328]"
+            class="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-[var(--text-secondary)] transition hover:border-[var(--border-light)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-title)]"
             type="button"
             @click="toggleRightCollapsed"
           >
@@ -270,7 +270,7 @@ watch(currentDocPath, () => {
         />
         <div
           v-else
-          class="flex h-full items-center justify-center rounded-lg border border-dashed border-[#d0d7de] bg-white px-6 text-sm text-[#57606a]"
+          class="flex h-full items-center justify-center rounded-lg border border-dashed border-[var(--border-light)] bg-[var(--bg-container)] px-6 text-sm text-[var(--text-secondary)]"
         >
           No Markdown documents are available for preview.
         </div>
@@ -284,7 +284,7 @@ watch(currentDocPath, () => {
       class="pointer-events-none absolute inset-y-0 left-0 z-20 flex items-center"
     >
       <button
-        class="pointer-events-auto flex h-16 w-6 items-center justify-center rounded-r-full border border-l-0 border-[#d0d7de] bg-white/92 text-[#57606a] shadow-xs backdrop-blur transition hover:w-7 hover:text-[#1f2328]"
+        class="pointer-events-auto flex h-16 w-6 items-center justify-center rounded-r-full border border-l-0 border-[var(--border-light)] bg-[var(--bg-container)]/92 text-[var(--text-secondary)] shadow-xs backdrop-blur transition hover:w-7 hover:text-[var(--text-title)]"
         type="button"
         @click="toggleLeftCollapsed"
       >
@@ -297,7 +297,7 @@ watch(currentDocPath, () => {
       class="pointer-events-none absolute inset-y-0 right-0 z-20 flex items-center"
     >
       <button
-        class="pointer-events-auto flex h-16 w-6 items-center justify-center rounded-l-full border border-r-0 border-[#d0d7de] bg-white/92 text-[#57606a] shadow-xs backdrop-blur transition hover:w-7 hover:text-[#1f2328]"
+        class="pointer-events-auto flex h-16 w-6 items-center justify-center rounded-l-full border border-r-0 border-[var(--border-light)] bg-[var(--bg-container)]/92 text-[var(--text-secondary)] shadow-xs backdrop-blur transition hover:w-7 hover:text-[var(--text-title)]"
         type="button"
         @click="toggleRightCollapsed"
       >

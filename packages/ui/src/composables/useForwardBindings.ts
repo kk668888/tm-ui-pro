@@ -10,10 +10,15 @@
 //   1. $attrs：非 props 的透传属性与监听器（Vue 已自动归类）
 //   2. 业务显式传入的 props（父组件 vnode.props 里真实存在的 key）
 //   3. 公司默认值（withDefaults 的 key，必须显式转发，避免被当作幻影值跳过）
+//
+// 合并语义（审查 P1 修复）：显式 props 与 $attrs 同名时（业务同时传 class/style/onXxx），
+// 用 Vue 的 mergeProps 合并而非直接覆盖——class/style 拼接、事件监听器数组化，
+// 与原生 v-bind 行为一致，避免 $attrs 中的同名值被静默丢弃。
 import {
   computed,
   getCurrentInstance,
   isRef,
+  mergeProps,
   useAttrs,
   type ComputedRef,
   type Ref,
@@ -58,7 +63,14 @@ export function useForwardBindings(
       // 业务显式传入：rawProps 里存在该 key（含 kebab/camel 两种形态）
       const isExplicit = key in raw || toCamel(key) in raw || toKebab(key) in raw
       if (isCompany || isExplicit) {
-        forward[key] = vals[key]
+        // 合并语义：key 已在 $attrs（业务透传了同名 class/style/onXxx）时用 mergeProps
+        // 合并——class/style 拼接、事件监听器数组化；非合并键取 vals 值（覆盖默认）。
+        // 若直接覆盖会丢失 $attrs 中的同名业务值（审查 P1 修复）。
+        if (key in forward) {
+          forward[key] = mergeProps({ [key]: forward[key] }, { [key]: vals[key] })[key]
+        } else {
+          forward[key] = vals[key]
+        }
       }
       // 其余（缺省被归一化为 false/undefined 的 prop）跳过，交给内部组件默认兜底
     }

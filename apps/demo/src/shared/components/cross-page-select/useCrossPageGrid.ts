@@ -1,4 +1,4 @@
-import { h, computed, watch, nextTick, type Ref } from 'vue';
+import { h, computed, watch, nextTick, onBeforeUnmount, type Ref } from 'vue';
 import CrossPageCheckboxHeader from './CrossPageCheckboxHeader.vue';
 import { useCrossPageSelect } from './useCrossPageSelect';
 import type { UseCrossPageSelectOptions } from './types';
@@ -44,36 +44,63 @@ export function useCrossPageGrid<T = unknown>(options: UseCrossPageGridOptions<T
     }
   }
 
-  function scheduleGridCheckboxSync() {
+  /**
+   * 勾选视觉同步（审查 P1 #10 优化）：
+   * - 选中态变化（最常见操作）：nextTick 后同步一次即可，避免每次勾选都做两次全量同步；
+   * - 数据变化（翻页/查询，needsMacroTask=true）：vxe proxyConfig 在 ajax.query 返回后
+   *   才把数据写回表格内部状态，可能晚于 currentData watcher，故额外延后一轮宏任务
+   *   再同步一次，确保表格完成分页数据替换后恢复勾选视觉。
+   */
+  function scheduleGridCheckboxSync(needsMacroTask: boolean) {
     if (syncTimer) {
       clearTimeout(syncTimer);
+      syncTimer = undefined;
     }
 
     void nextTick(() => {
       syncGridCheckbox();
-
-      // VXE proxyConfig 会在 ajax.query 返回后再把数据写回表格内部状态；翻页场景下，
-      // 这一步可能发生在 currentData 变更 watcher 之后，并覆盖前一次 setCheckboxRow。
-      // 因此额外延后一轮宏任务再同步一次，确保表格完成分页数据替换后恢复勾选视觉状态。
-      syncTimer = setTimeout(() => {
-        syncTimer = undefined;
-        syncGridCheckbox();
-      }, 0);
+      if (needsMacroTask) {
+        syncTimer = setTimeout(() => {
+          syncTimer = undefined;
+          syncGridCheckbox();
+        }, 0);
+      }
     });
   }
 
-  watch([composable.selectionState, selectOptions.data], scheduleGridCheckboxSync, {
-    flush: 'post',
+  watch(
+    [composable.selectionState, selectOptions.data],
+    ([sel, data], [oldSel, oldData]) => {
+      // 仅数据引用变化（翻页/查询）需要双同步；选中态变化单次同步即可
+      const dataChanged = data !== oldData;
+      void sel;
+      void oldSel;
+      scheduleGridCheckboxSync(dataChanged);
+    },
+    { flush: 'post' },
+  );
+
+  // 卸载时清理未触发的宏任务定时器，避免组件销毁后回调执行
+  onBeforeUnmount(() => {
+    if (syncTimer) {
+      clearTimeout(syncTimer);
+      syncTimer = undefined;
+    }
   });
 
   function handleCheckboxChange(params: VxeCheckboxEventParams<T>) {
     if (isSyncing) return;
-    composable.onCheckboxChange(params);
+    // vxe 事件参数字段可选（row/checked 可能 undefined），收窄后转发给状态层
+    if (params.row !== undefined && params.checked !== undefined) {
+      composable.onCheckboxChange({ row: params.row, checked: params.checked });
+    }
   }
 
   function handleCheckboxAll(params: VxeCheckboxEventParams<T>) {
     if (isSyncing) return;
-    composable.onCheckboxAll(params);
+    if (params.checked !== undefined) {
+      composable.onCheckboxAll({ checked: params.checked, records: params.records ?? [] });
+    }
   }
 
   const checkboxColumn = computed(() => ({

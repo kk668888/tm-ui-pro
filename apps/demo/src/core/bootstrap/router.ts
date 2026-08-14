@@ -30,7 +30,7 @@ const routes = [
   },
 ];
 
-const isDevAuthBypassEnabled =
+const isDevAuthBypassEnabled = (): boolean =>
   import.meta.env.DEV && import.meta.env.VITE_DEV_AUTH_BYPASS !== 'false';
 
 export const router = createRouter({
@@ -75,7 +75,7 @@ router.beforeEach(async (to) => {
 
   // 研发环境默认注入本地会话，免去每次调试都要经过登录页和验证码。
   // 该分支会被 Vite 在生产构建中静态消除，不影响线上登录态、续期和权限校验。
-  if (isDevAuthBypassEnabled) {
+  if (isDevAuthBypassEnabled()) {
     authStore.setupDevSession();
 
     if (to.path === '/login' || to.path === '/') {
@@ -100,14 +100,16 @@ router.beforeEach(async (to) => {
     await authStore.fetchUser();
   }
 
-  // 3) 未登录 → 登录页（带回跳）
-  if (!authStore.user) {
-    return { path: '/login', query: { redirect: to.fullPath } };
-  }
-
-  // 4) 拉取用户信息真失败 → 无权限页
+  // 3) 拉取用户信息真失败 → 无权限页。
+  //    先于「未登录」判定：fetchUser 非 401 失败时 user 仍为 null 且 error 被设置，
+  //    若先判未登录会把「有 token 但拉取失败」误送登录页，403 分支永远不可达。
   if (authStore.error) {
     return '/403';
+  }
+
+  // 4) 未登录 → 登录页（带回跳）
+  if (!authStore.user) {
+    return { path: '/login', query: { redirect: to.fullPath } };
   }
 
   // 5) 有权限码但无权限 → 403

@@ -59,6 +59,20 @@ const snapshot = (): Record<string, unknown> => {
   }
 }
 
+/**
+ * 深克隆单个值（JSON 语义，与 snapshot 一致）。
+ * resetToInitial 用它赋值，避免 model 与 initialSnapshot 共享嵌套引用
+ * （共享引用会让「重置后再次修改 model」同时污染快照，dirty 判定失效）。
+ */
+const deepClone = (value: unknown): unknown => {
+  try {
+    return JSON.parse(JSON.stringify(value)) as unknown
+  } catch {
+    // 不可序列化值：保留原引用（与 snapshot 降级语义对齐）
+    return value
+  }
+}
+
 /** model 初始快照（onMounted 自动取一次，markInitial 手动更新） */
 const initialSnapshot = ref<Record<string, unknown>>({})
 
@@ -66,27 +80,48 @@ onMounted(() => {
   initialSnapshot.value = snapshot()
 })
 
-/** 是否有任一字段值与初始值不同（浅比较） */
+/**
+ * 深比较两个值（JSON 序列化语义，与 snapshot 的深克隆一致）。
+ * 处理「快照深克隆 vs 比较浅比较」不一致 bug：model 含嵌套对象/数组时，
+ * 浅比较（!==）会让 isDirty 永远为真（initial 与 current 引用恒不同），
+ * 且 resetToInitial 无法复位。统一用深比较后，嵌套结构按内容判定。
+ * 不可序列化值（Date/Blob 等）降级为引用比较（与 snapshot 降级语义对齐）。
+ */
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  try {
+    return JSON.stringify(a) === JSON.stringify(b)
+  } catch {
+    // 含不可序列化值：回退引用比较
+    return a === b
+  }
+}
+
+/** 是否有任一字段值与初始值不同（深比较） */
 const isDirty = (): boolean => {
   const current = (props.model ?? {}) as Record<string, unknown>
   const initial = initialSnapshot.value
   const allKeys = [...new Set([...Object.keys(initial), ...Object.keys(current)])]
-  return allKeys.some((k) => current[k] !== initial[k])
+  return allKeys.some((k) => !deepEqual(current[k], initial[k]))
 }
 
-/** 返回所有值已变更的字段名列表 */
+/** 返回所有值已变更的字段名列表（深比较） */
 const getDirtyFields = (): string[] => {
   const current = (props.model ?? {}) as Record<string, unknown>
   const initial = initialSnapshot.value
   const allKeys = [...new Set([...Object.keys(initial), ...Object.keys(current)])]
-  return allKeys.filter((k) => current[k] !== initial[k])
+  return allKeys.filter((k) => !deepEqual(current[k], initial[k]))
 }
 
 /** 重置 model 到初始快照 + 清除校验状态 */
 const resetToInitial = (): void => {
   const model = (props.model ?? {}) as Record<string, unknown>
   const initial = initialSnapshot.value
-  Object.assign(model, initial)
+  // 逐字段深克隆赋值：不能 Object.assign(model, initial) 直接共享 initial 的嵌套引用，
+  // 否则重置后再次修改 model 会同时污染快照（deepEqual 恒相等，dirty 判定失效）。
+  for (const [key, value] of Object.entries(initial)) {
+    model[key] = deepClone(value)
+  }
   // 清除初始快照之后新增的字段
   for (const key of Object.keys(model)) {
     if (!(key in initial)) delete model[key]

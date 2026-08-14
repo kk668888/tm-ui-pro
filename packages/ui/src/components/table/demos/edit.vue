@@ -15,7 +15,7 @@ const data = ref<TmTableProps['data']>(
 )
 
 // editRender 使用 vxe-pc-ui 的 VxeInput 组件（需文档站已注册 vxe 全家桶）
-const columns = [
+const columns: TmTableProps['columns'] = [
   { field: 'id', title: 'ID', width: 80 },
   { field: 'name', title: '姓名（点击编辑）', editRender: { name: 'VxeInput' } },
   {
@@ -28,7 +28,7 @@ const columns = [
 ]
 
 // 行编辑配置：点击行进入整行编辑，showStatus 显示增删改状态
-const editConfig = { trigger: 'click', mode: 'row', showStatus: true }
+const editConfig: TmTableProps['editConfig'] = { trigger: 'click', mode: 'row', showStatus: true }
 </script>
 
 <template>

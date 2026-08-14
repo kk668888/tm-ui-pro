@@ -14,7 +14,8 @@ import { TmMessage } from '../../message'
     <TmPopconfirm title="这是一条普通确认" @confirm="() => TmMessage.success('已确认')">
       <TmButton>普通确认</TmButton>
     </TmPopconfirm>
-    <TmPopconfirm title="自定义按钮文案" ok-text="提交" cancel-text="返回"
+    <TmPopconfirm
+title="自定义按钮文案" ok-text="提交" cancel-text="返回"
       @confirm="() => TmMessage.success('已提交')">
       <TmButton>自定义文案</TmButton>
     </TmPopconfirm>

@@ -3,10 +3,10 @@ import { ref, computed } from 'vue';
 import { SELECTION_NONE, SELECTION_CURRENT_PAGE, SELECTION_ALL_PAGES } from './types';
 import type { SelectionState, SelectionPayload, UseCrossPageSelectOptions } from './types';
 
-export function useCrossPageSelect<T = any>(options: UseCrossPageSelectOptions<T>) {
+export function useCrossPageSelect<T = unknown>(options: UseCrossPageSelectOptions<T>) {
   const { rowKey, data, isDisabled, total } = options;
 
-  const getRowId = (row: any) => String(row[rowKey]);
+  const getRowId = (row: T) => String((row as Record<string, unknown>)[rowKey]);
 
   /** 可勾选的总行数（默认等于 total，有禁用行时由消费方传入或后端分页时传递） */
   const checkableTotal = options.checkableTotal ?? total;
@@ -28,7 +28,7 @@ export function useCrossPageSelect<T = any>(options: UseCrossPageSelectOptions<T
   const selectionState = computed(() => state.value);
 
   /** 判断某行是否选中，禁用行始终返回 false */
-  function isRowSelected(row: any): boolean {
+  function isRowSelected(row: T): boolean {
     if (isDisabled?.(row)) return false;
     const id = getRowId(row);
     const s = state.value;
@@ -57,7 +57,7 @@ export function useCrossPageSelect<T = any>(options: UseCrossPageSelectOptions<T
   });
 
   /** 单行 checkbox 变化，绑定 vxe-grid @checkbox-change */
-  function onCheckboxChange(params: { row: any; checked: boolean }) {
+  function onCheckboxChange(params: { row: T; checked: boolean }) {
     const row = params.row;
     if (isDisabled?.(row)) return;
     const id = getRowId(row);
@@ -97,7 +97,7 @@ export function useCrossPageSelect<T = any>(options: UseCrossPageSelectOptions<T
   }
 
   /** 当前页全选/取消全选，绑定 vxe-grid @checkbox-all */
-  function onCheckboxAll(params: { checked: boolean; records: any[] }) {
+  function onCheckboxAll(params: { checked: boolean; records: T[] }) {
     const s = state.value;
 
     if (s.mode === SELECTION_NONE || s.mode === SELECTION_CURRENT_PAGE) {

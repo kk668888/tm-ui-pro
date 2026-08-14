@@ -48,16 +48,17 @@ export function buildAntDesignVueTheme(tokens: ThemeTokens, mode: ThemeMode): Th
     },
     components: {
       Layout: {
-        bodyBg: tokens.bg.page,
-        headerBg: tokens.bg.container,
-        siderBg: tokens.bg.container,
+        colorBgBody: tokens.bg.page,
+        colorBgHeader: tokens.bg.container,
+        colorBgTrigger: tokens.bg.container,
       },
       Menu: {
-        itemSelectedColor: tokens.colors.primary.DEFAULT,
-        itemSelectedBg: tokens.bg.subtle,
+        colorItemTextSelected: tokens.colors.primary.DEFAULT,
+        colorItemBgSelected: tokens.bg.subtle,
       },
       Button: {
-        primaryShadow: 'none',
+        // ant 4.2.x Button ComponentToken 无 primaryShadow 字段（v3 遗留），
+        // 阴影统一由全局 token 控制，此处无需覆盖。
       },
     },
   };

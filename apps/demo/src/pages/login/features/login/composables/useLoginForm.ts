@@ -33,7 +33,7 @@ export function useLoginForm(redirect: string, onCaptchaRefresh: () => void) {
         captchaCode: formState.captchaCode,
       });
       router.push(redirect || '/');
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('[Login]', e);
       message.error(authStore.error || COPY.LOGIN.LOGIN_FAILED);
       formState.captchaCode = '';

@@ -71,7 +71,7 @@ function mergeCustomTokens(
 
   return next;
 }
-function overrideNestedPart<T extends Record<string, unknown>>(
+function overrideNestedPart<T extends object>(
   basePart: T,
   override?: Partial<{ [K in keyof T]: Partial<T[K]> }>,
 ): T {

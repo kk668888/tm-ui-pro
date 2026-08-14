@@ -44,3 +44,84 @@ if (!(window as { ResizeObserver?: unknown }).ResizeObserver) {
     disconnect(): void {}
   }
 }
+
+/**
+ * canvas 2D context stub：QRCode / Watermark 等组件在 jsdom 下调用 getContext，
+ * jsdom 24 的原生实现存在但抛 "Not implemented"（需安装 canvas npm 包），污染测试 stderr。
+ * 测试环境必然运行在 jsdom（无真实 canvas 包），无条件覆盖为最小可用的 2D context。
+ */
+HTMLCanvasElement.prototype.getContext = (function getContextStub(
+  this: HTMLCanvasElement,
+  _contextId: string,
+): CanvasRenderingContext2D | null {
+  // 仅 stub 2d 上下文；其他类型（webgl 等）保持 null，避免掩盖真实依赖
+  if (_contextId !== '2d') return null
+  return {
+    canvas: this,
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '',
+    textAlign: 'start',
+    textBaseline: 'alphabetic',
+    measureText: (text: string) => ({ width: text.length * 8 }),
+    save: () => {},
+    restore: () => {},
+    scale: () => {},
+    rotate: () => {},
+    translate: () => {},
+    transform: () => {},
+    setTransform: () => {},
+    resetTransform: () => {},
+    clearRect: () => {},
+    fillRect: () => {},
+    strokeRect: () => {},
+    beginPath: () => {},
+    closePath: () => {},
+    moveTo: () => {},
+    lineTo: () => {},
+    bezierCurveTo: () => {},
+    quadraticCurveTo: () => {},
+    arc: () => {},
+    arcTo: () => {},
+    ellipse: () => {},
+    rect: () => {},
+    clip: () => {},
+    fill: () => {},
+    stroke: () => {},
+    drawImage: () => {},
+    createImageData: () => ({ width: 0, height: 0, data: new Uint8ClampedArray(0) }),
+    getImageData: () => ({ width: 0, height: 0, data: new Uint8ClampedArray(0) }),
+    putImageData: () => {},
+    createLinearGradient: () => ({ addColorStop: () => {} }),
+    createRadialGradient: () => ({ addColorStop: () => {} }),
+    createPattern: () => null,
+    setLineDash: () => {},
+    getLineDash: () => [],
+    setLineCap: () => {},
+    setLineJoin: () => {},
+    setMiterLimit: () => {},
+    setShadowBlur: () => {},
+    setShadowColor: () => {},
+    setShadowOffsetX: () => {},
+    setShadowOffsetY: () => {},
+    setGlobalAlpha: () => {},
+    setGlobalCompositeOperation: () => {},
+    setImageSmoothingEnabled: () => {},
+    isPointInPath: () => false,
+    isPointInStroke: () => false,
+    fillText: () => {},
+    strokeText: () => {},
+    getTransform: () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 }),
+  } as unknown as CanvasRenderingContext2D
+// 断言为原生签名类型：覆盖 jsdom 的 getContext 多重重载（2d/webgl/bitmaprenderer），
+// 仅 2d 返回 stub 对象，其余返回 null；重载参数与返回联合与本函数不完全重叠，需 unknown 中转
+}) as typeof HTMLCanvasElement.prototype.getContext
+
+/**
+ * canvas toDataURL stub：QRCode 组件在 jsdom 下读取二维码画布数据，
+ * jsdom 24 原生实现抛 "Not implemented"，污染测试 stderr。返回 1x1 透明 PNG 数据。
+ */
+HTMLCanvasElement.prototype.toDataURL = function toDataURLStub(): string {
+  return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+}

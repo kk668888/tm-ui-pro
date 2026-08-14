@@ -23,7 +23,8 @@ describe('TmSlider', () => {
   })
 
   it('tipFormatter 透传', () => {
-    const tipFormatter = (v: number) => `值:${v}`
+    // ant Slider tipFormatter 签名 (value?: number) => any；测试函数按同签名声明
+    const tipFormatter = (v?: number) => `值:${v}`
     const wrapper = mount(TmSlider, { props: { tipFormatter } })
     expect(wrapper.findComponent({ name: 'ASlider' }).props('tipFormatter')).toBe(tipFormatter)
   })

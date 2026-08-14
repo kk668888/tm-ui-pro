@@ -17,7 +17,7 @@ function createComposable(overrides: { data?: Row[]; isDisabled?: (row: Row) => 
     { id: '5', disabled: false },
   ];
 
-  const data = ref(rows) as any;
+  const data = ref<Row[]>(rows);
   const total = ref(rows.length);
   const checkableTotal = computed(() => rows.filter((r) => !r.disabled).length);
   const isDisabled = overrides.isDisabled ?? ((row: Row) => row.disabled);
@@ -355,7 +355,7 @@ describe('useCrossPageSelect', () => {
       { id: '1', disabled: false },
       { id: '2', disabled: false },
     ];
-    const dataRef = ref(rows) as any;
+    const dataRef = ref(rows);
     const composable = useCrossPageSelect({
       rowKey: 'id',
       total: ref(2),

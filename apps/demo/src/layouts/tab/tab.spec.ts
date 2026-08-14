@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useTabStore } from './tab';
-import type { RouteLocationNormalizedLoaded } from 'vue-router';
+import type { RouteLocationNormalizedLoaded, Router } from 'vue-router';
 
 function mockRoute(
   overrides: Partial<RouteLocationNormalizedLoaded> & { name: string; path: string },
@@ -15,15 +15,18 @@ function mockRoute(
     params: overrides.params ?? {},
     path: overrides.path,
     query: overrides.query ?? {},
-    redirectedFrom: null,
-  } as RouteLocationNormalizedLoaded;
+    // 测试构造的 RouteLocation 与真实类型不完全重叠，经 unknown 中转断言
+  } as unknown as RouteLocationNormalizedLoaded;
 }
 
-const router = { push: vi.fn() };
+// 仅 mock push 的 Router：tab store 的 actions 只消费 router.push。
+// 用 vi.mocked 包装以保留 mock 方法类型（mockClear 等）。
+const router = { push: vi.fn() } as unknown as Router;
+const mockedPush = vi.mocked(router.push);
 
 beforeEach(() => {
   setActivePinia(createPinia());
-  router.push.mockClear();
+  mockedPush.mockClear();
 });
 
 describe('useTabStore — key as route.path', () => {
@@ -85,7 +88,7 @@ describe('useTabStore — closeTab visitedOrder navigation', () => {
 
     store.closeTab('/order', router);
     expect(store.activeTab).toBe('/user');
-    expect(router.push).toHaveBeenCalledWith('/user');
+    expect(mockedPush).toHaveBeenCalledWith('/user');
   });
 
   it('closeTab skips removed tabs in visitedOrder', () => {
@@ -106,7 +109,7 @@ describe('useTabStore — closeTab visitedOrder navigation', () => {
     const store = useTabStore();
     store.addTab(mockRoute({ name: 'Home', path: '/home' }));
     store.closeTab('/home', router);
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(mockedPush).toHaveBeenCalledWith('/');
   });
 
   it('closeLeftTabs removes tabs to the left', () => {
@@ -156,7 +159,7 @@ describe('useTabStore — closeTab visitedOrder navigation', () => {
     store.closeAllTabs(router);
     expect(store.tabs).toHaveLength(0);
     expect(store.visitedOrder).toHaveLength(0);
-    expect(router.push).toHaveBeenCalledWith('/');
+    expect(mockedPush).toHaveBeenCalledWith('/');
   });
 });
 
