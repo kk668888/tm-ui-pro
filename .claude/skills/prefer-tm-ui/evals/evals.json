@@ -1,0 +1,29 @@
+{
+  "skill_name": "prefer-tm-ui",
+  "evals": [
+    {
+      "id": "eval-login-form",
+      "name": "login-form",
+      "prompt": "项目已接入 @kibus/tm-ui-plus 组件库。请写一个登录页面组件 LoginForm.vue：包含用户名、密码输入框，一个登录按钮，点击后校验并模拟提交，失败用轻提示告知用户。用组件库的方式实现。",
+      "expected_output": "一个完整的 LoginForm.vue，使用 TmForm/TmFormItem/TmInput/TmButton/TmMessage，而非 ant-design-vue 原生组件（a-form/a-input/a-button/message）。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": "eval-user-table",
+      "name": "user-table",
+      "prompt": "项目已接入 @kibus/tm-ui-plus 组件库。请写一个用户列表页组件 UserList.vue：用表格展示用户数据，支持分页和按姓名搜索，数据来自远程接口 GET /api/users?page=&pageSize=&name=。用组件库的方式实现。",
+      "expected_output": "一个完整的 UserList.vue，使用 TmTable（request 远程数据 + search 声明式搜索 + 分页），而非 ant 原生 a-table 或自写表格。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": "eval-confirm-notify",
+      "name": "confirm-notify",
+      "prompt": "项目已接入 @kibus/tm-ui-plus 组件库。请写一个删除确认交互组件 DeleteButton.vue：点删除按钮先二次确认，确认后调用删除接口，成功用轻提示告知，失败用通知卡片告知。用组件库的方式实现。",
+      "expected_output": "一个完整的 DeleteButton.vue，使用 TmButton + TmPopconfirm（或 TmModal）+ TmMessage + TmNotification，而非 ant 原生组件或原生 confirm()。",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

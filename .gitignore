@@ -13,6 +13,10 @@ coverage
 **/.vitepress/dist/
 # SDD 工具的 scratch 目录，不可入库
 .superpowers
-# AI 工具的本机配置（Claude/Agent 工作流定义），不入库
-.claude
-.agents
+# AI 工具工作流定义（Claude skills/commands、Agent 定义）入库统一管理；
+# 但本机私密权限配置与 skill 测试评估产物仍排除
+.claude/settings.local.json
+.claude/skills/prefer-tm-ui/prefer-tm-ui-workspace/
+
+# 内网 Nexus 发布脚本（凭据敏感，不入库）
+publish-to-nexus.sh
