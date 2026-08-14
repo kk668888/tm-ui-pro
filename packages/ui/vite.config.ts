@@ -20,12 +20,12 @@
 //    （brief Bug 4：cleanVueFileName 在 vite-plugin-dts 4.5.x 仍存在，已核实 API）。
 // 4. __dirname 兼容：vite 加载配置经 esbuild 转译，`__dirname` 在 Windows + ESM 边界
 //    通常可用，但稳妥起见用 fileURLToPath(import.meta.url) 显式构造（brief Bug 6）。
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
 
 // ESM 下显式构造 __dirname，避免 Windows + ESM 边界的潜在不一致（brief Bug 6）
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -39,6 +39,17 @@ const PEER_EXTERNAL = [
   'vxe-pc-ui',
   '@vxe-ui/core',
 ] as const
+
+// 构建后把 README.md 复制进 dist/，保证产物目录自包含使用说明。
+// （npm 发布时根 README 会被自动包含于包根，此处另复制一份进产物目录，
+//   与 files:["dist"] 随包发布，本地解压产物即可看到文档）
+const copyReadmePlugin = (): Plugin => ({
+  name: 'tm-ui:copy-readme',
+  apply: 'build',
+  closeBundle() {
+    copyFileSync(resolve(__dirname, 'README.md'), resolve(__dirname, 'dist/README.md'))
+  },
+})
 
 export default defineConfig({
   plugins: [
@@ -163,6 +174,8 @@ export default defineConfig({
         }
       },
     }),
+    // 构建产物携带 README：dist/README.md，随 files:["dist"] 发布
+    copyReadmePlugin(),
   ],
   build: {
     lib: {
