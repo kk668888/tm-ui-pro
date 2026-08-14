@@ -2,7 +2,7 @@
 
 公司内部基于 **ant-design-vue + vxe-table** 二次封装的 Vue 3 组件库，采用「薄封装」策略：尽可能透传 ant / vxe 原生能力，仅在公司层叠加默认视觉规范与业务扩展键，避免重复造轮子、保持与 ant 生态零摩擦。
 
-> 已发布至 npm：`@kibus/tm-ui-plus@0.1.0`（public）
+> 已发布至 npm：`@kibus/tm-ui-plus@0.1.1`（public）
 
 ---
 
@@ -326,7 +326,7 @@ Monorepo 详情、OpenSpec 开发流程见仓库根目录 `README.md`。
 
 ## 版本与发布
 
-- 当前版本：`0.1.0`，已发布至 npm（public），可直接 `pnpm add @kibus/tm-ui-plus`
+- 当前版本：`0.1.1`，已发布至 npm（public），可直接 `pnpm add @kibus/tm-ui-plus`
 - 发布命令（需 bypass 2FA 的 npm token）：
 
 ```bash
