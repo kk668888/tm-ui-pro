@@ -1,22 +1,18 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "moduleResolution": "bundler",
-    "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    // 覆盖 base 的 lib/declaration：demo 是应用（非库），不需要声明文件
+    "declaration": false,
+    "sourceMap": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vitest/globals", "node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    },
-    "types": ["vitest/globals"]
+      "@/*": ["src/*"],
+      "@kibus/tm-ui-plus": ["../../packages/ui/src/index.ts"],
+      "@kibus/tm-ui-plus/table": ["../../packages/ui/src/components/table/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "env.d.ts"],
-  "exclude": ["node_modules", "dist", "src/mock"]
+  "exclude": ["node_modules", "dist"]
 }

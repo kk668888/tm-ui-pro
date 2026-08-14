@@ -1,5 +1,5 @@
 // packages/ui/vite.config.ts
-// @tm/ui 子包的 Vite library mode 构建配置
+// @kibus/tm-ui-plus 子包的 Vite library mode 构建配置
 //
 // 核心目标（M4 构建三件套协同要求）：
 //   build 产物路径 ↔ package.json exports 路径 ↔ dts 类型路径 三者必须对齐。
@@ -45,10 +45,10 @@ export default defineConfig({
     vue(),
     dts({
       // entryRoot：声明 src 为类型根，让 .d.ts 镜像 src 目录结构
-      // 产出 es/index.d.ts + es/components/table/index.d.ts（与 build js 路径对齐）
+      // 产出 dist/index.d.ts + dist/components/table/index.d.ts（与 build js 路径对齐）
       entryRoot: 'src',
       // outDir：与 ESM 输出目录一致，types 与 js 同目录便于 moduleResolution
-      outDir: 'es',
+      outDir: 'dist',
       // cleanVueFileName：把 .vue.d.ts 简化为 .d.ts（vite-plugin-dts 4.5.x API 已核实）
       cleanVueFileName: true,
       // staticImport：把 emit 出的 dynamic import() 类型表达式（如 `import('vue').DefineComponent`）
@@ -82,6 +82,8 @@ export default defineConfig({
           ],
           'vxe-pc-ui': [resolve(__dirname, 'node_modules/vxe-pc-ui')],
           'vxe-pc-ui/*': [resolve(__dirname, 'node_modules/vxe-pc-ui/*')],
+          'csstype': [resolve(__dirname, 'node_modules/csstype')],
+          'csstype/*': [resolve(__dirname, 'node_modules/csstype/*')],
         },
       },
       // afterBuild 后处理：把 emit 残留的相对 node_modules 路径 normalize 为包名。
@@ -176,20 +178,20 @@ export default defineConfig({
       // peerDeps 全部 external：业务侧自重，构建产物不含 vue/ant/vxe
       external: [...PEER_EXTERNAL],
       output: [
-        // ESM 产物：写入 es/，扩展名 .js
+        // ESM 产物：写入 dist/，扩展名 .js
         // chunkFileNames 用 chunks/ 子目录 + 含 hash，隔离共享 chunk 与业务入口，避免 hash 变更污染 git diff
         // exports:'named' 明确声明「以 named export 为主」，消除 rollup MIXED_EXPORTS 警告
         {
           format: 'es',
-          dir: 'es',
+          dir: 'dist',
           entryFileNames: '[name].js',
           chunkFileNames: 'chunks/[name]-[hash].js',
           exports: 'named',
         },
-        // CJS 产物：写入 lib/，扩展名 .cjs（区分 Node require 解析）
+        // CJS 产物：写入 dist/，扩展名 .cjs（与 ESM .js 区分，统一单目录）
         {
           format: 'cjs',
-          dir: 'lib',
+          dir: 'dist',
           entryFileNames: '[name].cjs',
           chunkFileNames: 'chunks/[name]-[hash].cjs',
           exports: 'named',

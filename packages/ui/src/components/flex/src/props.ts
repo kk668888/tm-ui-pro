@@ -27,5 +27,5 @@ export interface TmFlexProps {
   prefixCls?: string
 }
 
-// 类型透传：业务可 import { TmFlexProps, FlexProps } from '@tm/ui'（FlexProps 为 ant 完整类型）
+// 类型透传：业务可 import { TmFlexProps, FlexProps } from '@kibus/tm-ui-plus'（FlexProps 为 ant 完整类型）
 export type { FlexProps } from 'ant-design-vue'

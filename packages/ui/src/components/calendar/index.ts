@@ -4,6 +4,6 @@ import Calendar from './src/Calendar.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmCalendar = withInstall(Calendar, 'TmCalendar')
-// 类型再导出：业务方可直接 import { TmCalendarProps, CalendarProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmCalendarProps, CalendarProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmCalendar

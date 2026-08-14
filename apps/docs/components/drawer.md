@@ -50,4 +50,4 @@ const drawerProps = [
 ### TmDrawer Types
 
 - `TmDrawerProps = DrawerProps & { modelValue?: boolean }`
-- `DrawerProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `DrawerProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

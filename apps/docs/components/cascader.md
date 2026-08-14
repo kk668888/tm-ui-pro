@@ -60,4 +60,4 @@ const cascaderProps = [
 ### TmCascader Types
 
 - `TmCascaderProps = CascaderProps & { modelValue?: CascaderProps['value']; readonly?: boolean }`
-- `CascaderProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `CascaderProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

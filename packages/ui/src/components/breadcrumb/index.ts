@@ -9,7 +9,7 @@ export const TmBreadcrumb = withInstall(Breadcrumb, 'TmBreadcrumb')
 export const TmBreadcrumbItem = withInstall(BreadcrumbItem, 'TmBreadcrumbItem')
 export const TmBreadcrumbSeparator = withInstall(BreadcrumbSeparator, 'TmBreadcrumbSeparator')
 
-// 类型透传：业务方可直接 import { BreadcrumbProps, TmBreadcrumbProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { BreadcrumbProps, TmBreadcrumbProps, ... } from '@kibus/tm-ui-plus'
 export type {
   BreadcrumbProps,
   BreadcrumbItemProps,

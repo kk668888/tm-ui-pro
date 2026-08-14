@@ -3,8 +3,6 @@ import { ref, onBeforeUnmount, h } from 'vue';
 import {
   SearchOutlined,
   DownOutlined,
-  UserOutlined,
-  HomeOutlined,
   SettingOutlined,
   MailOutlined,
   AppstoreOutlined,
@@ -31,7 +29,7 @@ import {
   TmFooter,
   TmRow,
   TmCol,
-} from '@tm/ui';
+} from '@kibus/tm-ui-plus';
 
 defineOptions({ name: 'GeneralSection' });
 
@@ -100,52 +98,52 @@ const menuItems = [
 
       <a-divider orientation="left">导航类 Navigation</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmBreadcrumb：面包屑，透传 ant routes。</p>
         <TmBreadcrumb :routes="[{ breadcrumbName: '首页', path: '' }, { breadcrumbName: '应用中心', path: '' }, { breadcrumbName: '列表页', path: '' }]" />
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmDropdown：下拉菜单（ant items 配置）。</p>
         <TmDropdown :menu="{ items: [{ key: '1', label: '选项一' }, { key: '2', label: '选项二' }] }">
           <TmButton>下拉菜单 <DownOutlined /></TmButton>
         </TmDropdown>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmMenu：菜单（v-model:selectedKeys 受控选中）。</p>
-        <TmMenu v-model:selectedKeys="menuSelected" :items="menuItems" mode="inline" style="width: 260px" />
+        <TmMenu v-model:selected-keys="menuSelected" :items="menuItems" mode="inline" style="width: 260px" />
         <span class="ml-2 text-secondary">selected={{ menuSelected.join('、') }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmPagination：分页（v-model:current 回显）。</p>
         <TmPagination v-model:current="pageCurrent" :total="85" show-size-changer />
         <span class="ml-2 text-secondary">current={{ pageCurrent }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmSteps：步骤条（current 受控，按钮切换）。</p>
         <TmSteps :current="stepsCurrent" :items="[{ title: '第一步' }, { title: '第二步' }, { title: '第三步' }]" />
         <TmButton size="small" @click="stepsCurrent = stepsCurrent >= 2 ? 0 : stepsCurrent + 1">
           {{ stepsCurrent >= 2 ? '重新开始' : '下一步' }}
         </TmButton>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmTabs：标签页（a-tab-pane 子元素 + v-model:activeKey）。</p>
-        <TmTabs v-model:activeKey="tabsKey">
+        <TmTabs v-model:active-key="tabsKey">
           <a-tab-pane key="tab1" tab="Tab 1">Tab 1 内容</a-tab-pane>
           <a-tab-pane key="tab2" tab="Tab 2">Tab 2 内容</a-tab-pane>
         </TmTabs>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmAffix：固钉（吸附于滚动容器顶部）。</p>
         <TmAffix :offset-top="0"><TmButton type="primary">吸附固定</TmButton></TmAffix>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmAnchor：锚点（跳转页面内定位）。</p>
         <TmAnchor
           :items="[
@@ -153,58 +151,59 @@ const menuItems = [
             { key: 'a2', href: '#anchor-demo-2', title: '锚点二' },
           ]"
         />
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmPageHeader：页头（含返回）。</p>
         <TmPageHeader title="页面标题" sub-title="这是副标题" @back="() => TmMessage.info('返回点击')" />
-      </div>
+      </a-space>
 
       <a-divider orientation="left">布局与基础 Layout & Basic</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmDivider：分隔线。</p>
         <TmDivider orientation="left">分隔线标题</TmDivider>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmFlex：弹性布局容器。</p>
-        <TmFlex gap="middle" wrap>
+        <TmFlex gap="middle" wrap="wrap">
           <TmButton>块一</TmButton>
           <TmButton>块二</TmButton>
           <TmButton>块三</TmButton>
         </TmFlex>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmSpace：间距容器。</p>
         <TmSpace>
           <TmButton>Space 1</TmButton>
           <TmButton>Space 2</TmButton>
           <TmButton>Space 3</TmButton>
         </TmSpace>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmLayout + TmSider/TmHeader/TmContent/TmFooter：页面布局骨架。</p>
         <TmLayout style="border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden">
-          <TmHeader style="background: #1677ff; color: #fff; text-align: center; line-height: 64px">Header</TmHeader>
+          <!-- 演示色块用主题语义色（随预设/暗色联动），不再手写字面色 -->
+          <TmHeader style="background: var(--color-primary); color: #fff; text-align: center; line-height: 64px">Header</TmHeader>
           <TmLayout>
-            <TmSider style="background: #fafafa; padding: 12px; width: 140px">Sider</TmSider>
+            <TmSider style="background: var(--bg-subtle); padding: 12px; width: 140px">Sider</TmSider>
             <TmContent style="padding: 16px">Content</TmContent>
           </TmLayout>
-          <TmFooter style="background: #f5f5f5; text-align: center">Footer</TmFooter>
+          <TmFooter style="background: var(--bg-subtle); text-align: center">Footer</TmFooter>
         </TmLayout>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmRow / TmCol：24 栅格布局。</p>
         <TmRow :gutter="12">
-          <TmCol :span="8"><div style="background: #e6f4ff; border-radius: 4px; padding: 8px">col-8</div></TmCol>
-          <TmCol :span="8"><div style="background: #e6f4ff; border-radius: 4px; padding: 8px">col-8</div></TmCol>
-          <TmCol :span="8"><div style="background: #e6f4ff; border-radius: 4px; padding: 8px">col-8</div></TmCol>
+          <TmCol :span="8"><div style="background: var(--bg-subtle); border-radius: 4px; padding: 8px">col-8</div></TmCol>
+          <TmCol :span="8"><div style="background: var(--bg-subtle); border-radius: 4px; padding: 8px">col-8</div></TmCol>
+          <TmCol :span="8"><div style="background: var(--bg-subtle); border-radius: 4px; padding: 8px">col-8</div></TmCol>
         </TmRow>
-      </div>
+      </a-space>
     </a-space>
   </a-card>
 </template>

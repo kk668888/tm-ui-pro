@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -- 受信内容渲染：API 类型字符串（仓库内数据，非用户输入） -->
 <!--
   TmPropsTable.vue
   文档站 API 表格组件：内部用组件库 TmTable 渲染，统一 ant 主题视觉 + 列排序
@@ -17,7 +18,7 @@
   ```
 -->
 <script setup lang="ts">
-import { TmTable } from '@tm/ui'
+import { TmTable } from '@kibus/tm-ui-plus'
 import { renderInline } from './renderMarkdown'
 
 /** API 表格行数据契约（各组件页 md 按此声明） */
@@ -50,9 +51,13 @@ const columns = [
 <template>
   <TmTable :data="data" :columns="columns" :pagination="false">
     <!-- 单元格内联 markdown 渲染（v-html 输出 markdown-it 产物，支持反引号代码/链接等） -->
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <template #md-prop="{ row }"><span v-html="renderInline(row.prop)" /></template>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <template #md-desc="{ row }"><span v-html="renderInline(row.desc)" /></template>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <template #md-type="{ row }"><span v-html="renderInline(row.type)" /></template>
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <template #md-default="{ row }"><span v-html="renderInline(row.default)" /></template>
   </TmTable>
 </template>

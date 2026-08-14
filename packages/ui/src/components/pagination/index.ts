@@ -4,6 +4,6 @@ import Pagination from './src/Pagination.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmPagination = withInstall(Pagination, 'TmPagination')
-// 类型再导出：业务方可直接 import { TmPaginationProps, PaginationProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmPaginationProps, PaginationProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmPagination

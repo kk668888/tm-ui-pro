@@ -4,6 +4,6 @@ import TreeSelect from './src/TreeSelect.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmTreeSelect = withInstall(TreeSelect, 'TmTreeSelect')
-// 类型再导出：业务方可直接 import { TmTreeSelectProps, TreeSelectProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmTreeSelectProps, TreeSelectProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmTreeSelect

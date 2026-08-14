@@ -7,7 +7,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmTabs = withInstall(Tabs, 'TmTabs')
 export const TmTabPane = withInstall(TabPane, 'TmTabPane')
 
-// 类型透传：业务方可直接 import { TabsProps, TabPaneProps, TmTabsProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { TabsProps, TabPaneProps, TmTabsProps, ... } from '@kibus/tm-ui-plus'
 export type { TabsProps, TabPaneProps } from 'ant-design-vue'
 export type { TmTabsProps, TmTabPaneProps } from './src/props'
 

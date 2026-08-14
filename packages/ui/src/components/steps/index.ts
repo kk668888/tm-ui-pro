@@ -7,7 +7,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmSteps = withInstall(Steps, 'TmSteps')
 export const TmStep = withInstall(Step, 'TmStep')
 
-// 类型透传：业务方可直接 import { StepsProps, StepProps, TmStepsProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { StepsProps, StepProps, TmStepsProps, ... } from '@kibus/tm-ui-plus'
 export type { StepsProps, StepProps } from 'ant-design-vue'
 export type { TmStepsProps, TmStepProps } from './src/props'
 

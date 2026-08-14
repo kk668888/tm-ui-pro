@@ -55,4 +55,4 @@ const badgeProps = [
 ### TmBadge Types
 
 - `TmBadgeProps = BadgeProps`（ant 原生）
-- `BadgeProps` 可直接从 `@tm/ui` 导入。
+- `BadgeProps` 可直接从 `@kibus/tm-ui-plus` 导入。

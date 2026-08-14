@@ -23,5 +23,5 @@ export interface TmTagExtProps {
 /** ant 原生（ExtractPropTypes）+ 公司扩展（IDE 提示 ant 原生属性与 status） */
 export type TmTagProps = TagBaseProps & TmTagExtProps
 
-// 类型透传：业务可 import { TmTagProps, TagProps } from '@tm/ui'（TagProps 为 ant 完整类型）
+// 类型透传：业务可 import { TmTagProps, TagProps } from '@kibus/tm-ui-plus'（TagProps 为 ant 完整类型）
 export type { TagProps } from 'ant-design-vue'

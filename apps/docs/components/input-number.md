@@ -61,4 +61,4 @@ const inputNumberProps = [
 ### TmInputNumber Types
 
 - `TmInputNumberProps = InputNumberProps & { modelValue?: InputNumberProps['value'] }`
-- `InputNumberProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `InputNumberProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

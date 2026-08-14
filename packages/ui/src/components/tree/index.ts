@@ -9,7 +9,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmTree = withInstall(Tree, 'TmTree')
 export const TmDirectoryTree = withInstall(DirectoryTree, 'TmDirectoryTree')
 
-// 类型透传：业务方可直接 import { TreeProps, TmTreeProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { TreeProps, TmTreeProps, ... } from '@kibus/tm-ui-plus'
 export type { TreeProps, DirectoryTreeProps } from 'ant-design-vue'
 export type { TmTreeProps, TmDirectoryTreeProps } from './src/props'
 

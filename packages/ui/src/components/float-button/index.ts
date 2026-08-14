@@ -9,6 +9,6 @@ export const TmFloatButton = withInstall(FloatButton, 'TmFloatButton')
 export const TmFloatButtonGroup = withInstall(FloatButtonGroup, 'TmFloatButtonGroup')
 export const TmFloatButtonBackTop = withInstall(FloatButtonBackTop, 'TmFloatButtonBackTop')
 
-// 类型再导出：业务方可直接 import { TmFloatButtonProps, TmFloatButtonGroupProps, TmFloatButtonBackTopProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmFloatButtonProps, TmFloatButtonGroupProps, TmFloatButtonBackTopProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default { TmFloatButton, TmFloatButtonGroup, TmFloatButtonBackTop }

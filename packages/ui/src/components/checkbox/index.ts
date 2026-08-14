@@ -5,6 +5,6 @@ import Checkbox from './src/Checkbox.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmCheckbox = withInstall(Checkbox, 'TmCheckbox')
-// 类型再导出：业务方可直接 import { TmCheckboxProps, CheckboxProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmCheckboxProps, CheckboxProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmCheckbox

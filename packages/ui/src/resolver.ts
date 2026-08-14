@@ -3,7 +3,7 @@
 //
 // 使用方式（业务方 vite.config.ts）：
 //   import Components from 'unplugin-vue-components/vite'
-//   import { TmResolver } from '@tm/ui'
+//   import { TmResolver } from '@kibus/tm-ui-plus'
 //   export default defineConfig({
 //     plugins: [Components({ resolvers: [TmResolver()] })],
 //   })
@@ -12,9 +12,9 @@
 // 1. 纯函数工厂：每次调用返回独立 ComponentResolver 实例（无共享闭包状态，不可变）。
 // 2. 仅识别 Tm 前缀：非 Tm 组件名（ElButton / a-button / 原生标签）一律 undefined，
 //    交由其它 resolver 或保持原生行为。
-// 3. TmTable 走子入口 @tm/ui/table：vxe-table 体积大，独立 chunk 隔离，按需加载不污染主入口。
-// 4. 其余 TmXxx 走主入口 @tm/ui：fail-fast 设计——未实现组件（如 TmXYZ）也返回 @tm/ui，
-//    业务侧 vite build 会因 `import { TmXYZ } from '@tm/ui'` 的 named export 缺失立即报错，
+// 3. TmTable 走子入口 @kibus/tm-ui-plus/table：vxe-table 体积大，独立 chunk 隔离，按需加载不污染主入口。
+// 4. 其余 TmXxx 走主入口 @kibus/tm-ui-plus：fail-fast 设计——未实现组件（如 TmXYZ）也返回 @kibus/tm-ui-plus，
+//    业务侧 vite build 会因 `import { TmXYZ } from '@kibus/tm-ui-plus'` 的 named export 缺失立即报错，
 //    比白名单静默 undefined 更早暴露错误（brief Bug 5 决策：保留 plan 逻辑）。
 // 5. kebab 转换：作为「组件名 → 入口路径」的标准映射保留，未来若 TmSelect 等独立子入口，
 //    可直接 `kebab === 'select'` 扩展，无需重构（brief Bug 1 决策：保留扩展预留）。
@@ -49,14 +49,14 @@ interface TmComponentResolverObject {
 }
 
 /**
- * @tm/ui 按需导入 Resolver 工厂
+ * @kibus/tm-ui-plus 按需导入 Resolver 工厂
  *
  * @returns 结构性兼容 unplugin-vue-components ComponentResolverObject 的对象，
  *          业务方配 `resolvers: [TmResolver()]` 即可
  *
  * 映射约定：
- *   - TmButton / TmInput / TmSelect / TmForm / TmFormItem / TmConfigProvider / ... → from '@tm/ui'
- *   - TmTable → from '@tm/ui/table'（vxe 子入口，体积隔离）
+ *   - TmButton / TmInput / TmSelect / TmForm / TmFormItem / TmConfigProvider / ... → from '@kibus/tm-ui-plus'
+ *   - TmTable → from '@kibus/tm-ui-plus/table'（vxe 子入口，体积隔离）
  *   - 非 Tm 前缀 / 仅 'Tm' 前缀无组件名 → undefined（不处理）
  */
 export function TmResolver(): TmComponentResolverObject {
@@ -79,9 +79,9 @@ export function TmResolver(): TmComponentResolverObject {
         .replace(/[A-Z]/g, (m) => '-' + m.toLowerCase())
         .slice(1)
 
-      // TmTable 走子入口 @tm/ui/table（vxe-table 体积大需独立 chunk），其余走主入口 @tm/ui
-      // 注：未实现组件（TmXYZ）也命中 '@tm/ui' 分支——fail-fast，业务侧构建期即报错（brief Bug 5 决策）
-      const from = kebab === 'table' ? '@tm/ui/table' : '@tm/ui'
+      // TmTable 走子入口 @kibus/tm-ui-plus/table（vxe-table 体积大需独立 chunk），其余走主入口 @kibus/tm-ui-plus
+      // 注：未实现组件（TmXYZ）也命中 '@kibus/tm-ui-plus' 分支——fail-fast，业务侧构建期即报错（brief Bug 5 决策）
+      const from = kebab === 'table' ? '@kibus/tm-ui-plus/table' : '@kibus/tm-ui-plus'
 
       return { name, from }
     },

@@ -61,4 +61,4 @@ const tagProps = [
 ### TmTag Types
 
 - `TmTagProps = TagBaseProps & { status?: 'success' | 'processing' | 'failed' | 'warning' }`
-- `TagProps`（ant 完整类型，含 DOM 属性）可直接从 `@tm/ui` 导入。
+- `TagProps`（ant 完整类型，含 DOM 属性）可直接从 `@kibus/tm-ui-plus` 导入。

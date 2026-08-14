@@ -9,7 +9,7 @@
 //    - green path：model 字段满足规则 → wrapper.vm.validate() resolves 字段值对象
 // 4. getFieldsValue 方法透传：经 Proxy 调用返回真实字段值（同步、无 DOM 依赖，覆盖「等方法」）
 // 5. provide/inject 通道：TmForm 包裹 TmFormItem 不报 inject 错误（v1 占位通道可用）
-// 6. 聚合 install：app.use(@tm/ui) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5）
+// 6. 聚合 install：app.use(@kibus/tm-ui-plus) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5）
 // 7. FormItem props 透传：label / name / rules 真实下发到内部 AFormItem
 // 8. FormItem 独立使用：无 TmForm 祖先时 useFormContext 返回 undefined 也不影响渲染
 // 9. $attrs 与 slots 全透传（Form 与 FormItem 各覆盖）
@@ -140,7 +140,7 @@ describe('TmForm', () => {
     expect(wrapper.find('.slot-content').exists()).toBe(true)
   })
 
-  it('聚合 install：app.use(@tm/ui) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5 双组件 install）', () => {
+  it('聚合 install：app.use(@kibus/tm-ui-plus) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5 双组件 install）', () => {
     // 锁定 src/index.ts 的聚合 install 必须同时注册两个组件：
     // form 模块含 TmForm + TmFormItem，遗漏任一会使业务侧 <TmFormItem> 报「未注册」错误。
     const app = createApp({})
@@ -212,7 +212,7 @@ describe('TmForm v2 扩展能力', () => {
   it('submitting prop 经 FormContext 下发到 TmFormItem slot props', async () => {
     // TmFormItem default slot 应能拿到 submitting 字段（经 slotScope 暴露）
     let capturedScope: unknown = null
-    const wrapper = mount(TmForm, {
+    mount(TmForm, {
       props: { submitting: true },
       slots: {
         default: () =>
@@ -231,7 +231,7 @@ describe('TmForm v2 扩展能力', () => {
 
   it('readonly prop 经 FormContext 下发到 TmFormItem slot props', async () => {
     let capturedScope: unknown = null
-    const wrapper = mount(TmForm, {
+    mount(TmForm, {
       props: { readonly: true },
       slots: {
         default: () =>
@@ -249,7 +249,7 @@ describe('TmForm v2 扩展能力', () => {
 
   it('disabled prop 经 FormContext 下发到 TmFormItem slot props', async () => {
     let capturedScope: unknown = null
-    const wrapper = mount(TmForm, {
+    mount(TmForm, {
       props: { disabled: true },
       slots: {
         default: () =>
@@ -326,6 +326,59 @@ describe('TmForm v2 扩展能力', () => {
     vm.markInitial()
     // isDirty 回到 false（新的快照 = 当前值）
     expect(vm.isDirty()).toBe(false)
+  })
+
+  it('嵌套对象字段：深比较判定 dirty（修复快照深克隆 vs 浅比较不一致）', async () => {
+    // 回归背景：snapshot() 深克隆 initial，而 isDirty 原用 !== 浅比较，
+    // 嵌套对象/数组字段的 initial 与 current 引用恒不同 → 永远 dirty、reset 无法复位。
+    const formState = reactive<{ user: { address: { city: string } }; tags: string[] }>({
+      user: { address: { city: '北京' } },
+      tags: ['a'],
+    })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    const vm = wrapper.vm as unknown as {
+      isDirty: () => boolean
+      getDirtyFields: () => string[]
+      resetToInitial: () => void
+    }
+
+    // 初始快照后：嵌套内容未变 → 不 dirty（旧实现这里恒为 true）
+    expect(vm.isDirty()).toBe(false)
+
+    // 嵌套字段深层变更 → dirty，且只报变更字段
+    formState.user.address.city = '上海'
+    await nextTick()
+    expect(vm.isDirty()).toBe(true)
+    expect(vm.getDirtyFields()).toEqual(['user'])
+
+    // resetToInitial 恢复深层值 → 回到 not dirty（旧实现无法复位）
+    vm.resetToInitial()
+    await nextTick()
+    expect(formState.user.address.city).toBe('北京')
+    expect(vm.isDirty()).toBe(false)
+
+    // 数组字段同理
+    formState.tags.push('b')
+    await nextTick()
+    expect(vm.isDirty()).toBe(true)
+    vm.resetToInitial()
+    await nextTick()
+    expect(formState.tags).toEqual(['a'])
+    expect(vm.isDirty()).toBe(false)
+  })
+
+  it('嵌套对象字段：getDirtyFields 不含未变更字段', async () => {
+    const formState = reactive<{ user: { name: string }; note: string }>({
+      user: { name: 'Tom' },
+      note: 'keep',
+    })
+    const wrapper = mount(TmForm, { props: { model: formState } })
+    await nextTick()
+    formState.user.name = 'Jerry'
+    await nextTick()
+    const vm = wrapper.vm as unknown as { getDirtyFields: () => string[] }
+    expect(vm.getDirtyFields()).toEqual(['user'])
   })
 
   it('公司扩展键透传边界：submitting/readonly 不误透传，disabled 走 ant 原生 prop', () => {

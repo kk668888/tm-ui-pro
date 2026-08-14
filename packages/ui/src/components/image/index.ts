@@ -7,6 +7,6 @@ import { withInstall } from '../../utils/withInstall'
 export const TmImage = withInstall(Image, 'TmImage')
 export const TmImagePreviewGroup = withInstall(ImagePreviewGroup, 'TmImagePreviewGroup')
 
-// 类型再导出：业务方可直接 import { TmImageProps, TmImagePreviewGroupProps, ImageProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmImageProps, TmImagePreviewGroupProps, ImageProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default { TmImage, TmImagePreviewGroup }

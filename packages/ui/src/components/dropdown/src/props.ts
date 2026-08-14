@@ -42,5 +42,5 @@ export interface TmDropdownButtonProps extends TmDropdownProps {
   danger?: boolean
 }
 
-// 类型透传：业务可 import { TmDropdownProps, DropdownProps } from '@tm/ui'（DropdownProps 为 ant 完整类型）
+// 类型透传：业务可 import { TmDropdownProps, DropdownProps } from '@kibus/tm-ui-plus'（DropdownProps 为 ant 完整类型）
 export type { DropdownProps } from 'ant-design-vue'

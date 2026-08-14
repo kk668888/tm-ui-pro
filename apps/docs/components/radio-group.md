@@ -61,4 +61,4 @@ const radioProps = [
 ### TmRadioGroup Types
 
 - `TmRadioGroupProps = RadioGroupProps & { modelValue?: RadioGroupProps['value']; readonly?: boolean }`
-- `RadioGroupProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `RadioGroupProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

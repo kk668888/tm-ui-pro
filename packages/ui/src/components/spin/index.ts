@@ -4,6 +4,6 @@ import Spin from './src/Spin.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmSpin = withInstall(Spin, 'TmSpin')
-// 类型再导出：业务方可直接 import { TmSpinProps, SpinProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmSpinProps, SpinProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmSpin

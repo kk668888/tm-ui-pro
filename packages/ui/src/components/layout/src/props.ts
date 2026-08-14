@@ -28,6 +28,6 @@ export type TmContentProps = LayoutBaseProps
 /** TmFooter = Layout 结构（ant Layout.Footer） */
 export type TmFooterProps = LayoutBaseProps
 
-// 类型透传：业务可 import { TmLayoutProps, LayoutProps, SiderProps } from '@tm/ui'
+// 类型透传：业务可 import { TmLayoutProps, LayoutProps, SiderProps } from '@kibus/tm-ui-plus'
 //（LayoutProps 为 ant 完整类型，含 HTMLAttributes）
 export type { LayoutProps, SiderProps } from 'ant-design-vue'

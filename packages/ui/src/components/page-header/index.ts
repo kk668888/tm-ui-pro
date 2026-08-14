@@ -4,6 +4,6 @@ import PageHeader from './src/PageHeader.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmPageHeader = withInstall(PageHeader, 'TmPageHeader')
-// 类型再导出：业务方可直接 import { TmPageHeaderProps, PageHeaderProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmPageHeaderProps, PageHeaderProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmPageHeader

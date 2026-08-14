@@ -5,7 +5,7 @@
   1. ant Timeline 会 filterEmpty(slots.default()) 遍历子项（TimelineItem），读取每个子项 vnode 的
      props.label / children.label 判断展示内容。模板 `<slot />` 编译为 <slot> 虚拟节点，
      ant 拿不到真实 TimelineItem → 必须 render function 转发 slots.default() 返回真实子组件 VNode（Bug 2026-08-12）。
-  2. 子项 TimelineItem 未在 @tm/ui 注册（设计 Non-Goals），业务 children 使用 ant 的 TimelineItem 组件。
+  2. 子项 TimelineItem 未在 @kibus/tm-ui-plus 注册（设计 Non-Goals），业务 children 使用 ant 的 TimelineItem 组件。
   3. 公司默认：无（ant 原生 mode / reverse / pending 等兜底）
   4. useForwardBindings 消幻影 false + useForwardRef 方法透传
 -->

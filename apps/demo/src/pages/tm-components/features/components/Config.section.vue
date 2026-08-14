@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TmConfigProvider, TmTable, TmButton, TmApp, TmMessage } from '@tm/ui';
-import type { TmTableProps } from '@tm/ui';
+import { TmConfigProvider, TmTable, TmButton, TmApp, TmMessage } from '@kibus/tm-ui-plus';
+import type { TmTableProps } from '@kibus/tm-ui-plus';
 
 defineOptions({ name: 'ConfigSection' });
 
@@ -27,12 +27,12 @@ const bridgeColumns = [
     </p>
     <a-space direction="vertical" :size="16" class="w-full">
       <TmConfigProvider :theme-mode="themeMode">
-        <div class="mb-3 flex items-center gap-3">
+        <a-space align="center" style="margin-bottom: 12px">
           <TmButton @click="themeMode = themeMode === 'light' ? 'dark' : 'light'">
             切换{{ themeMode === 'light' ? '暗色' : '亮色' }}
           </TmButton>
           <TmButton type="primary">主按钮（随 theme-mode 联动）</TmButton>
-        </div>
+        </a-space>
         <TmTable :data="bridgeRows" :columns="bridgeColumns" />
       </TmConfigProvider>
 

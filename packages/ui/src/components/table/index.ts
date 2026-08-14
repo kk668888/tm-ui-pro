@@ -5,12 +5,12 @@ import { withInstall } from '../../utils/withInstall'
 
 /**
  * TmTable 组件（vxe-grid 薄封装 + request 远程扩展）
- * - 业务侧 `app.use(TmTable)` 或 `app.use(@tm/ui)` 全局注册
- * - 也可直接当组件用：`import { TmTable } from '@tm/ui'`
+ * - 业务侧 `app.use(TmTable)` 或 `app.use(@kibus/tm-ui-plus)` 全局注册
+ * - 也可直接当组件用：`import { TmTable } from '@kibus/tm-ui-plus'`
  */
 export const TmTable = withInstall(Table, 'TmTable')
 
-// 类型 re-export：业务侧 import type { TmTableProps, TmTableExtProps, VxeGridProps, ... } from '@tm/ui'
+// 类型 re-export：业务侧 import type { TmTableProps, TmTableExtProps, VxeGridProps, ... } from '@kibus/tm-ui-plus'
 export * from './src/props'
 
 export default TmTable

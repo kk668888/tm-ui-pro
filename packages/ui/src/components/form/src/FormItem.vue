@@ -9,7 +9,7 @@
   4. v2 新增 — useFormContext() 消费：
      - 注入祖先 TmForm 下发的 calculated FormContext（含 submitting/readonly/disabled）
      - 无 TmForm 祖先时返回 undefined，不影响独立使用
-     - 通过 slot props 暴露给子控件（特别是非 @tm/ui 的第三方控件）
+     - 通过 slot props 暴露给子控件（特别是非 @kibus/tm-ui-plus 的第三方控件）
   注：FormItem 无需 ref 方法透传（ant FormItem 暴露的方法通常由 ant Form 内部调度）
 -->
 <script setup lang="ts">

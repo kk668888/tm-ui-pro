@@ -4,6 +4,6 @@ import Empty from './src/Empty.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmEmpty = withInstall(Empty, 'TmEmpty')
-// 类型再导出：业务方可直接 import { TmEmptyProps, EmptyProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmEmptyProps, EmptyProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmEmpty

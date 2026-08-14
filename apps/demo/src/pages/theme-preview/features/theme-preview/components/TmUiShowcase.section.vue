@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TmButton, TmInput, TmSelect, TmTag } from '@tm/ui';
+import { TmButton, TmInput, TmSelect, TmTag } from '@kibus/tm-ui-plus';
 
 defineOptions({ name: 'TmUiShowcaseSection' });
 
@@ -26,7 +26,7 @@ const scenarioOptions: TmSelectOption[] = [
 <template>
   <a-card title="⑥ TM UI 组件库">
     <p class="mb-4 text-sm text-secondary">
-      该区块直接从 <code>@tm/ui</code> 引入组件，用于验证 demo 应用已经正确安装、注册并加载组件库样式。
+      该区块直接从 <code>@kibus/tm-ui-plus</code> 引入组件，用于验证 demo 应用已经正确安装、注册并加载组件库样式。
     </p>
 
     <a-space direction="vertical" :size="16" class="w-full">

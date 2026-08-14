@@ -61,4 +61,4 @@ const switchProps = [
 ### TmSwitch Types
 
 - `TmSwitchProps = SwitchProps & { modelValue?: SwitchProps['checked']; readonly?: boolean }`
-- `SwitchProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `SwitchProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

@@ -1,12 +1,12 @@
 ## Purpose
 
-定义 apps/demo 的 TM 组件集中陈列页行为：覆盖 @tm/ui 全部组件，按 5 类分组陈列，核心组件带可交互示例，作为业务选型与回归演示的统一入口。
+定义 apps/demo 的 TM 组件集中陈列页行为：覆盖 @kibus/tm-ui-plus 全部组件，按 5 类分组陈列，核心组件带可交互示例，作为业务选型与回归演示的统一入口。
 
 ## Requirements
 
 ### Requirement: 全组件陈列覆盖
 
-tm-components 页 SHALL 陈列 @tm/ui 全部导出组件（约 67 个，含基础用法演示），按通用 / 表单 / 数据展示 / 反馈 / 全局配置 5 类分组，页面声明与现状一致。
+tm-components 页 SHALL 陈列 @kibus/tm-ui-plus 全部导出组件（约 67 个，含基础用法演示），按通用 / 表单 / 数据展示 / 反馈 / 全局配置 5 类分组，页面声明与现状一致。
 
 #### Scenario: 分组展示缺失组件
 
@@ -20,7 +20,7 @@ tm-components 页 SHALL 陈列 @tm/ui 全部导出组件（约 67 个，含基�
 
 ### Requirement: 关键组件交互示例
 
-tm-components 页 SHALL 为业务核心组件提供带状态 / 事件的交互示例，真实反映 @tm/ui 能力。
+tm-components 页 SHALL 为业务核心组件提供带状态 / 事件的交互示例，真实反映 @kibus/tm-ui-plus 能力。
 
 #### Scenario: Table 远程分页与搜索
 

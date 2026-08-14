@@ -1,4 +1,4 @@
-# @tm/ui 组件库
+# @kibus/tm-ui-plus 组件库
 
 公司内部基于 **ant-design-vue + vxe-table** 二次封装的 Vue 3 组件库，配套 VitePress 文档站。
 
@@ -28,7 +28,7 @@ pnpm workspace 工作区，根目录 `pnpm-workspace.yaml` 声明 `packages/*` �
 ```
 tm-ui-new/
 ├── packages/
-│   └── ui/                     # @tm/ui 组件库（核心库，零应用依赖）
+│   └── ui/                     # @kibus/tm-ui-plus 组件库（核心库，零应用依赖）
 │       ├── src/
 │       │   ├── components/     # 业务组件（button/input/select/form/table）
 │       │   ├── config-provider/# TmConfigProvider 主题桥接 + locale
@@ -53,7 +53,9 @@ tm-ui-new/
 
 ## 组件清单
 
-所有组件均以 `Tm` 前缀命名，可通过 `app.use(@tm/ui)` 全量注册或按需导入。
+所有组件均以 `Tm` 前缀命名，可通过 `app.use(@kibus/tm-ui-plus)` 全量注册或按需导入。
+**仓库已覆盖 60+ 个 ant-design-vue 组件**（通用 / 布局 / 导航 / 表单 / 数据展示 / 反馈 / 全局配置），
+完整清单见文档站 `/components/` 侧边栏或 `packages/ui/src/index.ts` 导出。以下为核心范本组件：
 
 | 组件 | 基于 | 公司扩展能力 |
 | --- | --- | --- |
@@ -91,25 +93,27 @@ pnpm install
 // 全量注册（入口文件）
 import { createApp } from 'vue'
 import App from './App.vue'
-import '@tm/ui/style.css'
-import TmUi from '@tm/ui'
+import TmUi from '@kibus/tm-ui-plus'
 import VXETable from 'vxe-table'
 import 'vxe-table/lib/style.css'
 import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
 
 const app = createApp(App)
-// 业务需自行注册 vxe（vxe 非 @tm/ui 依赖注入）
+// 业务需自行注册 vxe（vxe 非 @kibus/tm-ui-plus 依赖注入）
 app.use(VXETable).use(VxeUI)
 app.use(TmUi)
 app.mount('#app')
 ```
 
+> 注：`@kibus/tm-ui-plus` 为薄封装库，自身无样式产物（组件样式由 ant-design-vue 的 CSS-in-JS
+> 与 vxe 的预编译样式提供），**不存在** `@kibus/tm-ui-plus/style.css` 入口。
+
 ### 按需导入
 
 ```ts
-import { TmButton, TmTable } from '@tm/ui'
-import type { TmTableProps, FormInstance } from '@tm/ui'
+import { TmButton, TmTable } from '@kibus/tm-ui-plus'
+import type { TmTableProps, FormInstance } from '@kibus/tm-ui-plus'
 ```
 
 或配合 `unplugin-vue-components` 零配置自动导入：
@@ -117,14 +121,14 @@ import type { TmTableProps, FormInstance } from '@tm/ui'
 ```ts
 // vite.config.ts
 import Components from 'unplugin-vue-components/vite'
-import { TmResolver } from '@tm/ui'
+import { TmResolver } from '@kibus/tm-ui-plus'
 
 export default defineConfig({
   plugins: [Components({ resolvers: [TmResolver()] })],
 })
 ```
 
-`TmTable` 走独立子入口 `@tm/ui/table`（vxe 体积大，独立 chunk 隔离）；样式子入口 `@tm/ui/style.css`。
+`TmTable` 走独立子入口 `@kibus/tm-ui-plus/table`（vxe 体积大，独立 chunk 隔离）。
 
 ---
 
@@ -132,15 +136,21 @@ export default defineConfig({
 
 | 命令 | 说明 |
 | --- | --- |
-| `pnpm dev` | 启动文档站开发服务器（http://localhost:5555） |
-| `pnpm build` | 构建 `@tm/ui`（es + lib 双格式 + .d.ts 声明） |
+| `pnpm dev` / `pnpm dev:docs` | 启动文档站开发服务器（http://localhost:5555） |
+| `pnpm dev:demo` | 启动 demo 应用（http://localhost:3000） |
+| `pnpm build` / `pnpm build:ui` | 构建 `@kibus/tm-ui-plus`（es + lib 双格式 + .d.ts 声明） |
+| `pnpm build:demo` / `pnpm build:docs` | 构建 demo 应用 / 文档站 |
 | `pnpm test` | 运行组件库单测（Vitest，jsdom） |
+| `pnpm test:coverage` | 组件库单测 + 覆盖率报告（≥80% 门槛） |
+| `pnpm typecheck` | vue-tsc 全仓类型检查（packages/ui + demo） |
+| `pnpm check` | 统一质量门禁：lint + typecheck + coverage + build |
 | `pnpm lint` / `pnpm format` | ESLint / Prettier 代码规范 |
 | `pnpm changeset` | 创建变更集（发布用） |
 | `pnpm release` | 构建 + changeset publish 发布 |
 
-> 文档站通过 `workspace:*` 引用 `@tm/ui`，解析到 `packages/ui/es/index.js`（**构建产物**）。
-> 修改组件库源码后需重新 `pnpm --filter @tm/ui build`，docs 才能看到新效果。
+> 文档站通过 `workspace:*` 引用 `@kibus/tm-ui-plus`，解析到 `packages/ui/es/index.js`（**构建产物**）。
+> 修改组件库源码后需重新 `pnpm --filter @kibus/tm-ui-plus build`，docs 才能看到新效果。
+> demo 应用则通过 alias 直接消费 `packages/ui/src`（源码），改组件库无需重建即可生效。
 
 ---
 
@@ -188,7 +198,7 @@ ant ConfigProvider → useToken() → vxe CSS 变量 → TmTable 自动跟随主
 - **`??` 级联落空**：Boolean prop 未传时是 `false` 而非 `undefined`，会阻断 `false ?? contextValue` 落到上下文。需 `withDefaults` 显式置 `undefined` 区分「未传」。
 - **ant Select 无 readonly**：运行时完全不处理 readonly。用受控 `open: false` 锁死下拉 + 关闭清除按钮实现只读。
 - **vxe `fit` 运行时解析为 false**：即使全局 config 为 true，prop 默认值在运行时仍为 false，需显式下发。
-- **vxe 需要业务侧自行注册**：`app.use(@tm/ui)` 前需 `app.use(vxe-table)` / `app.use(vxe-pc-ui)`。
+- **vxe 需要业务侧自行注册**：`app.use(@kibus/tm-ui-plus)` 前需 `app.use(vxe-table)` / `app.use(vxe-pc-ui)`。
 
 ---
 
@@ -222,7 +232,7 @@ VitePress 站（`apps/docs`），`pnpm dev` 启动后访问 http://localhost:555
 
 - 每个组件页通过 `<DemoBlock>` 内嵌可运行 demo，源码用 `<<<` 指令直接引用 `packages/ui/src/components/*/demos/`（文档与组件库 demo 同步，不重复维护）。
 - `apps/docs/.vitepress/theme/Layout.vue` 用 `TmConfigProvider` 包裹全站，统一 ant locale 与主题。
-- 文档站需处理 VitePress SSR：`vite.ssr.noExternal` 把 ant / vxe / @tm/ui 打进 SSR bundle，避免 `renderToString` 报错。
+- 文档站需处理 VitePress SSR：`vite.ssr.noExternal` 把 ant / vxe / @kibus/tm-ui-plus 打进 SSR bundle，避免 `renderToString` 报错。
 
 ---
 

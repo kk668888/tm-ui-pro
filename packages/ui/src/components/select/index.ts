@@ -5,6 +5,6 @@ import Select from './src/Select.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmSelect = withInstall(Select, 'TmSelect')
-// 类型再导出：业务方可直接 import { TmSelectProps, TmSelectExtProps, SelectProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmSelectProps, TmSelectExtProps, SelectProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmSelect

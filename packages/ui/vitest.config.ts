@@ -1,5 +1,5 @@
 // packages/ui/vitest.config.ts
-// @tm/ui 子包的 Vitest 完整配置（Task 12 在 Task 4 最小版上合并 coverage + 全局 polyfill）
+// @kibus/tm-ui-plus 子包的 Vitest 完整配置（Task 12 在 Task 4 最小版上合并 coverage + 全局 polyfill）
 //
 // 关键升级（覆盖 Task 4 最小版）：
 // 1. coverage：v8 provider，text + html reporter；include 业务源码，剔除 spec/demos/setup
@@ -34,6 +34,14 @@ export default defineConfig({
         'src/test/**',
         'src/**/*.d.ts',
       ],
+      // 覆盖率门槛（README 声明 ≥80% 的落地）：低于阈值测试即失败，
+      // 防止组件扩展时覆盖率悄悄下滑（2026-08-14 审查收口）。
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        statements: 80,
+        branches: 70,
+      },
     },
   },
 })

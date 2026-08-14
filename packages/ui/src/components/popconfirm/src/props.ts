@@ -21,5 +21,5 @@ export interface TmPopconfirmExtProps {
 /** ant 原生（ExtractPropTypes）+ 公司扩展（IDE 提示 ant 原生属性与 danger） */
 export type TmPopconfirmProps = PopconfirmBaseProps & TmPopconfirmExtProps
 
-// 类型透传：业务可 import { TmPopconfirmProps, PopconfirmProps } from '@tm/ui'
+// 类型透传：业务可 import { TmPopconfirmProps, PopconfirmProps } from '@kibus/tm-ui-plus'
 export type { PopconfirmProps } from 'ant-design-vue'

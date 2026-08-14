@@ -4,6 +4,6 @@ import Rate from './src/Rate.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmRate = withInstall(Rate, 'TmRate')
-// 类型再导出：业务方可直接 import { TmRateProps, RateProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmRateProps, RateProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmRate

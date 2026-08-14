@@ -14,7 +14,7 @@ import {
   TmProgress,
   TmSkeleton,
   TmTour,
-} from '@tm/ui';
+} from '@kibus/tm-ui-plus';
 
 defineOptions({ name: 'FeedbackSection' });
 
@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
       TmMessage / TmNotification 命令式调用；TmModal / TmDrawer 组件式 v-model 开关。
     </p>
     <a-space direction="vertical" :size="16" class="w-full">
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmMessage</span>
         <a-space wrap>
           <TmButton type="primary" @click="TmMessage.success('保存成功')">成功</TmButton>
@@ -83,17 +83,17 @@ onBeforeUnmount(() => {
           <TmButton danger @click="TmMessage.error('操作失败，请重试')">错误</TmButton>
           <TmButton @click="showLoading">加载</TmButton>
         </a-space>
-      </div>
+      </a-space>
 
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmModal / TmDrawer</span>
         <a-space wrap>
           <TmButton type="primary" @click="modalOpen = true">打开弹窗</TmButton>
           <TmButton @click="drawerOpen = true">打开抽屉</TmButton>
         </a-space>
-      </div>
+      </a-space>
 
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmNotification</span>
         <a-space wrap>
           <TmButton type="primary" @click="notify('success')">成功</TmButton>
@@ -101,20 +101,20 @@ onBeforeUnmount(() => {
           <TmButton @click="notify('warning')">警告</TmButton>
           <TmButton danger @click="notify('error')">错误</TmButton>
         </a-space>
-      </div>
+      </a-space>
 
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmAlert / TmSpin</span>
-        <div class="flex flex-col gap-2">
+        <a-space direction="vertical">
           <TmAlert status="success" message="操作成功" description="数据已保存" />
           <TmAlert status="warning" message="磁盘空间不足" description="请及时清理" />
           <TmSpin :spinning="true" tip="加载中...">
             <div class="rounded border border-dashed border-secondary p-4">加载内容区域</div>
           </TmSpin>
-        </div>
-      </div>
+        </a-space>
+      </a-space>
 
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmPopconfirm / TmPopover / TmResult</span>
         <a-space wrap>
           <TmPopconfirm title="确定删除该记录吗？" danger>
@@ -128,9 +128,9 @@ onBeforeUnmount(() => {
           </TmPopover>
         </a-space>
         <TmResult status="success" title="提交成功" sub-title="等待审核，可在列表查看进度" />
-      </div>
+      </a-space>
 
-      <div class="tour-anchor-1 flex flex-col gap-2">
+      <a-space direction="vertical" class="tour-anchor-1">
         <span class="text-sm text-secondary">TmProgress（业务 status 映射 + 动态百分比）</span>
         <a-space direction="vertical" class="w-full">
           <TmProgress :percent="progressPercent" status="success" />
@@ -144,9 +144,9 @@ onBeforeUnmount(() => {
           <TmButton size="small" :disabled="progressPercent >= 100" @click="progressPercent += 10">+10%</TmButton>
           <span class="text-secondary">{{ progressPercent }}%</span>
         </a-space>
-      </div>
+      </a-space>
 
-      <div class="tour-anchor-2 flex flex-col gap-2">
+      <a-space direction="vertical" class="tour-anchor-2">
         <span class="text-sm text-secondary">TmSkeleton（加载态切换）</span>
         <TmSkeleton :loading="skeletonLoading" :avatar="true" :paragraph="{ rows: 3 }" style="max-width: 360px">
           <div>真实内容：这里是加载完成后展示的业务信息。</div>
@@ -154,13 +154,13 @@ onBeforeUnmount(() => {
         <TmButton size="small" @click="skeletonLoading = !skeletonLoading">
           {{ skeletonLoading ? '加载完成' : '重新加载' }}
         </TmButton>
-      </div>
+      </a-space>
 
-      <div class="flex flex-col gap-2">
+      <a-space direction="vertical">
         <span class="text-sm text-secondary">TmTour（步骤引导，v-model:open 自闭合）</span>
         <TmButton type="primary" @click="tourOpen = true">开始引导</TmButton>
         <TmTour v-model:open="tourOpen" :steps="tourSteps" />
-      </div>
+      </a-space>
 
       <TmModal v-model="modalOpen" title="基础弹窗" @ok="modalOpen = false" @cancel="modalOpen = false">
         <p>弹窗内容，支持任意插槽与 ant Modal 全部 props / events。</p>

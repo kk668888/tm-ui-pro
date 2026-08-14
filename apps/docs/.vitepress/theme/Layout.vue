@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import DefaultTheme from 'vitepress/theme'
 import { StyleProvider as AStyleProvider } from 'ant-design-vue'
-import { TmConfigProvider, TmApp } from '@tm/ui'
+import { TmConfigProvider, TmApp } from '@kibus/tm-ui-plus'
 
 // 取出 VitePress 默认主题的 Layout 组件，在本层包裹后原样透传
 const { Layout: DefaultLayout } = DefaultTheme

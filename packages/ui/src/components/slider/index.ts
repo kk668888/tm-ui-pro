@@ -4,6 +4,6 @@ import Slider from './src/Slider.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmSlider = withInstall(Slider, 'TmSlider')
-// 类型再导出：业务方可直接 import { TmSliderProps, SliderProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmSliderProps, SliderProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmSlider

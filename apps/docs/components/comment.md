@@ -2,11 +2,11 @@
 
 基于 [ant-design-vue](https://www.antdv.com/components/comment-cn) Comment 的**兼容型**薄封装。保留 ant 全部 props / slots，不新增业务评论模型。
 
-> ⚠️ **上游已废弃**：ant-design-vue 已标记 Comment 为废弃组件，未来版本可能移除。@tm/ui 保留封装以满足全覆盖，但**新业务不建议使用**。
+> ⚠️ **上游已废弃**：ant-design-vue 已标记 Comment 为废弃组件，未来版本可能移除。@kibus/tm-ui-plus 保留封装以满足全覆盖，但**新业务不建议使用**。
 
 ## 何时使用
 
-- 存量评论界面平滑迁移到 @tm/ui。
+- 存量评论界面平滑迁移到 @kibus/tm-ui-plus。
 - 新评论界面推荐使用 **Avatar / Flex / Space / Typography** 组合构建。
 
 ## 基础用法

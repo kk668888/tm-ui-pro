@@ -7,7 +7,7 @@ import { withInstall } from '../utils/withInstall'
  * TmConfigProvider：带 install 方法的 ConfigProvider 组件
  *
  * 用法：
- *   import { TmConfigProvider } from '@tm/ui'
+ *   import { TmConfigProvider } from '@kibus/tm-ui-plus'
  *   app.use(TmConfigProvider)            // 全局注册
  *   // 或在模板中直接使用 <TmConfigProvider>...</TmConfigProvider>
  */

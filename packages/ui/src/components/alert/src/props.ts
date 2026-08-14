@@ -23,5 +23,5 @@ export interface TmAlertExtProps {
 /** ant 原生（ExtractPropTypes）+ 公司扩展（IDE 提示 ant 原生属性与 status） */
 export type TmAlertProps = AlertBaseProps & TmAlertExtProps
 
-// 类型透传：业务可 import { TmAlertProps, AlertProps } from '@tm/ui'
+// 类型透传：业务可 import { TmAlertProps, AlertProps } from '@kibus/tm-ui-plus'
 export type { AlertProps } from 'ant-design-vue'

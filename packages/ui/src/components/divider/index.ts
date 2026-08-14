@@ -4,6 +4,6 @@ import Divider from './src/Divider.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmDivider = withInstall(Divider, 'TmDivider')
-// 类型再导出：业务方可直接 import { TmDividerProps, DividerProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmDividerProps, DividerProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmDivider

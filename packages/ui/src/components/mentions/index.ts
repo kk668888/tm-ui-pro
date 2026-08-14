@@ -7,7 +7,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmMentions = withInstall(Mentions, 'TmMentions')
 export const TmMentionsOption = withInstall(MentionsOption, 'TmMentionsOption')
 
-// 类型透传：业务方可直接 import { MentionsProps, TmMentionsProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { MentionsProps, TmMentionsProps, ... } from '@kibus/tm-ui-plus'
 export type { MentionsProps } from 'ant-design-vue'
 export type { TmMentionsProps, TmMentionsOptionProps } from './src/props'
 

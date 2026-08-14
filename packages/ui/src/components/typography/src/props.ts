@@ -27,7 +27,7 @@ export type TmTypographyTextProps = TextProps
 /** TmTypographyLink = ant Link 原生 props（含 copyable / ellipsis） */
 export type TmTypographyLinkProps = LinkBaseProps
 
-// 类型透传：业务可 import { TmTypographyLinkProps, LinkProps } from '@tm/ui'
+// 类型透传：业务可 import { TmTypographyLinkProps, LinkProps } from '@kibus/tm-ui-plus'
 //（LinkProps 为 ant 完整类型，含 AnchorHTMLAttributes）
 export type { TitleProps } from 'ant-design-vue/es/typography/Title'
 export type { ParagraphProps } from 'ant-design-vue/es/typography/Paragraph'

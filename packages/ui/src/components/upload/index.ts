@@ -4,6 +4,6 @@ import Upload from './src/Upload.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmUpload = withInstall(Upload, 'TmUpload')
-// 类型再导出：业务方可直接 import { TmUploadProps, UploadProps, UploadFile } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmUploadProps, UploadProps, UploadFile } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmUpload

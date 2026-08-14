@@ -22,11 +22,10 @@ import {
   TmQRCode,
   TmSegmented,
   TmStatistic,
-  TmTimeline,
   TmTooltip,
-} from '@tm/ui';
-import type { TmTableProps } from '@tm/ui';
-import { request } from '@/core/http';
+} from '@kibus/tm-ui-plus';
+import type { TmTableProps, TmTableResult } from '@kibus/tm-ui-plus';
+import { getDemoUsers } from '../api/demo-user.api';
 
 defineOptions({ name: 'DataDisplaySection' });
 
@@ -72,13 +71,18 @@ const remoteColumns: TmTableProps['columns'] = [
 ];
 const density = ref<'compact' | 'default' | 'loose'>('default');
 
-/** 远程拉数：mock 接口被 msw 拦截；jsdom 测试下失败时返回空表，保证演示块稳定挂载 */
-async function fetchRemote(params: { page: number; pageSize: number; query?: Record<string, unknown> }) {
+/** 远程拉数：mock 接口被 msw 拦截（baseURL=/api，此处写相对路径避免双重前缀）；jsdom 测试下失败时返回空表，保证演示块稳定挂载 */
+async function fetchRemote(
+  params: Parameters<NonNullable<TmTableProps['request']>>[0],
+): Promise<TmTableResult<Record<string, unknown>>> {
   try {
-    const res = await request.get<{ list: Record<string, unknown>[]; total: number }>('/api/users', {
-      params: { page: params.page, pageSize: params.pageSize, ...params.query },
+    const res = await getDemoUsers({
+      page: params.currentPage,
+      pageSize: params.pageSize,
+      name: (params.query?.name as string | undefined) ?? '',
     });
-    return { data: res.list, total: res.total };
+    // DemoUserRow 结构兼容 Record<string, unknown>（索引访问用 string 字段）
+    return { data: res.data.list as unknown as Record<string, unknown>[], total: res.data.total };
   } catch {
     return { data: [], total: 0 };
   }
@@ -128,36 +132,36 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
 
       <a-divider orientation="left">信息展示 Info</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmAvatar：头像（文字 / 图标 / 形状尺寸）。</p>
         <a-space>
           <TmAvatar size="large">张</TmAvatar>
           <TmAvatar>三</TmAvatar>
           <TmAvatar shape="square">4</TmAvatar>
         </a-space>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmCard：卡片容器。</p>
         <TmCard title="卡片标题" extra="更多" style="width: 320px">
           卡片内容，可放任意自定义节点。
         </TmCard>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmStatistic：统计数值。</p>
         <a-space :size="32">
-          <TmStatistic title="总销售额" :value="112893" precision="2" />
+          <TmStatistic title="总销售额" :value="112893" :precision="2" />
           <TmStatistic title="今日活跃" :value="1128" suffix="人" />
         </a-space>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmImage：图片预览（hover 遮罩可预览大图）。</p>
         <TmImage :width="140" :src="demoImage" />
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmSegmented：分段控制器（v-model:value）。</p>
         <TmSegmented
           v-model:value="segValue"
@@ -167,16 +171,16 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
           ]"
         />
         <span class="ml-2 text-secondary">value={{ segValue }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmQRCode：二维码。</p>
         <TmQRCode value="https://tm-ui.example.com" :size="120" />
-      </div>
+      </a-space>
 
       <a-divider orientation="left">折叠 / 走马灯 / 时间轴</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmCollapse：折叠面板（TmCollapsePanel 子项）。</p>
         <TmCollapse style="max-width: 520px">
           <TmCollapsePanel key="1" header="面板一">
@@ -186,29 +190,30 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
             <p>折叠面板内容二</p>
           </TmCollapsePanel>
         </TmCollapse>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmCarousel：走马灯（自动播放）。</p>
         <TmCarousel autoplay style="max-width: 420px">
-          <div style="height: 120px; line-height: 120px; text-align: center; background: #1677ff; color: #fff">1</div>
-          <div style="height: 120px; line-height: 120px; text-align: center; background: #52c41a; color: #fff">2</div>
-          <div style="height: 120px; line-height: 120px; text-align: center; background: #faad14; color: #fff">3</div>
+          <!-- 演示色块用主题语义色（随预设/暗色联动），不再手写字面色 -->
+          <a-flex justify="center" align="center" class="text-white" style="height: 120px; background: var(--color-primary)">1</a-flex>
+          <a-flex justify="center" align="center" class="text-white" style="height: 120px; background: var(--color-success)">2</a-flex>
+          <a-flex justify="center" align="center" class="text-white" style="height: 120px; background: var(--color-warning)">3</a-flex>
         </TmCarousel>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmTimeline：时间轴（ant 子项）。</p>
         <a-timeline>
           <a-timeline-item>创建账号 2026-08-01</a-timeline-item>
           <a-timeline-item color="green">完成实名认证 2026-08-05</a-timeline-item>
           <a-timeline-item color="red">解绑手机 2026-08-09</a-timeline-item>
         </a-timeline>
-      </div>
+      </a-space>
 
       <a-divider orientation="left">列表 / 描述 / 评论 / 提示</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmList：列表（data-source + renderItem 插槽）。</p>
         <TmList :data-source="listData" :pagination="false" style="max-width: 560px">
           <template #renderItem="{ item }">
@@ -222,9 +227,9 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
             </TmListItem>
           </template>
         </TmList>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmDescriptions：描述列表（TmDescriptionsItem 子项）。</p>
         <TmDescriptions title="用户信息" :column="2" bordered>
           <TmDescriptionsItem label="姓名">张三</TmDescriptionsItem>
@@ -232,9 +237,9 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
           <TmDescriptionsItem label="城市">杭州</TmDescriptionsItem>
           <TmDescriptionsItem label="邮箱">zhangsan@example.com</TmDescriptionsItem>
         </TmDescriptions>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmComment：评论（作者 + 内容 + 时间）。</p>
         <TmComment author="张三">
           <template #avatar><TmAvatar size="large">张</TmAvatar></template>
@@ -243,19 +248,19 @@ async function fetchRemote(params: { page: number; pageSize: number; query?: Rec
           </template>
           <template #datetime>2026-08-13 10:30</template>
         </TmComment>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmTooltip：文字气泡提示。</p>
         <TmTooltip title="这是一个提示" placement="top">
           <TmButton>悬停显示提示</TmButton>
         </TmTooltip>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmCalendar：日历（卡片模式）。</p>
         <TmCalendar :fullscreen="false" style="max-width: 400px" />
-      </div>
+      </a-space>
     </a-space>
   </a-card>
 </template>

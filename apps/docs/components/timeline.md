@@ -25,7 +25,7 @@ const props = [
   <TimelineDemo />
 </DemoBlock>
 
-> 注：TmTimeline 使用 render function 转发 default slot。子项未在 @tm/ui 注册（设计 Non-Goals），children 使用 ant 原生 `TimelineItem` 组件。
+> 注：TmTimeline 使用 render function 转发 default slot。子项未在 @kibus/tm-ui-plus 注册（设计 Non-Goals），children 使用 ant 原生 `TimelineItem` 组件。
 
 ## API
 

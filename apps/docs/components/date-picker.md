@@ -68,4 +68,4 @@ const datePickerProps = [
 
 - `TmDatePickerProps = DatePickerProps & { modelValue?: Dayjs | string | null; valueFormat?: string; readonly?: boolean }`
 - `TmRangePickerProps = RangePickerProps & { modelValue?: [Dayjs,Dayjs] | [string,string] | null; valueFormat?: string; readonly?: boolean }`
-- `DatePickerProps` / `RangePickerProps`（ant 原生）可直接从 `@tm/ui` 导入。
+- `DatePickerProps` / `RangePickerProps`（ant 原生）可直接从 `@kibus/tm-ui-plus` 导入。

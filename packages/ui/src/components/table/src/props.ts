@@ -1,7 +1,7 @@
 // packages/ui/src/components/table/src/props.ts
 // TmTable 类型定义：
 // - TmTableProps = VxeGridProps（vxe 原生）+ TmTableExtProps（公司扩展：request / search / density）
-// - re-export vxe 原生类型，业务侧 import { TmTableProps, VxeGridProps, ... } from '@tm/ui' 即可
+// - re-export vxe 原生类型，业务侧 import { TmTableProps, VxeGridProps, ... } from '@kibus/tm-ui-plus' 即可
 //
 // 注意：从 VxeGridProps 继承的 pagerConfig 不再透传给 vxe-grid（vxe 不再渲染分页器），
 // 其 total / currentPage / pageSize 语义改为驱动 ant-design-vue Pagination 的 props（见 design D3）。
@@ -101,9 +101,9 @@ export interface TmTableExtProps {
 
 /**
  * 完整 props：vxe 原生 props + 公司扩展
- * @template D 行数据类型（vxe 原生支持泛型）
+ * @template D 行数据类型（vxe 原生支持泛型）；默认 unknown（业务显式声明行类型更安全）
  */
-export type TmTableProps<D = any> = VxeGridProps<D> & TmTableExtProps
+export type TmTableProps<D = unknown> = VxeGridProps<D> & TmTableExtProps
 
 // re-export vxe 原生类型，业务侧无需直接依赖 vxe-table 也能拿到类型
 export type {

@@ -4,6 +4,6 @@ import Card from './src/Card.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmCard = withInstall(Card, 'TmCard')
-// 类型再导出：业务方可直接 import { TmCardProps, CardProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmCardProps, CardProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default TmCard

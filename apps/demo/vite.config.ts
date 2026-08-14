@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import { resolve } from 'path';
-import { autoRoutesPlugin, menuVisualizerPlugin, defineRenderPlugin } from './build-plugins';
+import { autoRoutesPlugin, menuVisualizerPlugin } from './build-plugins';
 
 // 用 async 配置：legacy 插件需 dynamic import 按需加载（默认不安装该包），只能在异步上下文 await。
 export default defineConfig(async ({ mode }) => {
@@ -13,7 +13,6 @@ export default defineConfig(async ({ mode }) => {
   const plugins = [
     vue(),
     tailwindcss(),
-    defineRenderPlugin(),
     autoRoutesPlugin(),
     Components({
       resolvers: [AntDesignVueResolver({ importStyle: false })],
@@ -54,6 +53,9 @@ export default defineConfig(async ({ mode }) => {
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
+        // 工作区内直接消费组件库源码：类型与运行时同源（绕过 vite-plugin-dts 对
+        // Omit 交叉类型的展开缺陷），且改组件库无需 rebuild 即可生效（审查 P2 #14）。
+        '@kibus/tm-ui-plus': resolve(__dirname, '../../packages/ui/src/index.ts'),
       },
     },
     server: {

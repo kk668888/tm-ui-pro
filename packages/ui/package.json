@@ -1,5 +1,5 @@
 {
-  "name": "@tm/ui",
+  "name": "@kibus/tm-ui-plus",
   "version": "0.1.0",
   "description": "公司内部基于 ant-design-vue + vxe-table 二次封装的组件库",
   "repository": {
@@ -7,32 +7,27 @@
     "url": "git+ssh://git@your-company.com/tm-ui.git"
   },
   "type": "module",
-  "main": "lib/index.cjs",
-  "module": "es/index.js",
-  "types": "es/index.d.ts",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./es/index.d.ts",
-      "import": "./es/index.js",
-      "require": "./lib/index.cjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./table": {
-      "types": "./es/components/table/index.d.ts",
-      "import": "./es/components/table/index.js",
-      "require": "./lib/components/table/index.cjs"
-    },
-    "./style.css": "./es/ui.css"
+      "types": "./dist/components/table/index.d.ts",
+      "import": "./dist/components/table/index.js",
+      "require": "./dist/components/table/index.cjs"
+    }
   },
-  "sideEffects": [
-    "**/*.css"
-  ],
   "files": [
-    "es",
-    "lib"
+    "dist"
   ],
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://registry.your-company.com/"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "build": "vite build",
@@ -57,6 +52,7 @@
     "@vue/test-utils": "^2.4.0",
     "@vxe-ui/core": "4.4.18",
     "ant-design-vue": "^4.2.6",
+    "csstype": "^3.2.3",
     "jsdom": "^24.0.0",
     "scroll-into-view-if-needed": "^2.2.31",
     "unplugin-vue-components": "^32.1.0",

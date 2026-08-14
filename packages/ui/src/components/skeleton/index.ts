@@ -13,6 +13,6 @@ export const TmSkeletonImage = withInstall(SkeletonImage, 'TmSkeletonImage')
 export const TmSkeletonInput = withInstall(SkeletonInput, 'TmSkeletonInput')
 export const TmSkeletonButton = withInstall(SkeletonButton, 'TmSkeletonButton')
 
-// 类型再导出：业务方可直接 import { TmSkeletonProps, TmSkeletonAvatarProps, SkeletonProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmSkeletonProps, TmSkeletonAvatarProps, SkeletonProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default { TmSkeleton, TmSkeletonAvatar, TmSkeletonImage, TmSkeletonInput, TmSkeletonButton }

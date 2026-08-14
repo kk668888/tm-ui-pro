@@ -53,7 +53,7 @@ const buttonProps = [
 ### TmButton Types
 
 ```ts
-import type { TmButtonProps, TmButtonExtProps } from '@tm/ui'
+import type { TmButtonProps, TmButtonExtProps } from '@kibus/tm-ui-plus'
 ```
 
 ## 扩展机制

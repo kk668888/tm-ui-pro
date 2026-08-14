@@ -1,7 +1,7 @@
 # docs/site Specification
 
 ## Purpose
-Defines the @tm/ui documentation site's top-level presentation behaviors: a home landing page introducing the component library, and site-wide local full-text search across component documentation.
+Defines the @kibus/tm-ui-plus documentation site's top-level presentation behaviors: a home landing page introducing the component library, and site-wide local full-text search across component documentation.
 ## Requirements
 ### Requirement: 首页落地页
 
@@ -10,7 +10,7 @@ Defines the @tm/ui documentation site's top-level presentation behaviors: a home
 #### Scenario: 首页展示品牌信息
 
 - **WHEN** 用户访问文档站根路径
-- **THEN** 页面展示组件库名称（@tm/ui）、定位描述（基于 ant-design-vue + vxe-table 二次封装）与快速入口按钮
+- **THEN** 页面展示组件库名称（@kibus/tm-ui-plus）、定位描述（基于 ant-design-vue + vxe-table 二次封装）与快速入口按钮
 
 #### Scenario: 首页展示核心特性
 

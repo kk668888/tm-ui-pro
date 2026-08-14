@@ -7,6 +7,6 @@ import { withInstall } from '../../utils/withInstall'
 export const TmCollapse = withInstall(Collapse, 'TmCollapse')
 export const TmCollapsePanel = withInstall(CollapsePanel, 'TmCollapsePanel')
 
-// 类型再导出：业务方可直接 import { TmCollapseProps, TmCollapsePanelProps, CollapseProps } from '@tm/ui'
+// 类型再导出：业务方可直接 import { TmCollapseProps, TmCollapsePanelProps, CollapseProps } from '@kibus/tm-ui-plus'
 export * from './src/props'
 export default { TmCollapse, TmCollapsePanel }

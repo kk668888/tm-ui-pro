@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { request } from '@/core/http';
+import { getDemoUsers } from '../api/demo-user.api';
 import {
   TmForm,
   TmFormItem,
@@ -28,7 +28,7 @@ import {
   TmSlider,
   TmTransfer,
   TmTree,
-} from '@tm/ui';
+} from '@kibus/tm-ui-plus';
 
 defineOptions({ name: 'FormSection' });
 
@@ -73,19 +73,22 @@ const regionOptions = [
     children: [{ value: 'nanjing', label: '南京' }],
   },
 ];
+// ant Tree DataNode 要求 key 字段；tree-select 用 value 映射，两处共用时补齐 key
 const treeData = [
   {
     title: 'Node1',
+    key: '0-0',
     value: '0-0',
     children: [
-      { title: 'Child Node1', value: '0-0-1' },
-      { title: 'Child Node2', value: '0-0-2' },
+      { title: 'Child Node1', key: '0-0-1', value: '0-0-1' },
+      { title: 'Child Node2', key: '0-0-2', value: '0-0-2' },
     ],
   },
   {
     title: 'Node2',
+    key: '0-1',
     value: '0-1',
-    children: [{ title: 'Child Node3', value: '0-1-1' }],
+    children: [{ title: 'Child Node3', key: '0-1-1', value: '0-1-1' }],
   },
 ];
 
@@ -113,6 +116,8 @@ const transferData = [
   { key: '3', title: '内容三' },
 ];
 const transferKeys = ref<string[]>(['1']);
+// TmTransfer 的 render 自定义渲染：显示标题（ant 类型约定 (item: TransferItem) => RenderResult）
+const transferRender = (item: { title?: string }) => item.title ?? '';
 const treeCheckedKeys = ref<string[]>(['0-0-1']);
 
 // ── 字段联动：选择部门控制账户输入禁用 ──
@@ -124,10 +129,8 @@ const remoteSelectValue = ref<string | undefined>(undefined);
 async function fetchRemoteOptions(query: string): Promise<{ label: string; value: string }[]> {
   if (!query) return [];
   try {
-    const res = await request.get<{ list: { id: string; name: string }[] }>('/api/users', {
-      params: { name: query, pageSize: 50 },
-    });
-    return res.list.map((u) => ({ label: u.name, value: u.name }));
+    const res = await getDemoUsers({ page: 1, pageSize: 50, name: query });
+    return res.data.list.map((u) => ({ label: u.name, value: u.name }));
   } catch {
     return [];
   }
@@ -182,58 +185,58 @@ function onReset() {
       表单控件统一 v-model，右侧实时回显；TmForm 手动模式演示必填 / 邮箱校验与脏追踪。
     </p>
     <a-space direction="vertical" :size="16" class="w-full">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
+      <a-row :gutter="[16, 16]">
+        <a-col :xs="24" :md="12">
           <TmInput v-model="name" placeholder="请输入用户名" allow-clear />
           <span class="ml-2 text-secondary">name={{ name || '空' }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmInputNumber v-model="age" :min="0" :max="100" />
           <span class="ml-2 text-secondary">age={{ age }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmSelect v-model="fruit" :options="fruitOptions" placeholder="请选择水果" style="width: 200px" />
           <span class="ml-2 text-secondary">fruit={{ fruit }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmRadioGroup v-model="role" :options="roleOptions" />
           <span class="ml-2 text-secondary">role={{ role }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmCheckboxGroup v-model="tags" :options="tagOptions" />
           <span class="ml-2 text-secondary">tags={{ tags.join('、') }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmSwitch v-model="enabled" checked-children="开" un-checked-children="关" />
           <span class="ml-2 text-secondary">enabled={{ enabled }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmDatePicker v-model="date" value-format="YYYY-MM-DD" style="width: 200px" />
           <span class="ml-2 text-secondary">date={{ date }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmRangePicker v-model="range" value-format="YYYY-MM-DD" style="width: 280px" />
           <span class="ml-2 text-secondary">range={{ range.join('~') }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmCascader v-model="region" :options="regionOptions" style="width: 240px" />
           <span class="ml-2 text-secondary">region={{ region.join('/') }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmTreeSelect v-model="treeValue" :tree-data="treeData" style="width: 240px" />
           <span class="ml-2 text-secondary">tree={{ treeValue }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmTimePicker v-model="timeStr" value-format="HH:mm:ss" style="width: 200px" />
           <span class="ml-2 text-secondary">time={{ timeStr }}</span>
-        </div>
-        <div>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmUpload v-model:file-list="uploadList" action="/api/upload" :before-upload="beforeUpload">
             <TmButton>上传文件（限 1MB）</TmButton>
           </TmUpload>
           <span class="ml-2 text-secondary">files={{ uploadList.length }}</span>
-        </div>
-      </div>
+        </a-col>
+      </a-row>
 
       <a-divider orientation="left">TmForm 手动模式</a-divider>
       <TmForm
@@ -273,58 +276,58 @@ function onReset() {
 
       <a-divider orientation="left">补充控件 Extra</a-divider>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmAutoComplete：自动完成（输入联想）。</p>
         <TmAutoComplete v-model:value="acValue" :options="acOptions" style="width: 220px" placeholder="输入 a 试试" />
         <span class="ml-2 text-secondary">value={{ acValue || '空' }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmCheckbox：复选框（v-model:checked）。</p>
         <TmCheckbox v-model:checked="singleChecked">同意协议</TmCheckbox>
         <span class="ml-2 text-secondary">checked={{ singleChecked }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmMentions：提及（@ 触发）。</p>
         <TmMentions v-model:value="mentionValue" :options="mentionOptions" style="width: 220px" placeholder="输入 @ 触发" />
         <span class="ml-2 text-secondary">value={{ mentionValue || '空' }}</span>
-      </div>
+      </a-space>
 
-      <div>
-        <p class="mb-2 text-xs text-secondary">TmRadio：单选框（v-model:checked）。</p>
+      <a-space direction="vertical" :size="4">
+        <p class="mb-2 text-xs text-secondary">TmRadio：单选框（value + :checked 受控）。</p>
         <a-space>
-          <TmRadio v-model:checked="singleRadio" value="a">选项 A</TmRadio>
-          <TmRadio v-model:checked="singleRadio" value="b">选项 B</TmRadio>
+          <TmRadio :checked="singleRadio === 'a'" value="a" @change="singleRadio = 'a'">选项 A</TmRadio>
+          <TmRadio :checked="singleRadio === 'b'" value="b" @change="singleRadio = 'b'">选项 B</TmRadio>
         </a-space>
         <span class="ml-2 text-secondary">value={{ singleRadio }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmRate：评分（v-model + allow-half）。</p>
         <TmRate v-model:value="rateValue" allow-half />
         <span class="ml-2 text-secondary">{{ rateValue }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmSlider：滑块（v-model + 范围）。</p>
         <TmSlider v-model:value="sliderValue" :min="0" :max="100" style="max-width: 320px" />
         <span class="ml-2 text-secondary">{{ sliderValue }}</span>
-      </div>
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmTransfer：穿梭框（v-model:targetKeys）。</p>
-        <TmTransfer v-model:targetKeys="transferKeys" :data-source="transferData" :render="(item: { title: string }) => item.title" style="max-width: 480px" />
-      </div>
+        <TmTransfer v-model:target-keys="transferKeys" :data-source="transferData" :render="transferRender" style="max-width: 480px" />
+      </a-space>
 
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmTree：树（勾选受控 checkedKeys）。</p>
-        <TmTree v-model:checkedKeys="treeCheckedKeys" :tree-data="treeData" checkable style="max-width: 300px" />
+        <TmTree v-model:checked-keys="treeCheckedKeys" :tree-data="treeData" checkable style="max-width: 300px" />
         <span class="ml-2 text-secondary">checked={{ treeCheckedKeys.join('、') }}</span>
-      </div>
+      </a-space>
 
       <a-divider orientation="left">字段联动 Field Linking</a-divider>
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">选择「前端」后才可输入账户（禁用联动）。</p>
         <a-space>
           <TmSelect
@@ -338,10 +341,10 @@ function onReset() {
           />
           <TmInput v-model="linkAccount" :disabled="linkDept !== 'fe'" placeholder="未选前端时禁用" style="width: 220px" />
         </a-space>
-      </div>
+      </a-space>
 
       <a-divider orientation="left">Select 远程搜索 Remote Select</a-divider>
-      <div>
+      <a-space direction="vertical" :size="4">
         <p class="mb-2 text-xs text-secondary">TmSelect 远程搜索（输入关键词，mock /api/users 过滤）。</p>
         <TmSelect
           v-model="remoteSelectValue"
@@ -351,7 +354,7 @@ function onReset() {
           style="width: 240px"
         />
         <span class="ml-2 text-secondary">value={{ remoteSelectValue || '空' }}</span>
-      </div>
+      </a-space>
     </a-space>
   </a-card>
 </template>

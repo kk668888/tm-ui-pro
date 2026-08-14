@@ -1,6 +1,6 @@
 # Table 表格
 
-基于 [vxe-table](https://vxetable.cn/) 的 `vxe-grid` 薄封装。**表格主体**（列 / 数据 / 排序 / 勾选 / 行编辑等）由 vxe 提供，**分页器与搜索表单使用 ant-design-vue**，与公司 @tm/ui 全 ant 生态视觉一致。在透传全部 vxe-grid 原生 props / slots / events 的基础上，提供三个公司级扩展键：`request`（远程分页拉数）、`search`（声明式 ant 搜索表单）、`density`（行高密度）。
+基于 [vxe-table](https://vxetable.cn/) 的 `vxe-grid` 薄封装。**表格主体**（列 / 数据 / 排序 / 勾选 / 行编辑等）由 vxe 提供，**分页器与搜索表单使用 ant-design-vue**，与公司 @kibus/tm-ui-plus 全 ant 生态视觉一致。在透传全部 vxe-grid 原生 props / slots / events 的基础上，提供三个公司级扩展键：`request`（远程分页拉数）、`search`（声明式 ant 搜索表单）、`density`（行高密度）。
 
 > 视觉规范默认：`border` / `stripe` / `showOverflow` / `fit`（列宽铺满容器）与公司设计对齐，业务侧可覆盖。
 
@@ -173,7 +173,7 @@ export interface TmTableResult<T = Record<string, unknown>> {
 - 其余 vxe-grid 实例方法全部透传。
 
 ```ts
-import type { VxeGridInstance } from '@tm/ui'
+import type { VxeGridInstance } from '@kibus/tm-ui-plus'
 const tableRef = ref<VxeGridInstance>()
 const checked = tableRef.value?.getCheckboxRecords()
 ```
@@ -193,10 +193,10 @@ import type {
   VxeGridInstance,
   VxeColumnProps,
   VxeGridListeners,
-} from '@tm/ui'
+} from '@kibus/tm-ui-plus'
 
 // 也可走子入口（按需 import 子模块，与主入口类型一致）
-import type { TmTableProps as TmTableProps2 } from '@tm/ui/table'
+import type { TmTableProps as TmTableProps2 } from '@kibus/tm-ui-plus/table'
 ```
 
 ## 扩展机制
@@ -215,5 +215,5 @@ import type { TmTableProps as TmTableProps2 } from '@tm/ui/table'
 ## 注意事项
 
 - **BREAKING（v2）**：分页器由 vxe 内置 `pagerConfig` 改为 ant Pagination。迁移：删除对 `pagerConfig.total` 的手动维护（远程模式由内部接管）；若曾监听 vxe `page-change` 事件，改由 ant Pagination 的 change 驱动（组件内自动处理，业务无需绑定）。
-- TmTable 依赖 vxe-table 4.20+、vxe-pc-ui 4.16+（表格主体）与 ant-design-vue 4.x（分页 / 搜索表单）运行时，业务方需在 `app.use(@tm/ui)` 前自行注册 vxe（或使用 `TmConfigProvider`）。文档站已在 `theme/index.ts` 全量注册 vxe，故本页 demo 可直接渲染。
+- TmTable 依赖 vxe-table 4.20+、vxe-pc-ui 4.16+（表格主体）与 ant-design-vue 4.x（分页 / 搜索表单）运行时，业务方需在 `app.use(@kibus/tm-ui-plus)` 前自行注册 vxe（或使用 `TmConfigProvider`）。文档站已在 `theme/index.ts` 全量注册 vxe，故本页 demo 可直接渲染。
 - SSR 环境（如 VitePress build 阶段的 `renderToString`）下 vxe-grid 可能因依赖 `window` / `document` 而渲染异常，文档站通过 `vite.ssr.noExternal` 配置把 vxe 打进 bundle 解决。

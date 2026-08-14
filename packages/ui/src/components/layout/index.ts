@@ -1,7 +1,7 @@
 // packages/ui/src/components/layout/index.ts
 // TmLayout 出口：TmLayout / TmSider / TmHeader / TmContent / TmFooter 多子组件模块，按 form 模块形态组织
 // 设计要点：
-// - 命名导出全部 5 个子组件：src/index.ts 聚合时分别注册，确保 app.use(@tm/ui) 后均可用。
+// - 命名导出全部 5 个子组件：src/index.ts 聚合时分别注册，确保 app.use(@kibus/tm-ui-plus) 后均可用。
 // - default export 提供对象形态 { TmLayout, TmSider, ... }，便于整体引用。
 import Layout from './src/Layout.vue'
 import Sider from './src/Sider.vue'
@@ -16,7 +16,7 @@ export const TmHeader = withInstall(Header, 'TmHeader')
 export const TmContent = withInstall(Content, 'TmContent')
 export const TmFooter = withInstall(Footer, 'TmFooter')
 
-// 类型透传：业务方可直接 import { LayoutProps, SiderProps, TmLayoutProps, ... } from '@tm/ui'
+// 类型透传：业务方可直接 import { LayoutProps, SiderProps, TmLayoutProps, ... } from '@kibus/tm-ui-plus'
 export type { LayoutProps, SiderProps } from 'ant-design-vue'
 export type {
   TmLayoutProps,

@@ -2,27 +2,27 @@
 // VitePress 站点配置：标题、导航、侧边栏与 Vite SSR 选项
 //
 // 设计要点（Task 15 / Bug 2 + Bug 6）：
-// - 文档站定位为「应用层」，承载所有应用级依赖；通过 workspace:* 引用 @tm/ui，
+// - 文档站定位为「应用层」，承载所有应用级依赖；通过 workspace:* 引用 @kibus/tm-ui-plus，
 //   确保核心库零应用依赖。
 // - 移除 Task 3 的 ignoreDeadLinks:true（当时 /components/* 链接暂无内容）。
 //   Task 15 创建 5 个组件页后，所有 nav/sidebar 链接都有真实目标，可恢复死链校验，
 //   防止后续误改链接导致死链被静默忽略。
-// - vite.ssr.noExternal：让 VitePress SSR 阶段把 ant-design-vue / vxe / @tm/ui 等
+// - vite.ssr.noExternal：让 VitePress SSR 阶段把 ant-design-vue / vxe / @kibus/tm-ui-plus 等
 //   ESM 包打进 SSR bundle（而非视为 external 走 node 原生 resolve），避免
 //   `Cannot find module` / `named export not found` 类 SSR 报错（Bug 6）。
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: '@tm/ui 组件库',
+  title: '@kibus/tm-ui-plus 组件库',
   description: '公司内部基于 ant-design-vue + vxe-table 二次封装的组件库',
   // Bug 2：移除 ignoreDeadLinks（Task 3 deferred 收口）。
   // 各组件页 + nav/sidebar 链接均有真实目标，死链校验恢复启用。
   vite: {
     ssr: {
       // Bug 6：SSR bundle 必须包含以下 ESM 包，否则 VitePress build 阶段
-      // `renderToString(<TmTable>)` 会因 vxe / @tm/ui 命名 export 无法解析而报错。
+      // `renderToString(<TmTable>)` 会因 vxe / @kibus/tm-ui-plus 命名 export 无法解析而报错。
       noExternal: [
-        '@tm/ui',
+        '@kibus/tm-ui-plus',
         'ant-design-vue',
         '@ant-design/icons-vue',
         'vxe-table',

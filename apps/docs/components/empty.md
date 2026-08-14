@@ -43,4 +43,4 @@ const emptyProps = [
 ### TmEmpty Types
 
 - `TmEmptyProps = EmptyProps`（ant 原生）
-- `EmptyProps` 可直接从 `@tm/ui` 导入。
+- `EmptyProps` 可直接从 `@kibus/tm-ui-plus` 导入。

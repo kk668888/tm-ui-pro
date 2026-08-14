@@ -1,8 +1,8 @@
 // apps/docs/.vitepress/theme/index.ts
-// VitePress 自定义主题入口：扩展默认主题 + 真正注册 ant / vxe / @tm/ui
+// VitePress 自定义主题入口：扩展默认主题 + 真正注册 ant / vxe / @kibus/tm-ui-plus
 //
 // 设计变更（Task 15 / Bug 3 收口）：
-// Task 14 时本文件作为 @tm/ui dts portability 真实消费验证入口，仅把 TmButton /
+// Task 14 时本文件作为 @kibus/tm-ui-plus dts portability 真实消费验证入口，仅把 TmButton /
 // TmResolver / TmTable 挂到 globalProperties 作为「编译期 import 探针」（$tmDtsProbe），
 // 不在页面真正渲染。Task 15 创建的各组件文档页通过 `<script setup>` 直接渲染 <TmXxx>
 // demo，必须真正注册组件，故升级为「全量应用层注册」：
@@ -12,7 +12,7 @@
 //   3. vxe-table：app.use(VxeUITable)（默认 export 含 install，注册
 //      VxeTable/VxeColumn/VxeColgroup/VxeGrid/VxeToolbar —— TmTable demo 必需）
 //      —— 收口 T11 deferred d：vxe-pc-ui 在文档站全量注册，消除运行时 console.warn
-//   4. @tm/ui：app.use(install)（聚合 install，与业务方 app.use(@tm/ui) 一致，
+//   4. @kibus/tm-ui-plus：app.use(install)（聚合 install，与业务方 app.use(@kibus/tm-ui-plus) 一致，
 //      一次性注册 TmButton/TmInput/TmSelect/TmForm/TmFormItem/TmTable）
 //   5. 自建 DemoBlock：轻量 demo 容器（Bug 1 自建方案，零第三方 demo 插件依赖）
 //
@@ -20,14 +20,14 @@
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 
-// 应用层依赖：ant + vxe + @tm/ui（与 packages/ui 业务方用法一致）
+// 应用层依赖：ant + vxe + @kibus/tm-ui-plus（与 packages/ui 业务方用法一致）
 import Antd from 'ant-design-vue'
 import VxeUIPCUI from 'vxe-pc-ui'
 import VxeUITable from 'vxe-table'
-// @tm/ui 的聚合 install：app.use(install) 一次性注册全部 Tm 组件
-// （注意：这里 import 自 @tm/ui 主入口，走 packages/ui/package.json exports 的 dist，
+// @kibus/tm-ui-plus 的聚合 install：app.use(install) 一次性注册全部 Tm 组件
+// （注意：这里 import 自 @kibus/tm-ui-plus 主入口，走 packages/ui/package.json exports 的 dist，
 //  与业务方一致；不直接 import 源码，避免与 packages/ui 的内部 import 混淆。）
-import { install as tmInstall } from '@tm/ui'
+import { install as tmInstall } from '@kibus/tm-ui-plus'
 
 // 自定义 demo 容器组件
 import DemoBlock from './components/DemoBlock.vue'
@@ -65,7 +65,7 @@ const theme: Theme = {
     app.use(VxeUIPCUI)
     // 3) vxe-table：注册 VxeGrid / VxeTable / VxeColumn / VxeToolbar（TmTable 直接依赖）
     app.use(VxeUITable)
-    // 4) @tm/ui：聚合 install，全量注册 Tm 组件（与业务方 app.use(@tm/ui) 一致）
+    // 4) @kibus/tm-ui-plus：聚合 install，全量注册 Tm 组件（与业务方 app.use(@kibus/tm-ui-plus) 一致）
     app.use(tmInstall)
     // 5) 自定义容器组件（markdown demo 用 <DemoBlock> 包裹）
     app.component('DemoBlock', DemoBlock)
