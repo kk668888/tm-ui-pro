@@ -29,6 +29,14 @@ export interface UseSegmentedInputOptions {
   sanitize: (s: string) => string
   /** 段级合法性（空串是否合法由调用方决定；IPv4：1-3 位数字且 ≤255） */
   validate: (seg: string) => boolean
+  /**
+   * 段值归一化后处理（可选；仅调用方显式触发时执行，不做自动时机判断）：
+   * 对非空段做「完成期」格式统一（如 MAC 补前导 0 + 转大写）。
+   * 与 validate 的关系：validate 是「输入期」接收校验（宽松，IM 接受 1-2 位），
+   * isComplete 与 normalizeSegments() 使用「normalize 后再 validate」的完成期校验（严格，2 位）。
+   * 不传时 normalizeSegments() 为 no-op、isComplete 语义与旧版本逐字节一致（IPv4 不传）。
+   */
+  normalize?: (seg: string) => string
   /** 外部受控值 getter（组件传 () => props.modelValue ?? ''） */
   modelValue: () => string
   /** 值变化回调（组件接 emit('update:modelValue', v)） */
@@ -50,7 +58,7 @@ export interface UseSegmentedInputOptions {
  * ```
  */
 export function useSegmentedInput(options: UseSegmentedInputOptions) {
-  const { segments, maxLen, separator, acceptChar, sanitize, validate } = options
+  const { segments, maxLen, separator, acceptChar, sanitize, validate, normalize } = options
 
   // ── 段状态 ────────────────────────────────────────────────
   // reactive 数组：模板 :value="segValues[i]" 直接驱动四个 input 的受控显示
@@ -67,9 +75,18 @@ export function useSegmentedInput(options: UseSegmentedInputOptions) {
   let lastEmitted = ''
 
   // ── 派生状态 ──────────────────────────────────────────────
-  /** 四段齐且全部合法（emit 完整串的前提） */
+  /** 段齐且每段均已是「规范化形态」（emit 完整串的前提）。
+   *  完成期判据（D_MAC1）：段值非空、normalize 后不回变（即已是规范形，如 MAC 的 2 位补零大写）、
+   *  且 validate 通过。若某段仍是非规范形（MAC 输入期 1 位「A」，normalize 会改写成「0A」）→
+   *  未达完成期，emit 保持 ''；normalizeSegments() 收敛后才翻转 isComplete。
+   *  IPv4 不传 normalize → normalize(seg)===seg 恒真，判据退化为旧的「validate(原始段值)」，逐字节兼容。 */
   const isComplete = computed(
-    () => segValues.length === segments && segValues.every(s => s !== '' && validate(s)),
+    () =>
+      segValues.length === segments &&
+      segValues.every(s => {
+        if (s === '') return false
+        return normalize ? normalize(s) === s && validate(s) : validate(s)
+      }),
   )
 
   /** 当前段值组装出的展示串（与 emit 值同源；段未齐时也能看半成品） */
@@ -109,6 +126,28 @@ export function useSegmentedInput(options: UseSegmentedInputOptions) {
     } else {
       segValues.forEach((_, i) => (segValues[i] = ''))
     }
+  }
+
+  /**
+   * 段值归一化收敛（调用方在 blur 等时机显式触发）：
+   * 对每个非空段执行「normalize 后校验」，若校验通过则把段值替换为归一化结果——
+   * 归一化可能改变 isComplete（如 MAC 补零后从不完整变完整），变更后走 commit()
+   * 重新计算 emit 值。空段不动（归一化不作用在半成品缺失上，缺段不补）。
+   * 未配置 normalize 时静默 no-op（IPv4 回归护栏：行为与旧版本一致）。
+   */
+  function normalizeSegments(): void {
+    if (!normalize) return
+    let changed = false
+    segValues.forEach((s, i) => {
+      if (s === '') return
+      const next = normalize(s)
+      // 只有归一化结果合法才落段——若配置的 normalize 产出越界值，保留原值交由 segErrors 标红
+      if (next !== s && validate(next)) {
+        segValues[i] = next
+        changed = true
+      }
+    })
+    if (changed) commit()
   }
 
   // 受控回写监听：immediate 让初始值（含非法初始值）在挂载时即落段
@@ -215,10 +254,12 @@ export function useSegmentedInput(options: UseSegmentedInputOptions) {
       }
       const el = segEls.value[i]
       if (!el) return
-      // 预演插入后的段值：考虑光标位置与选区（选中替换场景）
+      // 预演插入后的段值：考虑光标位置与选区（选中替换场景）。
+      // 先过 sanitize 归一形态再校验——MAC 等 validate 只认规范化形式
+      // （大写 hex）时，键入小写 a 预览 'a' 也能正确判定可承载，否则被误拦截
       const before = el.value.slice(0, el.selectionStart ?? 0)
       const after = el.value.slice(el.selectionEnd ?? 0)
-      const hypothetical = before + e.key + after
+      const hypothetical = sanitize(before + e.key + after)
       if (hypothetical.length <= maxLen && validate(hypothetical)) {
         return // 本段可承载：放行，input 事件负责同步段值与段满跳段
       }
@@ -226,7 +267,7 @@ export function useSegmentedInput(options: UseSegmentedInputOptions) {
       // 非末段 → 跳段承载（spec「越界数字触发跳段」：25 再打 6 → 25.6）
       if (i < segments - 1) {
         e.preventDefault()
-        const nextVal = segValues[i + 1] + e.key
+        const nextVal = sanitize(segValues[i + 1] + e.key)
         // 承载后新段也必须合法（如下一段已有 25，再承载 6 会变 256）；
         // 不合法时只跳段不承载（罕见边界，丢弃该字符但焦点反馈到位）
         if (nextVal.length <= maxLen && validate(nextVal)) {
@@ -356,6 +397,7 @@ export function useSegmentedInput(options: UseSegmentedInputOptions) {
     onCompositionStart,
     onCompositionEnd,
     onSegmentPaste,
+    normalizeSegments,
     focus,
     blur,
     focusSegment,

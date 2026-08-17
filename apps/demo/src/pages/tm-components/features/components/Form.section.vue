@@ -13,6 +13,7 @@ import {
   TmCheckboxGroup,
   TmSwitch,
   TmInputIp,
+  TmInputMac,
   TmDatePicker,
   TmRangePicker,
   TmCascader,
@@ -104,6 +105,9 @@ function beforeUpload(file: { size?: number }): boolean {
 
 // ── TmInputIp：四段式 IPv4 输入（首个自研交互组件，v-model 未齐为 ''）──
 const hostIp = ref('192.168.1.1');
+
+// ── TmInputMac：六段式 MAC 输入（segment 系第二位，blur 归一化后 emit 规范大写串）──
+const hostMac = ref('0A:1B:2C:3D:4E:5F');
 
 // ── 补充控件：AutoComplete/Checkbox/Mentions/Radio/Rate/Slider/Transfer/Tree ──
 const acValue = ref('');
@@ -243,6 +247,10 @@ function onReset() {
         <a-col :xs="24" :md="12">
           <TmInputIp v-model="hostIp" style="max-width: 260px" />
           <span class="ml-2 text-secondary">hostIp={{ hostIp || "''（未填齐）" }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmInputMac v-model="hostMac" style="max-width: 260px" />
+          <span class="ml-2 text-secondary">hostMac={{ hostMac || "''（未补齐）" }}</span>
         </a-col>
       </a-row>
 

@@ -5,7 +5,7 @@
 //       v-model 收敛契约（未齐 ''/齐全组装/前导零原文）、focus/blur 定位
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { nextTick, reactive } from 'vue'
-import { useSegmentedInput } from '../useSegmentedInput'
+import { useSegmentedInput, type UseSegmentedInputOptions } from '../useSegmentedInput'
 
 /** IPv4 格式参数（组件层同款注入） */
 const IPV4 = {
@@ -17,11 +17,13 @@ const IPV4 = {
   validate: (s: string) => /^[0-9]{1,3}$/.test(s) && Number(s) <= 255,
 }
 
-/** 模拟 v-model 宿主：reactive 保证 modelValue getter 的 watch 能追踪到变更 */
-function setup(initial = '') {
+/** 模拟 v-model 宿主：reactive 保证 modelValue getter 的 watch 能追踪到变更
+ *  override 可覆盖任一格式参数（含 normalize），供 MAC 等第二类分段场景复用同一 harness */
+function setup(initial = '', override: Partial<UseSegmentedInputOptions> = {}) {
   const host = reactive({ value: initial, emitted: [] as string[] })
   const si = useSegmentedInput({
     ...IPV4,
+    ...override,
     modelValue: () => host.value,
     onUpdate: v => {
       host.emitted.push(v)
@@ -29,13 +31,13 @@ function setup(initial = '') {
     },
   })
   // 真实 DOM input：jsdom 支持 focus/setSelectionRange，聚焦断言走 document.activeElement
-  const els = Array.from({ length: IPV4.segments }, () => {
+  const segEls = Array.from({ length: override.segments ?? IPV4.segments }, () => {
     const el = document.createElement('input')
     document.body.appendChild(el)
     return el
   })
-  els.forEach((el, i) => si.setSegmentRef(i, el))
-  return { si, host, els }
+  segEls.forEach((el, i) => si.setSegmentRef(i, el))
+  return { si, host, els: segEls }
 }
 
 /** 构造 keydown 事件（含 preventDefault spy，便于断言拦截与否） */
@@ -369,5 +371,56 @@ describe('useSegmentedInput · 焦点方法', () => {
     expect(document.activeElement).toBe(els[3])
     si.blur()
     expect(document.activeElement).not.toBe(els[3])
+  })
+})
+
+describe('useSegmentedInput · normalize 钩子（MAC 补零归一化）', () => {
+  /** MAC 地址格式参数（组件层同款注入）：6 段 × 2 位十六进制 */
+  const MAC = {
+    segments: 6,
+    maxLen: 2,
+    separator: ':',
+    acceptChar: /^[0-9a-fA-F]$/,
+    sanitize: (s: string) => s.replace(/[^0-9a-fA-F]/g, '').toUpperCase(),
+    validate: (s: string) => /^[0-9A-F]{1,2}$/.test(s),
+    normalize: (s: string) => s.toUpperCase().padStart(2, '0'),
+  }
+
+  it('1 位段输入期合法但不完整；normalizeSegments() 补零后翻转 isComplete 并 emit 规范串', () => {
+    const { si, host, els } = setup('', MAC)
+    // 六段各输入 1 位（sanitize 实时转大写，为归一前形态）
+    ;['a', 'b', 'c', 'd', 'e', 'f'].forEach((ch, i) => {
+      els[i].value += ch
+      si.onSegmentInput(i, { target: els[i] } as unknown as Event)
+    })
+    expect(si.segValues).toEqual(['A', 'B', 'C', 'D', 'E', 'F']) // 实时大写、未补零
+    expect(si.isComplete.value).toBe(false) // 1 位可接收但未达完成期（2 位）
+    expect(host.emitted.at(-1)).toBe('') // 未补齐：v-model 仍空串
+    // 触发 blur 归一：补前导 0 → 六段全 2 位 → 完成期成立
+    si.normalizeSegments()
+    expect(si.segValues).toEqual(['0A', '0B', '0C', '0D', '0E', '0F'])
+    expect(si.isComplete.value).toBe(true)
+    expect(host.emitted.at(-1)).toBe('0A:0B:0C:0D:0E:0F')
+  })
+
+  it('已规范段值 normalizeSegments() 幂等：不重复 emit', () => {
+    const { si, host, els } = setup('', MAC)
+    ;['0A', '0B', '0C', '0D', '0E', '0F'].forEach((v, i) => (si.segValues[i] = v))
+    const before = host.emitted.length
+    si.normalizeSegments()
+    expect(si.segValues).toEqual(['0A', '0B', '0C', '0D', '0E', '0F']) // 段值不变
+    expect(host.emitted.length).toBe(before) // 无新 emit
+  })
+
+  it('不传 normalize：normalizeSegments() 为 no-op，isComplete 语义与旧版一致（IPv4 回归护栏）', () => {
+    const { si, host, els } = setup()
+    typeInto(si, els, 0, '192')
+    typeInto(si, els, 1, '168')
+    typeInto(si, els, 2, '1')
+    expect(si.isComplete.value).toBe(false)
+    const before = host.emitted.length
+    si.normalizeSegments() // 未配置 → no-op
+    expect(si.segValues[0]).toBe('192')
+    expect(host.emitted.length).toBe(before)
   })
 })

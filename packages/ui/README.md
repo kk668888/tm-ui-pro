@@ -117,7 +117,7 @@ import { TmTable } from '@kibus/tm-ui-plus/table'
 
 | 分类 | 组件 |
 | --- | --- |
-| 通用 | `TmButton` `TmInput` `TmInputNumber` `TmInputIp` `TmSelect` `TmAutoComplete` `TmCheckbox` `TmCheckboxGroup` `TmRadio` `TmRadioGroup` `TmSwitch` `TmRate` `TmSlider` `TmMentions` `TmTransfer` `TmTree` `TmCascader` `TmTreeSelect` `TmDatePicker` `TmRangePicker` `TmTimePicker` `TmUpload` |
+| 通用 | `TmButton` `TmInput` `TmInputNumber` `TmInputIp` `TmInputMac` `TmSelect` `TmAutoComplete` `TmCheckbox` `TmCheckboxGroup` `TmRadio` `TmRadioGroup` `TmSwitch` `TmRate` `TmSlider` `TmMentions` `TmTransfer` `TmTree` `TmCascader` `TmTreeSelect` `TmDatePicker` `TmRangePicker` `TmTimePicker` `TmUpload` |
 | 表单 | `TmForm` `TmFormItem` |
 | 布局 | `TmSpace` `TmDivider` `TmFlex` `TmRow` `TmCol` `TmLayout` `TmSider` `TmHeader` `TmContent` `TmFooter` |
 | 导航 | `TmBreadcrumb` `TmDropdown` `TmMenu` `TmPagination` `TmSteps` `TmTabs` `TmAffix` `TmAnchor` `TmPageHeader` |
@@ -136,6 +136,7 @@ import { TmTable } from '@kibus/tm-ui-plus/table'
 | `TmForm` | `layout: 'horizontal'`、`hideRequiredMark: false` |
 | `TmConfigProvider` | `locale: zh_CN` |
 | `TmInputIp` | `size: 'middle'` |
+| `TmInputMac` | `size: 'middle'`、`separator: ':'` |
 
 ### TmInputIp（四段式 IPv4 输入，库内首个自研交互组件）
 
@@ -158,6 +159,28 @@ const ip = ref('192.168.1.1')
 - **校验分层**：键入即拦截非法字符与越界（keydown 层 + input 兜底层双防线）；程序设值含非法段（如 `999.1.1.1`）按原文展示并标红，不静默修正；blur 保留半成品不清空
 - **级联**：`disabled` / `readonly` 未显式传时级联 `TmForm` 上下文；`ref.focus()` 定位第一个空段
 - **非 Goal**：IPv6 / CIDR 掩码输入（未来独立组件）
+
+### TmInputMac（六段式 MAC 地址输入，segment 系第二位自研组件）
+
+与 `TmInputIp` 共用分段内核 `useSegmentedInput`：六个短输入段以 `:`（或 `-`）分隔，段内只接受十六进制并实时转大写；失焦时单字符段自动补前导 `0`（`A` → `0A`），产出规范大写串。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { TmInputMac } from '@kibus/tm-ui-plus'
+const mac = ref('0A:1B:2C:3D:4E:5F')
+</script>
+<template>
+  <TmInputMac v-model="mac" separator=":" />
+</template>
+```
+
+- **v-model 契约**：六段均补齐为 2 位大写十六进制（规范形）时为核心大写串（如 `0A:1B:2C:3D:4E:5F`）；任一段为空或未达规范形时为 `''`——表单侧「要么空要么完整规范」，必填与否交给 form rule
+- **交互**：只键入十六进制即可——段满 2 位自动跳段，打当前配置的分隔符也可跳段；段首退格回跳上一段；`←`/`→` 跨段移动；粘贴 `1A:2B:3C:4D:5E:6F` 或 `AABBCCDDEEFF` 均自动分发
+- **归一化**：输入中实时转大写但补零留到失焦时——blur 把所有单字符段补 `0` 并统一大写，此时才 emit 规范串；半成品（缺任一段）失焦补零但不 emit（`''`）
+- **分隔符**：`separator` 可配 `':'`（默认）或 `'-'`，保存 / 组装 / 粘贴解析共用；`:` 模式粘 `-` 串会被整串拒绝（不做双格式容错）
+- **级联**：`disabled` / `readonly` 未显式传时级联 `TmForm` 上下文；`ref.focus()` 定位第一个空段
+- **非 Goal**：IPv6 / MAC 前缀写法 / 厂商 OUI 语义校验（仅格式校验）
 
 ---
 

@@ -27,4 +27,11 @@ describe('FormSection', () => {
     const text = wrapper.text().replace(/\s+/g, '');
     expect(text).toContain('hostIp=192.168.1.1');
   });
+
+  it('渲染 TmInputMac 六段式 MAC 输入与回显（segment 系第二组件）', () => {
+    const wrapper = mountSection(FormSection);
+    expect(wrapper.findAll('.tm-input-mac input').length).toBe(6);
+    const text = wrapper.text().replace(/\s+/g, '');
+    expect(text).toContain('hostMac=0A:1B:2C:3D:4E:5F');
+  });
 });

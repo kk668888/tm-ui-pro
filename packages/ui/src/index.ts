@@ -39,6 +39,7 @@ export { TmCheckboxGroup } from './components/checkbox-group'
 export { TmSwitch } from './components/switch'
 export { TmInputNumber } from './components/input-number'
 export { TmInputIp } from './components/input-ip'
+export { TmInputMac } from './components/input-mac'
 export { TmDatePicker, TmRangePicker } from './components/date-picker'
 export { TmCascader } from './components/cascader'
 export { TmTreeSelect } from './components/tree-select'
@@ -139,6 +140,7 @@ export type {
 export type { TmSwitchProps, TmSwitchExtProps, SwitchProps } from './components/switch'
 export type { TmInputNumberProps, TmInputNumberExtProps, InputNumberProps } from './components/input-number'
 export type { TmInputIpProps } from './components/input-ip'
+export type { TmInputMacProps, TmInputMacSeparator } from './components/input-mac'
 export type {
   TmDatePickerProps,
   TmDatePickerExtProps,
