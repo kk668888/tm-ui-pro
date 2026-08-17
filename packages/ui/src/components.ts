@@ -16,6 +16,7 @@ import { TmRadioGroup } from './components/radio-group'
 import { TmCheckboxGroup } from './components/checkbox-group'
 import { TmSwitch } from './components/switch'
 import { TmInputNumber } from './components/input-number'
+import { TmInputIp } from './components/input-ip'
 import { TmDatePicker, TmRangePicker } from './components/date-picker'
 import { TmCascader } from './components/cascader'
 import { TmTreeSelect } from './components/tree-select'
@@ -199,4 +200,5 @@ export const tmComponents: readonly Plugin[] = [
   TmFloatButton,
   TmFloatButtonGroup,
   TmFloatButtonBackTop,
+  TmInputIp,
 ]

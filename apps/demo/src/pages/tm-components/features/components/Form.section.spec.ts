@@ -20,4 +20,11 @@ describe('FormSection', () => {
     expect(text).toContain('内容一');
     expect(text).toContain('checked=0-0-1');
   });
+
+  it('渲染 TmInputIp 四段式 IP 输入与回显（首个自研交互组件）', () => {
+    const wrapper = mountSection(FormSection);
+    expect(wrapper.findAll('.tm-input-ip input').length).toBe(4);
+    const text = wrapper.text().replace(/\s+/g, '');
+    expect(text).toContain('hostIp=192.168.1.1');
+  });
 });

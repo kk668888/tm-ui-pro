@@ -46,6 +46,7 @@ export default defineConfig({
             { text: 'Button 按钮', link: '/components/button' },
             { text: 'Input 输入框', link: '/components/input' },
             { text: 'InputNumber 数字输入框', link: '/components/input-number' },
+            { text: 'InputIp IP 地址输入框', link: '/components/input-ip' },
             { text: 'Select 选择器', link: '/components/select' },
             { text: 'RadioGroup 单选组', link: '/components/radio-group' },
             { text: 'CheckboxGroup 复选组', link: '/components/checkbox-group' },

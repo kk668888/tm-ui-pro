@@ -12,6 +12,7 @@ import {
   TmRadioGroup,
   TmCheckboxGroup,
   TmSwitch,
+  TmInputIp,
   TmDatePicker,
   TmRangePicker,
   TmCascader,
@@ -100,6 +101,9 @@ const uploadList = ref<UploadFile[]>([]);
 function beforeUpload(file: { size?: number }): boolean {
   return !(file.size && file.size > 1024 * 1024);
 }
+
+// ── TmInputIp：四段式 IPv4 输入（首个自研交互组件，v-model 未齐为 ''）──
+const hostIp = ref('192.168.1.1');
 
 // ── 补充控件：AutoComplete/Checkbox/Mentions/Radio/Rate/Slider/Transfer/Tree ──
 const acValue = ref('');
@@ -235,6 +239,10 @@ function onReset() {
             <TmButton>上传文件（限 1MB）</TmButton>
           </TmUpload>
           <span class="ml-2 text-secondary">files={{ uploadList.length }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmInputIp v-model="hostIp" style="max-width: 260px" />
+          <span class="ml-2 text-secondary">hostIp={{ hostIp || "''（未填齐）" }}</span>
         </a-col>
       </a-row>
 

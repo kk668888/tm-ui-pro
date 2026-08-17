@@ -117,7 +117,7 @@ import { TmTable } from '@kibus/tm-ui-plus/table'
 
 | 分类 | 组件 |
 | --- | --- |
-| 通用 | `TmButton` `TmInput` `TmInputNumber` `TmSelect` `TmAutoComplete` `TmCheckbox` `TmCheckboxGroup` `TmRadio` `TmRadioGroup` `TmSwitch` `TmRate` `TmSlider` `TmMentions` `TmTransfer` `TmTree` `TmCascader` `TmTreeSelect` `TmDatePicker` `TmRangePicker` `TmTimePicker` `TmUpload` |
+| 通用 | `TmButton` `TmInput` `TmInputNumber` `TmInputIp` `TmSelect` `TmAutoComplete` `TmCheckbox` `TmCheckboxGroup` `TmRadio` `TmRadioGroup` `TmSwitch` `TmRate` `TmSlider` `TmMentions` `TmTransfer` `TmTree` `TmCascader` `TmTreeSelect` `TmDatePicker` `TmRangePicker` `TmTimePicker` `TmUpload` |
 | 表单 | `TmForm` `TmFormItem` |
 | 布局 | `TmSpace` `TmDivider` `TmFlex` `TmRow` `TmCol` `TmLayout` `TmSider` `TmHeader` `TmContent` `TmFooter` |
 | 导航 | `TmBreadcrumb` `TmDropdown` `TmMenu` `TmPagination` `TmSteps` `TmTabs` `TmAffix` `TmAnchor` `TmPageHeader` |
@@ -135,6 +135,29 @@ import { TmTable } from '@kibus/tm-ui-plus/table'
 | `TmTable` | `border: true`、`stripe: true`、`showOverflow: true`、`fit: true`、分页 `pageSize: 10` |
 | `TmForm` | `layout: 'horizontal'`、`hideRequiredMark: false` |
 | `TmConfigProvider` | `locale: zh_CN` |
+| `TmInputIp` | `size: 'middle'` |
+
+### TmInputIp（四段式 IPv4 输入，库内首个自研交互组件）
+
+非 ant 薄封装：四个短输入段以 `.` 分隔，视觉复用 ant design token 与其他表单控件一致。
+分段输入内核沉淀在 `useSegmentedInput` composable，供未来 IPv6 / port-range 复用。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { TmInputIp } from '@kibus/tm-ui-plus'
+const ip = ref('192.168.1.1')
+</script>
+<template>
+  <TmInputIp v-model="ip" />
+</template>
+```
+
+- **v-model 契约**：四段齐且每段 0-255 时为完整点分串（前导零按原文，如 `192.01.1.1`）；任一段为空或越界时为 `''`——表单侧「要么空要么完整合法」，必填与否交给 form rule
+- **交互**：只打数字即可——段满 3 位自动跳段，打 `.` 也可跳段；越界数字（如 `25` 后打 `6`）自动跳段并承载；段首退格回跳上一段；`←`/`→` 跨段移动；粘贴 `192.168.1.1` 或 `19216811` 均自动分发
+- **校验分层**：键入即拦截非法字符与越界（keydown 层 + input 兜底层双防线）；程序设值含非法段（如 `999.1.1.1`）按原文展示并标红，不静默修正；blur 保留半成品不清空
+- **级联**：`disabled` / `readonly` 未显式传时级联 `TmForm` 上下文；`ref.focus()` 定位第一个空段
+- **非 Goal**：IPv6 / CIDR 掩码输入（未来独立组件）
 
 ---
 
