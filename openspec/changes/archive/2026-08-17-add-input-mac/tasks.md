@@ -33,4 +33,4 @@
 
 - [x] 5.1 全量测试：`pnpm --filter @kibus/tm-ui-plus test run` 全绿（89 文件 / 628 测试，含既有 useSegmentedInput/InputIp 回归）；coverage Statements 93.56% / Branches 78.59% / Functions 82.08% / Lines 94.77% 全过阈值
 - [x] 5.2 `openspec validate --all` 全绿（change/add-input-mac + spec/components/input-ip 均 ✓）；`openspec status --change add-input-mac` 四 artifact 完成
-- [ ] 5.3 等待 review → 同步主规格 → 归档 → git 提交（中文信息）
+- [x] 5.3 review 通过 → 同步主规格 openspec/specs/components/input-mac/spec.md → 归档 archive/2026-08-17-add-input-mac → git 提交 89a394e（中文）
