@@ -36,8 +36,18 @@ export default defineConfig({
     search: {
       provider: 'local',
     },
-    nav: [{ text: '组件', link: '/components/button' }],
+    nav: [
+      { text: '组件', link: '/components/button' },
+      { text: '指南', link: '/guide/readme' },
+    ],
     sidebar: {
+      // /guide/ 前缀页面（README 使用入门）展示指南侧边栏
+      '/guide/': [
+        {
+          text: '指南',
+          items: [{ text: 'README · 使用指南', link: '/guide/readme' }],
+        },
+      ],
       // /components/ 前缀的页面统一展示组件侧边栏
       '/components/': [
         {

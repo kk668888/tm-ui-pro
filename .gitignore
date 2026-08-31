@@ -20,3 +20,5 @@ coverage
 
 # 内网 Nexus 发布脚本（凭据敏感，不入库）
 publish-to-nexus.sh
+demo2
+Todo.md
