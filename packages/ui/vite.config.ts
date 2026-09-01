@@ -17,7 +17,7 @@
 // 2. 多 format 输出：es（ESM, .js）+ lib（CJS, .cjs）双目录，由 rollupOptions.output 数组驱动。
 //    注意：在自定义 output 数组时，移除 lib.fileName 避免与 output.entryFileNames 冲突（brief Bug 2）。
 // 3. dts 插件：仅对 src 下业务代码生成 .d.ts，剔除 spec / demos / test setup 等噪声
-//    （brief Bug 4：cleanVueFileName 在 vite-plugin-dts 4.5.x 仍存在，已核实 API）。
+//    （brief Bug 4：cleanVueFileName 在 vite-plugin-dts 5.x 仍存在，已核实 API）。
 // 4. __dirname 兼容：vite 加载配置经 esbuild 转译，`__dirname` 在 Windows + ESM 边界
 //    通常可用，但稳妥起见用 fileURLToPath(import.meta.url) 显式构造（brief Bug 6）。
 import { defineConfig, type Plugin } from 'vite'
@@ -60,7 +60,7 @@ export default defineConfig({
       entryRoot: 'src',
       // outDir：与 ESM 输出目录一致，types 与 js 同目录便于 moduleResolution
       outDir: 'dist',
-      // cleanVueFileName：把 .vue.d.ts 简化为 .d.ts（vite-plugin-dts 4.5.x API 已核实）
+      // cleanVueFileName：把 .vue.d.ts 简化为 .d.ts（vite-plugin-dts 5.x API 已核实）
       cleanVueFileName: true,
       // staticImport：把 emit 出的 dynamic import() 类型表达式（如 `import('vue').DefineComponent`）
       // 转换为 static import（`import { DefineComponent } from 'vue'`），让 TS 在 dts 中用包名而非

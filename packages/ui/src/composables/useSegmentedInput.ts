@@ -13,7 +13,7 @@
 // - keydown 层：拦截非法字符与越界键入（体验：字符根本不出现）
 // - input 层：兜底 keydown 拦不住的路径（IME 组合输入、浏览器自动填充、拖放文本）
 //   —— 兜底做同样的清理规则，最坏体验是输入被丢弃，不会产生脏值
-import { computed, nextTick, reactive, ref, watch, type Ref } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 /** 分段输入的格式规则与外部接线（由具体组件注入） */
 export interface UseSegmentedInputOptions {

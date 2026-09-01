@@ -163,7 +163,7 @@ describe('TmInputMac · 退格回跳 / 方向键跨段 / 粘贴', () => {
     expect(segs.map(s => s.element.value)).toEqual(['0A', '', '', '', '', ''])
   })
 
-  it('separator="-" 模式下完整组装与粘贴按 '-' 解析', async () => {
+  it('separator="-" 模式下完整组装与粘贴按「-」解析', async () => {
     const { wrapper } = mountMac({ separator: '-' })
     const segs = wrapper.findAll('input')
     await segs[0].trigger('paste', { clipboardData: { getData: () => '0A-0B-0C-0D-0E-0F' } })

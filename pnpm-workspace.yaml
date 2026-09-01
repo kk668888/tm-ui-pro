@@ -17,3 +17,6 @@ allowBuilds:
   esbuild: false
   msw: true
   vue-demi: false
+minimumReleaseAgeExclude:
+  - unplugin-dts@1.1.0
+  - vite-plugin-dts@5.1.0

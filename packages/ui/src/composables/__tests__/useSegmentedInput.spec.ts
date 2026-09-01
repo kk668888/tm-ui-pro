@@ -204,7 +204,7 @@ describe('useSegmentedInput · 键入拦截与 input 兜底', () => {
   })
 
   it('keydown 层拦截非数字字符', () => {
-    const { si, els } = setup()
+    const { si } = setup()
     for (const k of ['a', 'A', ' ', '-', '！']) {
       const ev = keyEvent(k)
       si.onSegmentKeydown(0, ev)
@@ -404,7 +404,7 @@ describe('useSegmentedInput · normalize 钩子（MAC 补零归一化）', () =>
   })
 
   it('已规范段值 normalizeSegments() 幂等：不重复 emit', () => {
-    const { si, host, els } = setup('', MAC)
+    const { si, host } = setup('', MAC)
     ;['0A', '0B', '0C', '0D', '0E', '0F'].forEach((v, i) => (si.segValues[i] = v))
     const before = host.emitted.length
     si.normalizeSegments()

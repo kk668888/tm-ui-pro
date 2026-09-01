@@ -6,9 +6,8 @@
     "sourceMap": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vitest/globals", "node"],
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@kibus/tm-ui-plus": ["../../packages/ui/src/index.ts"],
       "@kibus/tm-ui-plus/table": ["../../packages/ui/src/components/table/index.ts"]
     }

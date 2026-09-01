@@ -3,7 +3,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "es",
-    "baseUrl": ".",
     "types": ["vitest/globals", "node"],
     "paths": {
       "vue-types": ["./node_modules/vue-types"],
