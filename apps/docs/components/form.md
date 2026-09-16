@@ -26,6 +26,8 @@ import FormSubmittingDemo from '../../../packages/ui/src/components/form/demos/s
 import FormSubmittingDemoCode from '../../../packages/ui/src/components/form/demos/submitting.vue?raw'
 import FormDirtyDemo from '../../../packages/ui/src/components/form/demos/dirty.vue'
 import FormDirtyDemoCode from '../../../packages/ui/src/components/form/demos/dirty.vue?raw'
+import FormRulesDemo from '../../../packages/ui/src/components/form/demos/rules.vue'
+import FormRulesDemoCode from '../../../packages/ui/src/components/form/demos/rules.vue?raw'
 
 // TmPropsTable 数据：TmForm / TmFormItem Props 表格（数据驱动渲染）
 const formProps = [
@@ -115,6 +117,16 @@ const formItemProps = [
 
 <DemoBlock :code="FormDirtyDemoCode">
   <FormDirtyDemo />
+</DemoBlock>
+
+## 字段校验
+
+`rules` 直接绑定 `toAntRule` 产出的规则数组。演示三类典型：**正则类**（手机号，必填 + 格式双文案：空值提示「请输入手机号」、格式错误提示「手机号格式不正确」）、**比较类**（年龄数值区间 1~120，非必填留空直接通过）、**计算类**（身份证含 GB 11643 校验位——试试把标准示例 `11010519491231002X` 的末位改成其他数字，会被校验位算法拦下）。
+
+本 demo 逐字段绑在 `TmFormItem` 的 `rules` 上；字段较多时也可把规则聚合到 **`TmForm` 的 `rules`**（以字段名为 key），见 [Validation 校验工具](/tools/validation)。
+
+<DemoBlock :code="FormRulesDemoCode">
+  <FormRulesDemo />
 </DemoBlock>
 
 ## API

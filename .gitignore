@@ -11,6 +11,7 @@ coverage
 .vitepress/dist
 **/.vitepress/cache/
 **/.vitepress/dist/
+**/.vitepress/.temp/
 # SDD 工具的 scratch 目录，不可入库
 .superpowers
 # pnpm 本地 store（在仓库根生成时勿入库）

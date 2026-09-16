@@ -38,6 +38,7 @@ export default defineConfig({
     },
     nav: [
       { text: '组件', link: '/components/button' },
+      { text: '工具', link: '/tools/validation' },
       { text: '指南', link: '/guide/readme' },
     ],
     sidebar: {
@@ -46,6 +47,13 @@ export default defineConfig({
         {
           text: '指南',
           items: [{ text: 'README · 使用指南', link: '/guide/readme' }],
+        },
+      ],
+      // /tools/ 前缀页面（工具函数类能力，非组件）展示工具侧边栏
+      '/tools/': [
+        {
+          text: '校验工具',
+          items: [{ text: 'Validation 校验工具函数', link: '/tools/validation' }],
         },
       ],
       // /components/ 前缀的页面统一展示组件侧边栏
