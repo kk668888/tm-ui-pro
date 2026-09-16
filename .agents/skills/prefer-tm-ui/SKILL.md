@@ -1,6 +1,6 @@
 ---
 name: prefer-tm-ui
-description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-ui-plus 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @kibus/tm-ui-plus；用户提到 TmButton / TmTable / TmForm / TmMessage 等组件；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
+description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-ui-plus 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段校验、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @kibus/tm-ui-plus；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
 ---
 
 # 优先引用 @kibus/tm-ui-plus
@@ -165,6 +165,25 @@ async function fetchRemote(
 
 进阶（勾选 / 行编辑 / 实例方法透传）与完整列模型见 `references/tm-table-guide.md`。
 
+### 字段 / 单元格校验
+
+**不要手写** async-validator / vxe 规则——用组件库校验工具，一份判据产出两份规则：
+
+```ts
+import { toAntRule, toVxeRule } from '@kibus/tm-ui-plus'
+
+// TmForm：绑 TmForm 的 rules（以字段名为 key 聚合，FormItem 只声明 name）或 TmFormItem 的 rules
+const rules = {
+  phone: toAntRule({ type: 'phone', required: true, requiredMessage: '请输入手机号' }),
+  email: toAntRule({ type: 'email' }),
+}
+
+// TmTable：挂列级 rules；提交前 tableRef.value?.fullValidate(true) 批量校验
+// columns: [{ field: 'ip', editRender: { name: 'VxeInput' }, rules: toVxeRule({ type: 'ipv4', required: true }) }]
+```
+
+内置 11 种类型：`ipv4` / `ipv6` / `mac` / `port` / `phone` / `email` / `url` / `range` / `length` / `idCard` / `creditCode`（后两种含国标校验位）；自定义判据用 `registerValidator(name, predicate)`。空值语义由 `required` 驱动：非必填空值直接通过，必填提示 `requiredMessage`。完整类型表、Form 级/FormItem 级两种绑定与 **vxe `edit-rules` 两道门禁** → `references/tm-validation-guide.md`
+
 ### 类型系统
 
 ```ts
@@ -193,3 +212,4 @@ import type {
 5. **函数式 API 误注册**：`TmMessage`/`TmNotification` 是 named export，不是组件，不要 `app.use`
 6. **类型解析失败**：业务侧必装 peerDependencies（ant-design-vue / vxe-table 等），缺失或版本不符会报类型错误
 7. **组件库能力不足**：Tm 组件透传 ant/vxe 原生 props，缺的默认值可直接显式传入覆盖，不必放弃 Tm 组件
+8. **手写校验规则**：表单/表格校验一律用 `toAntRule` / `toVxeRule`（内置 11 种类型 + `registerValidator` 扩展），不要手写 async-validator / vxe 规则对象；vxe 列级 `rules` 不生效先查 `edit-rules` 门禁
