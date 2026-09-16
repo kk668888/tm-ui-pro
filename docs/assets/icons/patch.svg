@@ -1,0 +1,57 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width="24"
+  height="24"
+  role="img"
+  aria-labelledby="patch-icon-title patch-icon-desc"
+>
+  <!-- 图标语义：补丁包；用包裹造型表示可安装的包，加号角标表示增量修复内容 -->
+  <title id="patch-icon-title">补丁包</title>
+  <desc id="patch-icon-desc">一个立体包裹图标，右下角带有一个加号角标。</desc>
+
+  <!--
+    角标遮罩：
+    1. 白色区域保留包裹轮廓；
+    2. 黑色圆形在包裹右下角挖出空隙；
+    3. 这样加号角标不会和包裹线条直接交叉，视觉更清晰。
+  -->
+  <defs>
+    <mask
+      id="patch-package-badge-mask"
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+    >
+      <rect x="0" y="0" width="24" height="24" fill="#ffffff" />
+      <circle cx="17.9" cy="17.9" r="5.4" fill="#000000" />
+    </mask>
+  </defs>
+
+  <!--
+    使用 currentColor 作为描边颜色：
+    - 放入按钮/文本旁时可自动继承文字颜色；
+    - 无需修改 SVG 源码即可适配亮色与暗色主题。
+  -->
+  <g
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <!-- 包裹主体：立体方块轮廓，表示一个可分发、可安装的包 -->
+    <g mask="url(#patch-package-badge-mask)">
+      <path d="M3.4 8.2 12 3.8l8.6 4.4v7.6L12 20.2l-8.6-4.4z" />
+      <path d="M3.4 8.2 12 12.4l8.6-4.2" />
+      <path d="M12 12.4v7.8" />
+    </g>
+
+    <!-- 加号角标：表示新增修复内容或安装补丁包动作 -->
+    <circle cx="17.9" cy="17.9" r="4.15" />
+    <path d="M17.9 16v3.8" />
+    <path d="M16 17.9h3.8" />
+  </g>
+</svg>
