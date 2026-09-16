@@ -116,6 +116,15 @@ export {
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
+// 校验工具（函数式 API，非组件）：一份判据内核产出 ant / vxe 两份规则，
+// 供 TmForm（FormItem.rules）与 TmTable（列 rules + fullValidate 批量校验）使用
+export {
+  toAntRule,
+  toVxeRule,
+  registerValidator,
+  getCustomPredicate,
+  isBuiltinRuleType,
+} from './validation'
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@kibus/tm-ui-plus'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
@@ -281,5 +290,19 @@ export type {
   FloatButtonGroupProps,
   BackTopProps,
 } from './components/float-button'
+// 校验工具类型：校验配置（以 type 判别的联合）与自定义判据签名
+export type {
+  AnyValidationRuleConfig,
+  ValidationRuleConfig,
+  RegexRuleConfig,
+  RegexRuleType,
+  ChecksumRuleConfig,
+  ChecksumRuleType,
+  RangeRuleConfig,
+  LengthRuleConfig,
+  CustomRuleConfig,
+  BaseRuleConfig,
+  CustomPredicate,
+} from './validation'
 
 export default { install }
