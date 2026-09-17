@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "typecheck": "pnpm --filter @kibus/tm-ui-plus exec vue-tsc --noEmit && pnpm --filter demo exec vue-tsc --noEmit",
     "format": "prettier --write \"packages/**/*.{ts,vue}\"",
-    "check": "pnpm lint && pnpm typecheck && pnpm test:coverage && pnpm build:ui",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:coverage && pnpm build:ui && pnpm build:docs",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish"
