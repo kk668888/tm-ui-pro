@@ -60,7 +60,12 @@ jobs:
 
       - name: Changeset status
         run: |
-          # actions/checkout 只取 PR 的 merge ref，不会建本地 master 分支；
-          # 而 changesets 解析的 baseBranch 就是裸名 "master"，故显式补一个
-          git fetch --no-tags origin '+refs/heads/master:refs/heads/master'
+          # changesets 解析的 baseBranch 是裸名 "master"（不会回退到 origin/master），
+          # 所以本地必须有该引用。但两个触发场景的 HEAD 状态不同：
+          #   PR        → checkout 在 detached HEAD，无 master，需补建
+          #   push 主干 → HEAD 就是 master，git 会拒绝 fetch 进已检出的分支（exit 128）
+          # 故仅在缺引用时补建。
+          if ! git rev-parse --verify --quiet refs/heads/master >/dev/null; then
+            git fetch --no-tags origin '+refs/heads/master:refs/heads/master'
+          fi
           pnpm changeset status
