@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # changesets status 要执行 `git merge-base master HEAD` 定位分歧点。
+          # 默认（depth=1 且只取 PR 的 merge ref）既没有 master 引用、也没有可供
+          # 计算 merge-base 的历史，会报 "Failed to find where HEAD diverged from master"。
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -54,4 +59,8 @@ jobs:
         run: pnpm build:docs
 
       - name: Changeset status
-        run: pnpm changeset status
+        run: |
+          # actions/checkout 只取 PR 的 merge ref，不会建本地 master 分支；
+          # 而 changesets 解析的 baseBranch 就是裸名 "master"，故显式补一个
+          git fetch --no-tags origin '+refs/heads/master:refs/heads/master'
+          pnpm changeset status
