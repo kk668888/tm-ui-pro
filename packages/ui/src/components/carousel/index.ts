@@ -4,6 +4,6 @@ import Carousel from './src/Carousel.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmCarousel = withInstall(Carousel, 'TmCarousel')
-// 类型再导出：业务方可直接 import { TmCarouselProps, CarouselProps, CarouselRef } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmCarouselProps, CarouselProps, CarouselRef } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmCarousel

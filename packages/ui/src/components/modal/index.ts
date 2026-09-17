@@ -11,7 +11,7 @@ import { TmModalConfirm, type ModalFuncs } from './src/confirm'
 export const TmModal = Object.assign(withInstall(Modal, 'TmModal'), TmModalConfirm) as Component & {
   install: (app: App) => void
 } & ModalFuncs
-// 类型再导出：业务方可直接 import { TmModalProps, ModalProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmModalProps, ModalProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export { TmModalConfirm } from './src/confirm'
 export default TmModal

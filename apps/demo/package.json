@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "7.0.1",
-    "@kibus/tm-ui-plus": "workspace:*",
+    "@trustmo/tm-ui": "workspace:*",
     "@vxe-ui/core": "4.4.18",
     "ant-design-vue": "4.2.6",
     "axios": "1.7.0",

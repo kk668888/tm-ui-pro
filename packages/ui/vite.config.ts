@@ -1,5 +1,5 @@
 // packages/ui/vite.config.ts
-// @kibus/tm-ui-plus 子包的 Vite library mode 构建配置
+// @trustmo/tm-ui 子包的 Vite library mode 构建配置
 //
 // 核心目标（M4 构建三件套协同要求）：
 //   build 产物路径 ↔ package.json exports 路径 ↔ dts 类型路径 三者必须对齐。

@@ -8,7 +8,7 @@ import { createApp, type App } from 'vue'
 import { tmComponents } from '../components'
 import { install } from '../index'
 
-describe('@kibus/tm-ui-plus install 全量注册', () => {
+describe('@trustmo/tm-ui install 全量注册', () => {
   it('tmComponents 数组非空且每个元素都是可 install 的插件', () => {
     expect(tmComponents.length).toBeGreaterThan(50)
     for (const comp of tmComponents) {

@@ -5,6 +5,6 @@ import { withInstall } from '../../utils/withInstall'
 
 export const TmTour = withInstall(Tour, 'TmTour')
 
-// 类型再导出：业务方可直接 import { TmTourProps, TourProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmTourProps, TourProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmTour

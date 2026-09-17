@@ -49,7 +49,7 @@ registerValidator(name, predicate)   → 注册自定义判据，两个适配器
 **绑在 `TmForm` 的 `rules`**（字段多时推荐，以字段名为 key 聚合）：
 
 ```ts
-import { TmForm, TmFormItem, toAntRule } from '@kibus/tm-ui-plus'
+import { TmForm, TmFormItem, toAntRule } from '@trustmo/tm-ui'
 
 const rules = {
   phone: toAntRule({ type: 'phone', required: true, requiredMessage: '请输入手机号', message: '手机号格式不正确' }),
@@ -77,7 +77,7 @@ const rules = {
 规则挂**列级 `rules`**；提交前 `fullValidate(true)` 批量校验全部行：
 
 ```ts
-import { TmTable, toVxeRule } from '@kibus/tm-ui-plus'
+import { TmTable, toVxeRule } from '@trustmo/tm-ui'
 
 const columns: TmTableProps['columns'] = [
   { field: 'ip', title: '服务器 IP', editRender: { name: 'VxeInput' }, rules: toVxeRule({ type: 'ipv4', required: true }) },
@@ -120,7 +120,7 @@ toAntRule({ type: 'ipv4', required: true })
 ## 扩展：registerValidator
 
 ```ts
-import { registerValidator, toAntRule, toVxeRule } from '@kibus/tm-ui-plus'
+import { registerValidator, toAntRule, toVxeRule } from '@trustmo/tm-ui'
 
 registerValidator('ticketNo', (value) => /^TD-\d{6}$/.test(String(value)))
 
@@ -138,7 +138,7 @@ toVxeRule({ type: 'ticketNo' })
 判据依赖外部数据源时（最典型：编号 / 名称唯一性必须在提交时问服务端），让自定义判据**返回 Promise** 即可。异步能力**只从 `registerValidator` 进入**——配置对象不加任何字段，同步判据写法完全不变（类型放宽是向后兼容的）。
 
 ```ts
-import { registerValidator, toAntRule } from '@kibus/tm-ui-plus'
+import { registerValidator, toAntRule } from '@trustmo/tm-ui'
 
 registerValidator('deviceNoUnique', async (value) => {
   const { available } = await api.checkDeviceNo({ deviceNo: String(value) })

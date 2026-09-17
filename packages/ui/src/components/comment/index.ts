@@ -4,6 +4,6 @@ import Comment from './src/Comment.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmComment = withInstall(Comment, 'TmComment')
-// 类型再导出：业务方可直接 import { TmCommentProps, CommentProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmCommentProps, CommentProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmComment

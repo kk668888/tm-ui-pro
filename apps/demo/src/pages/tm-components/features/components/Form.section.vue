@@ -30,7 +30,7 @@ import {
   TmSlider,
   TmTransfer,
   TmTree,
-} from '@kibus/tm-ui-plus';
+} from '@trustmo/tm-ui';
 
 defineOptions({ name: 'FormSection' });
 

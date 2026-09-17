@@ -1,8 +1,8 @@
-# @kibus/tm-ui-plus
+# @trustmo/tm-ui
 
 公司内部基于 **ant-design-vue + vxe-table** 二次封装的 Vue 3 组件库，采用「薄封装」策略：尽可能透传 ant / vxe 原生能力，仅在公司层叠加默认视觉规范与业务扩展键，避免重复造轮子、保持与 ant 生态零摩擦。
 
-> 已发布至 npm：`@kibus/tm-ui-plus@0.1.1`（public）
+> 已发布至 npm：`@trustmo/tm-ui@0.1.1`（public）
 
 ---
 
@@ -35,7 +35,7 @@
 ## 安装
 
 ```bash
-pnpm add @kibus/tm-ui-plus vue ant-design-vue @ant-design/icons-vue vxe-table vxe-pc-ui @vxe-ui/core
+pnpm add @trustmo/tm-ui vue ant-design-vue @ant-design/icons-vue vxe-table vxe-pc-ui @vxe-ui/core
 ```
 
 ---
@@ -52,7 +52,7 @@ import 'vxe-pc-ui/lib/style.css'
 import VxeTable from 'vxe-table'
 import 'vxe-table/lib/style.css'
 import App from './App.vue'
-import TmUI from '@kibus/tm-ui-plus'
+import TmUI from '@trustmo/tm-ui'
 
 const app = createApp(App)
 
@@ -65,7 +65,7 @@ app.use(TmUI)
 app.mount('#app')
 ```
 
-> **样式说明**：组件库自身无样式产物（`@kibus/tm-ui-plus/style.css` 不存在）。
+> **样式说明**：组件库自身无样式产物（`@trustmo/tm-ui/style.css` 不存在）。
 > ant 组件样式由 CSS-in-JS 自动注入；vxe 样式需按上面引入预编译 CSS。
 > `main` / `module` / `types` 均指向构建产物 `dist/`。
 
@@ -76,8 +76,8 @@ app.mount('#app')
 ### 直接 import（推荐，tree-shaking 友好）
 
 ```ts
-import { TmButton, TmInput, TmSelect } from '@kibus/tm-ui-plus'
-import type { TmTableProps, FormInstance } from '@kibus/tm-ui-plus'
+import { TmButton, TmInput, TmSelect } from '@trustmo/tm-ui'
+import type { TmTableProps, FormInstance } from '@trustmo/tm-ui'
 ```
 
 ### 自动导入（unplugin-vue-components + TmResolver）
@@ -86,7 +86,7 @@ import type { TmTableProps, FormInstance } from '@kibus/tm-ui-plus'
 // vite.config.ts
 import { defineConfig } from 'vite'
 import Components from 'unplugin-vue-components/vite'
-import { TmResolver } from '@kibus/tm-ui-plus'
+import { TmResolver } from '@trustmo/tm-ui'
 
 export default defineConfig({
   plugins: [
@@ -106,7 +106,7 @@ export default defineConfig({
 `TmTable` 体积较大（vxe 底座），提供独立子入口隔离 chunk：
 
 ```ts
-import { TmTable } from '@kibus/tm-ui-plus/table'
+import { TmTable } from '@trustmo/tm-ui/table'
 ```
 
 ---
@@ -146,7 +146,7 @@ import { TmTable } from '@kibus/tm-ui-plus/table'
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmInputIp } from '@kibus/tm-ui-plus'
+import { TmInputIp } from '@trustmo/tm-ui'
 const ip = ref('192.168.1.1')
 </script>
 <template>
@@ -167,7 +167,7 @@ const ip = ref('192.168.1.1')
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmInputMac } from '@kibus/tm-ui-plus'
+import { TmInputMac } from '@trustmo/tm-ui'
 const mac = ref('0A:1B:2C:3D:4E:5F')
 </script>
 <template>
@@ -222,7 +222,7 @@ const mac = ref('0A:1B:2C:3D:4E:5F')
 `TmMessage` / `TmNotification` 为命令式 API，任意位置（组件内外）可调用；配合 `TmApp` 包裹后主题 / locale 自动跟随：
 
 ```ts
-import { TmMessage, TmNotification } from '@kibus/tm-ui-plus'
+import { TmMessage, TmNotification } from '@trustmo/tm-ui'
 
 // 轻提示
 TmMessage.success('保存成功')
@@ -245,7 +245,7 @@ TmNotification.warning({ message: '磁盘不足', description: '请及时清理'
 ```vue
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { TmForm, TmFormItem, TmInput, TmSelect, TmButton, TmMessage, type FormInstance } from '@kibus/tm-ui-plus'
+import { TmForm, TmFormItem, TmInput, TmSelect, TmButton, TmMessage, type FormInstance } from '@trustmo/tm-ui'
 
 const formState = reactive({ username: '', dept: '' })
 const formRef = ref<FormInstance>()
@@ -291,7 +291,7 @@ async function onSubmit() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmTable, type TmTableProps } from '@kibus/tm-ui-plus'
+import { TmTable, type TmTableProps } from '@trustmo/tm-ui'
 
 const rows = ref<TmTableProps['data']>([
   { id: 1, name: 'Tom', age: 28 },
@@ -314,7 +314,7 @@ const columns: TmTableProps['columns'] = [
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmTable, TmButton, type TmTableProps, type TmTableResult } from '@kibus/tm-ui-plus'
+import { TmTable, TmButton, type TmTableProps, type TmTableResult } from '@trustmo/tm-ui'
 
 const density = ref<'compact' | 'default' | 'loose'>('default')
 
@@ -353,7 +353,7 @@ import type {
   FormInstance,       // 表单实例（validate / resetFields / isDirty）
   InputProps,         // ant 原生类型透传
   SelectProps,
-} from '@kibus/tm-ui-plus'
+} from '@trustmo/tm-ui'
 ```
 
 ---
@@ -362,8 +362,8 @@ import type {
 
 ```bash
 pnpm install                 # 安装依赖
-pnpm --filter @kibus/tm-ui-plus test    # 运行单测（Vitest + jsdom）
-pnpm --filter @kibus/tm-ui-plus build   # 构建（dist/：ESM .js + CJS .cjs + .d.ts）
+pnpm --filter @trustmo/tm-ui test    # 运行单测（Vitest + jsdom）
+pnpm --filter @trustmo/tm-ui build   # 构建（dist/：ESM .js + CJS .cjs + .d.ts）
 ```
 
 Monorepo 详情、OpenSpec 开发流程见仓库根目录 `README.md`。
@@ -372,11 +372,11 @@ Monorepo 详情、OpenSpec 开发流程见仓库根目录 `README.md`。
 
 ## 版本与发布
 
-- 当前版本：`0.1.1`，已发布至 npm（public），可直接 `pnpm add @kibus/tm-ui-plus`
+- 当前版本：`0.1.1`，已发布至 npm（public），可直接 `pnpm add @trustmo/tm-ui`
 - 发布命令（需 bypass 2FA 的 npm token）：
 
 ```bash
-pnpm --filter @kibus/tm-ui-plus publish
+pnpm --filter @trustmo/tm-ui publish
 ```
 
 > 发布前确认 `packages/ui/package.json` 的 `repository` 已替换为公司真实仓库地址。

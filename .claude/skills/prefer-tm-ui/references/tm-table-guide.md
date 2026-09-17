@@ -1,6 +1,6 @@
 # TmTable 使用指南
 
-`TmTable` 是 `@kibus/tm-ui-plus` 基于 [vxe-table](https://vxetable.cn/) `vxe-grid` 的薄封装。**表格主体**（列 / 数据 / 排序 / 勾选 / 行编辑）由 vxe 提供，**分页器与搜索表单用 ant-design-vue**，与全 ant 生态视觉一致。
+`TmTable` 是 `@trustmo/tm-ui` 基于 [vxe-table](https://vxetable.cn/) `vxe-grid` 的薄封装。**表格主体**（列 / 数据 / 排序 / 勾选 / 行编辑）由 vxe 提供，**分页器与搜索表单用 ant-design-vue**，与全 ant 生态视觉一致。
 
 ## 心智模型
 
@@ -45,7 +45,7 @@ digraph choose {
 TmTable 列配置是 vxe 的 `VxeColumnProps` 数组，字段名用 **`field`**。照抄 ant 表格的 `dataIndex` 会导致列渲染为空。
 
 ```ts
-import type { TmTableProps } from '@kibus/tm-ui-plus'
+import type { TmTableProps } from '@trustmo/tm-ui'
 
 const columns: TmTableProps['columns'] = [
   { type: 'checkbox', width: 60 },            // vxe 勾选列
@@ -64,7 +64,7 @@ const columns: TmTableProps['columns'] = [
 
 ```ts
 // columns.ts
-import type { TmTableProps } from '@kibus/tm-ui-plus'
+import type { TmTableProps } from '@trustmo/tm-ui'
 
 export const columns: TmTableProps['columns'] = [
   { field: 'id', title: 'ID', width: 80 },
@@ -101,8 +101,8 @@ export const search: TmTableProps['search'] = {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmTable } from '@kibus/tm-ui-plus'
-import type { TmTableDensity } from '@kibus/tm-ui-plus'
+import { TmTable } from '@trustmo/tm-ui'
+import type { TmTableDensity } from '@trustmo/tm-ui'
 import { columns, request, search } from './columns'
 
 const density = ref<TmTableDensity>('default')
@@ -136,8 +136,8 @@ TmTable 透传 vxe-grid 全部 props / slots / events，进阶能力零适配直
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmTable } from '@kibus/tm-ui-plus'
-import type { TmTableProps, VxeGridInstance } from '@kibus/tm-ui-plus'
+import { TmTable } from '@trustmo/tm-ui'
+import type { TmTableProps, VxeGridInstance } from '@trustmo/tm-ui'
 
 const tableRef = ref<VxeGridInstance>()
 const columns: TmTableProps['columns'] = [
@@ -220,8 +220,8 @@ import type {
   VxeGridInstance,     // ref 实例类型（getCheckboxRecords 等）
   VxeColumnProps,      // 单列类型
   VxeGridListeners,    // vxe 原生事件类型
-} from '@kibus/tm-ui-plus'
-// 或按需子入口：import type { TmTableProps } from '@kibus/tm-ui-plus/table'
+} from '@trustmo/tm-ui'
+// 或按需子入口：import type { TmTableProps } from '@trustmo/tm-ui/table'
 ```
 
 ## 常见坑

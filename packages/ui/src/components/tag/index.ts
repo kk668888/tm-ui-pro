@@ -4,6 +4,6 @@ import Tag from './src/Tag.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmTag = withInstall(Tag, 'TmTag')
-// 类型再导出：业务方可直接 import { TmTagProps, TagProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmTagProps, TagProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmTag

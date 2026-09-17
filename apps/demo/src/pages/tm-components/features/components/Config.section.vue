@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { TmConfigProvider, TmTable, TmButton, TmApp, TmMessage } from '@kibus/tm-ui-plus';
-import type { TmTableProps } from '@kibus/tm-ui-plus';
+import { TmConfigProvider, TmTable, TmButton, TmApp, TmMessage } from '@trustmo/tm-ui';
+import type { TmTableProps } from '@trustmo/tm-ui';
 
 defineOptions({ name: 'ConfigSection' });
 

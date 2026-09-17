@@ -2,7 +2,7 @@
 layout: home
 
 hero:
-  name: '@kibus/tm-ui-plus'
+  name: '@trustmo/tm-ui'
   text: '基于 ant-design-vue + vxe-table 二次封装的 Vue 3 组件库'
   tagline: 薄封装 · 主题联动 · 数据驱动表格
   actions:

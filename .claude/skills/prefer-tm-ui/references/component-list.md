@@ -1,4 +1,4 @@
-# @kibus/tm-ui-plus 组件速查
+# @trustmo/tm-ui 组件速查
 
 > 本文件是 `prefer-tm-ui` skill 的参考资料。写 UI 代码时若不确定该用哪个 Tm 组件，查本表。
 
@@ -74,7 +74,7 @@
 
 ## 关键入口
 
-- 主入口：`import { TmButton, ... } from '@kibus/tm-ui-plus'`（含全部组件 + 类型 + `TmResolver`）
-- 子入口（隔离 chunk）：`import { TmTable } from '@kibus/tm-ui-plus/table'`
+- 主入口：`import { TmButton, ... } from '@trustmo/tm-ui'`（含全部组件 + 类型 + `TmResolver`）
+- 子入口（隔离 chunk）：`import { TmTable } from '@trustmo/tm-ui/table'`
 - 自动导入：vite 配 `Components({ resolvers: [TmResolver()] })`，模板直接用 `<TmButton>`
-- 无样式产物：`@kibus/tm-ui-plus/style.css` 不存在；vxe 样式需业务侧引入 `vxe-pc-ui/lib/style.css` + `vxe-table/lib/style.css`
+- 无样式产物：`@trustmo/tm-ui/style.css` 不存在；vxe 样式需业务侧引入 `vxe-pc-ui/lib/style.css` + `vxe-table/lib/style.css`

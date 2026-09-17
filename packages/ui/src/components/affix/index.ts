@@ -4,6 +4,6 @@ import Affix from './src/Affix.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmAffix = withInstall(Affix, 'TmAffix')
-// 类型再导出：业务方可直接 import { TmAffixProps, AffixProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmAffixProps, AffixProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmAffix

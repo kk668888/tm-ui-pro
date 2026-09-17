@@ -4,6 +4,6 @@ import Cascader from './src/Cascader.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmCascader = withInstall(Cascader, 'TmCascader')
-// 类型再导出：业务方可直接 import { TmCascaderProps, CascaderProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmCascaderProps, CascaderProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmCascader

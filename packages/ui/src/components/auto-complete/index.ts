@@ -4,6 +4,6 @@ import AutoComplete from './src/AutoComplete.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmAutoComplete = withInstall(AutoComplete, 'TmAutoComplete')
-// 类型再导出：业务方可直接 import { TmAutoCompleteProps, AutoCompleteProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmAutoCompleteProps, AutoCompleteProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmAutoComplete

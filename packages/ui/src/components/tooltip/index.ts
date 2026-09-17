@@ -4,6 +4,6 @@ import Tooltip from './src/Tooltip.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmTooltip = withInstall(Tooltip, 'TmTooltip')
-// 类型再导出：业务方可直接 import { TmTooltipProps, TooltipProps, TooltipPlacement } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmTooltipProps, TooltipProps, TooltipPlacement } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmTooltip

@@ -14,7 +14,7 @@ import {
   TmProgress,
   TmSkeleton,
   TmTour,
-} from '@kibus/tm-ui-plus';
+} from '@trustmo/tm-ui';
 
 defineOptions({ name: 'FeedbackSection' });
 

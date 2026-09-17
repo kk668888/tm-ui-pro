@@ -18,7 +18,7 @@
   ```
 -->
 <script setup lang="ts">
-import { TmTable } from '@kibus/tm-ui-plus'
+import { TmTable } from '@trustmo/tm-ui'
 import { renderInline } from './renderMarkdown'
 
 /** API 表格行数据契约（各组件页 md 按此声明） */

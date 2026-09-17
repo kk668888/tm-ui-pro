@@ -10,7 +10,7 @@ export { TmResolver } from './resolver'
 import { tmComponents } from './components'
 
 /**
- * Vue 插件 install：app.use(@kibus/tm-ui-plus) 全量注册
+ * Vue 插件 install：app.use(@trustmo/tm-ui) 全量注册
  *
  * 由 tmComponents 数组统一驱动（审查 P1 #10 重构）：
  * - 旧实现为 103 行手写 app.use(TmXxx as unknown as {...})，与 export 清单重复维护，
@@ -27,7 +27,7 @@ export const install = (app: App): void => {
   // TmMessage / TmNotification 是函数式 API（非组件），不 app.use 注册，仅 named export
 }
 
-// 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@kibus/tm-ui-plus'
+// 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@trustmo/tm-ui'
 export { TmButton } from './components/button'
 export { TmInput } from './components/input'
 export { TmSelect } from './components/select'
@@ -125,7 +125,7 @@ export {
   getCustomPredicate,
   isBuiltinRuleType,
 } from './validation'
-// 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@kibus/tm-ui-plus'
+// 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@trustmo/tm-ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
 export type { TmSelectProps, TmSelectExtProps, SelectProps } from './components/select'

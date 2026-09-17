@@ -8,8 +8,8 @@
     "types": ["vitest/globals", "node"],
     "paths": {
       "@/*": ["./src/*"],
-      "@kibus/tm-ui-plus": ["../../packages/ui/src/index.ts"],
-      "@kibus/tm-ui-plus/table": ["../../packages/ui/src/components/table/index.ts"]
+      "@trustmo/tm-ui": ["../../packages/ui/src/index.ts"],
+      "@trustmo/tm-ui/table": ["../../packages/ui/src/components/table/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "env.d.ts"],

@@ -19,7 +19,7 @@ export default withVueTs(
       '**/dist/**',
       '**/public/**',
       '**/coverage/**',
-      // @kibus/tm-ui-plus 构建产物（es ESM / lib CJS）与 dts 输出
+      // @trustmo/tm-ui 构建产物（es ESM / lib CJS）与 dts 输出
       '**/es/**',
       '**/lib/**',
       // VitePress 缓存与站点产物

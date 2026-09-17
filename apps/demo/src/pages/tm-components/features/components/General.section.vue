@@ -29,7 +29,7 @@ import {
   TmFooter,
   TmRow,
   TmCol,
-} from '@kibus/tm-ui-plus';
+} from '@trustmo/tm-ui';
 
 defineOptions({ name: 'GeneralSection' });
 

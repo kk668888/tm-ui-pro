@@ -1,5 +1,5 @@
 // packages/ui/vitest.config.ts
-// @kibus/tm-ui-plus 子包的 Vitest 完整配置（Task 12 在 Task 4 最小版上合并 coverage + 全局 polyfill）
+// @trustmo/tm-ui 子包的 Vitest 完整配置（Task 12 在 Task 4 最小版上合并 coverage + 全局 polyfill）
 //
 // 关键升级（覆盖 Task 4 最小版）：
 // 1. coverage：v8 provider，text + html reporter；include 业务源码，剔除 spec/demos/setup

@@ -4,6 +4,6 @@ import Badge from './src/Badge.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmBadge = withInstall(Badge, 'TmBadge')
-// 类型再导出：业务方可直接 import { TmBadgeProps, BadgeProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmBadgeProps, BadgeProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmBadge

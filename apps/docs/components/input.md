@@ -60,7 +60,7 @@ const inputProps = [
 ### TmInput Types
 
 ```ts
-import type { TmInputProps, TmInputExtProps, InputProps } from '@kibus/tm-ui-plus'
+import type { TmInputProps, TmInputExtProps, InputProps } from '@trustmo/tm-ui'
 ```
 
 ## 扩展机制

@@ -1,5 +1,5 @@
 // packages/ui/src/validation/index.ts
-// 校验工具统一出口：业务方 `import { toAntRule, toVxeRule, registerValidator } from '@kibus/tm-ui-plus'`
+// 校验工具统一出口：业务方 `import { toAntRule, toVxeRule, registerValidator } from '@trustmo/tm-ui'`
 //
 // 用法速览：
 // - TmForm：  <TmFormItem :rules="toAntRule({ type: 'phone', required: true })">

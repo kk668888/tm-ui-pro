@@ -50,7 +50,7 @@ importers:
       '@ant-design/icons-vue':
         specifier: 7.0.1
         version: 7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))
-      '@kibus/tm-ui-plus':
+      '@trustmo/tm-ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@vxe-ui/core':
@@ -189,7 +189,7 @@ importers:
       '@ant-design/icons-vue':
         specifier: 7.0.1
         version: 7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))
-      '@kibus/tm-ui-plus':
+      '@trustmo/tm-ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@types/markdown-it':

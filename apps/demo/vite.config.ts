@@ -55,7 +55,7 @@ export default defineConfig(async ({ mode }) => {
         '@': resolve(__dirname, 'src'),
         // 工作区内直接消费组件库源码：类型与运行时同源（绕过 vite-plugin-dts 对
         // Omit 交叉类型的展开缺陷），且改组件库无需 rebuild 即可生效（审查 P2 #14）。
-        '@kibus/tm-ui-plus': resolve(__dirname, '../../packages/ui/src/index.ts'),
+        '@trustmo/tm-ui': resolve(__dirname, '../../packages/ui/src/index.ts'),
       },
     },
     server: {

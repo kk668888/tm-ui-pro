@@ -1,13 +1,13 @@
 ---
 name: prefer-tm-ui
-description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-ui-plus 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段/单元格校验（含异步校验，如唯一性检查）、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @kibus/tm-ui-plus；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule / registerValidator 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
+description: 在业务项目中编写 UI 代码时自动优先引用 @trustmo/tm-ui 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段/单元格校验（含异步校验，如唯一性检查）、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @trustmo/tm-ui；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule / registerValidator 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
 ---
 
-# 优先引用 @kibus/tm-ui-plus
+# 优先引用 @trustmo/tm-ui
 
 ## 为什么
 
-公司组件库 `@kibus/tm-ui-plus` 是 ant-design-vue + vxe-table 的薄封装，Tm 组件已内建：
+公司组件库 `@trustmo/tm-ui` 是 ant-design-vue + vxe-table 的薄封装，Tm 组件已内建：
 
 - **公司默认值**：按钮默认 `primary`、输入默认 `allowClear`、下拉默认搜索+防抖、表格默认边框+斑马纹
 - **业务扩展键**：表单 `submitting/readonly/disabled` 级联、脏追踪 `isDirty`、按钮防抖、select 远程搜索、表格远程 `request` + 声明式搜索 + 密度档位
@@ -17,7 +17,7 @@ description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-u
 
 ## 触发判断
 
-在业务项目里写/改 UI 代码时，先查 `package.json` 是否已装 `@kibus/tm-ui-plus`：
+在业务项目里写/改 UI 代码时，先查 `package.json` 是否已装 `@trustmo/tm-ui`：
 
 - 已安装 → 直接到 §2 选组件，用 Tm 组件
 - 未安装 → 先走 §1 接入
@@ -28,7 +28,7 @@ description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-u
 安装依赖（peerDependencies 全量，业务侧必装）：
 
 ```bash
-pnpm add @kibus/tm-ui-plus vue ant-design-vue @ant-design/icons-vue vxe-table vxe-pc-ui @vxe-ui/core
+pnpm add @trustmo/tm-ui vue ant-design-vue @ant-design/icons-vue vxe-table vxe-pc-ui @vxe-ui/core
 ```
 
 `main.ts` 注册顺序：**先 vxe，再组件库**（vxe 是独立依赖，组件库不代为注入）；vxe 样式需手动引入：
@@ -39,7 +39,7 @@ import VxeUI from 'vxe-pc-ui'
 import 'vxe-pc-ui/lib/style.css'
 import VxeTable from 'vxe-table'
 import 'vxe-table/lib/style.css'
-import TmUI from '@kibus/tm-ui-plus'
+import TmUI from '@trustmo/tm-ui'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -49,13 +49,13 @@ app.use(TmUI)       // 后组件库
 app.mount('#app')
 ```
 
-> 组件库自身**无样式产物**（不存在 `@kibus/tm-ui-plus/style.css`）。ant 样式由 CSS-in-JS 自动注入；vxe 样式必须按上面引入，否则表格/分页无样式。
+> 组件库自身**无样式产物**（不存在 `@trustmo/tm-ui/style.css`）。ant 样式由 CSS-in-JS 自动注入；vxe 样式必须按上面引入，否则表格/分页无样式。
 
 按需导入（可选，减少首屏体积）：
 
-- 直接 import：`import { TmButton, TmInput, TmSelect } from '@kibus/tm-ui-plus'`
-- TmTable 体积大，用子入口隔离 chunk：`import { TmTable } from '@kibus/tm-ui-plus/table'`
-- 自动导入（vite.config.ts 配 `Components({ resolvers: [TmResolver()] })`，`import { TmResolver } from '@kibus/tm-ui-plus'`）后，模板里直接写 `<TmButton>`，无需 import
+- 直接 import：`import { TmButton, TmInput, TmSelect } from '@trustmo/tm-ui'`
+- TmTable 体积大，用子入口隔离 chunk：`import { TmTable } from '@trustmo/tm-ui/table'`
+- 自动导入（vite.config.ts 配 `Components({ resolvers: [TmResolver()] })`，`import { TmResolver } from '@trustmo/tm-ui'`）后，模板里直接写 `<TmButton>`，无需 import
 
 ## §2 组件选择（核心）
 
@@ -102,7 +102,7 @@ app.mount('#app')
 ### 函数式 API
 
 ```ts
-import { TmMessage, TmNotification } from '@kibus/tm-ui-plus'
+import { TmMessage, TmNotification } from '@trustmo/tm-ui'
 
 TmMessage.success('保存成功')
 TmMessage.error('操作失败')
@@ -115,7 +115,7 @@ TmNotification.info({ message: '新消息', description: '你有 3 条未读' })
 
 ```ts
 import { ref } from 'vue'
-import { TmForm, TmFormItem, TmInput, TmButton, type FormInstance } from '@kibus/tm-ui-plus'
+import { TmForm, TmFormItem, TmInput, TmButton, type FormInstance } from '@trustmo/tm-ui'
 
 const formRef = ref<FormInstance>()
 await formRef.value?.validate()         // 校验（失败抛错，需 try/catch）
@@ -139,7 +139,7 @@ formRef.value?.markInitial?.()          // 提交成功后标记新基准
 远程数据（`request` + 声明式 `search` + `density`）：
 
 ```ts
-import type { TmTableProps, TmTableResult } from '@kibus/tm-ui-plus'
+import type { TmTableProps, TmTableResult } from '@trustmo/tm-ui'
 
 async function fetchRemote(
   params: Parameters<NonNullable<TmTableProps['request']>>[0],
@@ -170,7 +170,7 @@ async function fetchRemote(
 **不要手写** async-validator / vxe 规则——用组件库校验工具，一份判据产出两份规则：
 
 ```ts
-import { toAntRule, toVxeRule } from '@kibus/tm-ui-plus'
+import { toAntRule, toVxeRule } from '@trustmo/tm-ui'
 
 // TmForm：绑 TmForm 的 rules（以字段名为 key 聚合，FormItem 只声明 name）或 TmFormItem 的 rules
 const rules = {
@@ -198,7 +198,7 @@ import type {
   FormInstance,       // 表单实例（validate / isDirty）
   InputProps,         // ant 原生类型透传
   SelectProps,
-} from '@kibus/tm-ui-plus'
+} from '@trustmo/tm-ui'
 ```
 
 完整的 TmTable 类型（TmTablePageParam / TmTableSearchConfig / VxeGridProps 等）与进阶用法见 `references/tm-table-guide.md`。

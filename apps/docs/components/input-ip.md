@@ -77,4 +77,4 @@ const inputIpProps = [
 
 ### TmInputIp Types
 
-- `TmInputIpProps`（自有 props 契约）可直接从 `@kibus/tm-ui-plus` 导入。
+- `TmInputIpProps`（自有 props 契约）可直接从 `@trustmo/tm-ui` 导入。

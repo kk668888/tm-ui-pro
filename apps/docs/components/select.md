@@ -126,7 +126,7 @@ import type {
   TmSelectRemote,
   TmSelectApi,
   SelectProps,
-} from '@kibus/tm-ui-plus'
+} from '@trustmo/tm-ui'
 ```
 
 ## 扩展机制

@@ -8,7 +8,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
       // 与 vite.config.ts 保持一致：测试也消费组件库源码（类型/运行时同源）
-      '@kibus/tm-ui-plus': resolve(__dirname, '../../packages/ui/src/index.ts'),
+      '@trustmo/tm-ui': resolve(__dirname, '../../packages/ui/src/index.ts'),
     },
   },
   test: {

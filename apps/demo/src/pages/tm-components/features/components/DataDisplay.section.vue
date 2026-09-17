@@ -23,8 +23,8 @@ import {
   TmSegmented,
   TmStatistic,
   TmTooltip,
-} from '@kibus/tm-ui-plus';
-import type { TmTableProps, TmTableResult } from '@kibus/tm-ui-plus';
+} from '@trustmo/tm-ui';
+import type { TmTableProps, TmTableResult } from '@trustmo/tm-ui';
 import { getDemoUsers } from '../api/demo-user.api';
 
 defineOptions({ name: 'DataDisplaySection' });

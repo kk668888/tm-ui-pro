@@ -9,7 +9,7 @@
 //    - green path：model 字段满足规则 → wrapper.vm.validate() resolves 字段值对象
 // 4. getFieldsValue 方法透传：经 Proxy 调用返回真实字段值（同步、无 DOM 依赖，覆盖「等方法」）
 // 5. provide/inject 通道：TmForm 包裹 TmFormItem 不报 inject 错误（v1 占位通道可用）
-// 6. 聚合 install：app.use(@kibus/tm-ui-plus) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5）
+// 6. 聚合 install：app.use(@trustmo/tm-ui) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5）
 // 7. FormItem props 透传：label / name / rules 真实下发到内部 AFormItem
 // 8. FormItem 独立使用：无 TmForm 祖先时 useFormContext 返回 undefined 也不影响渲染
 // 9. $attrs 与 slots 全透传（Form 与 FormItem 各覆盖）
@@ -140,7 +140,7 @@ describe('TmForm', () => {
     expect(wrapper.find('.slot-content').exists()).toBe(true)
   })
 
-  it('聚合 install：app.use(@kibus/tm-ui-plus) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5 双组件 install）', () => {
+  it('聚合 install：app.use(@trustmo/tm-ui) 同时全局注册 TmForm 与 TmFormItem（plan-bug #5 双组件 install）', () => {
     // 锁定 src/index.ts 的聚合 install 必须同时注册两个组件：
     // form 模块含 TmForm + TmFormItem，遗漏任一会使业务侧 <TmFormItem> 报「未注册」错误。
     const app = createApp({})

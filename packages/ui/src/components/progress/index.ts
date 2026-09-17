@@ -5,7 +5,7 @@ import { withInstall } from '../../utils/withInstall'
 
 export const TmProgress = withInstall(Progress, 'TmProgress')
 
-// 类型再导出：业务方可直接 import { TmProgressProps, TmProgressStatus, ProgressProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmProgressProps, TmProgressStatus, ProgressProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export * from './src/status'
 export default TmProgress

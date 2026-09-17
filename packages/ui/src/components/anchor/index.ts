@@ -7,7 +7,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmAnchor = withInstall(Anchor, 'TmAnchor')
 export const TmAnchorLink = withInstall(AnchorLink, 'TmAnchorLink')
 
-// 类型透传：业务方可直接 import { AnchorProps, AnchorLinkProps, TmAnchorProps, ... } from '@kibus/tm-ui-plus'
+// 类型透传：业务方可直接 import { AnchorProps, AnchorLinkProps, TmAnchorProps, ... } from '@trustmo/tm-ui'
 export type { AnchorProps, AnchorLinkProps } from 'ant-design-vue'
 export type { TmAnchorProps, TmAnchorLinkProps } from './src/props'
 

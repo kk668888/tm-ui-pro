@@ -157,7 +157,7 @@ const formItemProps = [
 - `markInitial()` — 手动把当前 model 标记为新的初始快照（编辑场景异步加载完数据后调用，使 `isDirty()` 复位）
 
 ```ts
-import type { FormInstance } from '@kibus/tm-ui-plus'
+import type { FormInstance } from '@trustmo/tm-ui'
 const formRef = ref<FormInstance>()
 await formRef.value?.validate()
 const dirty = formRef.value?.isDirty()         // 离开页面前确认
@@ -171,7 +171,7 @@ formRef.value?.markInitial()                   // 提交成功后复位脏标记
 
 <TmPropsTable :data="formItemProps" />
 
-**Default slot props（v2 新增）**：`TmFormItem` 的默认插槽会把 FormContext 的 `submitting` / `readonly` / `disabled` 透传给子控件，便于第三方控件（非 `@kibus/tm-ui-plus`）消费级联状态：
+**Default slot props（v2 新增）**：`TmFormItem` 的默认插槽会把 FormContext 的 `submitting` / `readonly` / `disabled` 透传给子控件，便于第三方控件（非 `@trustmo/tm-ui`）消费级联状态：
 
 ```vue
 <TmFormItem label="名称" name="name" v-slot="{ readonly, disabled, submitting }">
@@ -187,7 +187,7 @@ import type {
   FormInstance,
   FormItemProps,
   FormItemInstance,
-} from '@kibus/tm-ui-plus'
+} from '@trustmo/tm-ui'
 ```
 
 ## 扩展机制

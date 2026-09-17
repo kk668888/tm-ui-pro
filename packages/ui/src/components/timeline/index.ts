@@ -4,6 +4,6 @@ import Timeline from './src/Timeline.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmTimeline = withInstall(Timeline, 'TmTimeline')
-// 类型再导出：业务方可直接 import { TmTimelineProps, TimelineProps } from '@kibus/tm-ui-plus'
+// 类型再导出：业务方可直接 import { TmTimelineProps, TimelineProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmTimeline

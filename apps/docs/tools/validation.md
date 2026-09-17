@@ -104,7 +104,7 @@ toAntRule({ type: 'ipv4', required: true })
 ## 扩展：注册自定义判据
 
 ```ts
-import { registerValidator, toAntRule, toVxeRule } from '@kibus/tm-ui-plus'
+import { registerValidator, toAntRule, toVxeRule } from '@trustmo/tm-ui'
 
 registerValidator('ticketNo', (value) => /^TD-\d{6}$/.test(String(value)))
 
@@ -129,7 +129,7 @@ toVxeRule({ type: 'ticketNo' })
 用法与同步判据完全一致，只是判据函数返回 Promise：
 
 ```ts
-import { registerValidator, toAntRule } from '@kibus/tm-ui-plus'
+import { registerValidator, toAntRule } from '@trustmo/tm-ui'
 
 // 异步判据：返回 Promise —— 兑现为 true 即通过，false 即不通过
 registerValidator('deviceNoUnique', async (value) => {

@@ -43,13 +43,13 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Unit tests + coverage thresholds (@kibus/tm-ui-plus)
+      - name: Unit tests + coverage thresholds (@trustmo/tm-ui)
         run: pnpm test:coverage
 
       - name: Demo tests
         run: pnpm --filter demo test
 
-      - name: Build @kibus/tm-ui-plus
+      - name: Build @trustmo/tm-ui
         run: pnpm build:ui
 
       - name: Build demo

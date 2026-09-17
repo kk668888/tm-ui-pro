@@ -14,7 +14,7 @@
 
 当前仓库是一个 monorepo，也就是一个仓库里放了多个应用或包。
 
-`packages/ui` 是其中的 UI 组件库子包，包名是 `@kibus/tm-ui-plus`。它负责提供 `TmButton`、`TmInput`、`TmTable` 等组件。
+`packages/ui` 是其中的 UI 组件库子包，包名是 `@trustmo/tm-ui`。它负责提供 `TmButton`、`TmInput`、`TmTable` 等组件。
 
 ### 什么是单元测试
 
@@ -32,7 +32,7 @@
 }
 ```
 
-这表示运行 `pnpm --filter @kibus/tm-ui-plus test` 时，会执行 Vitest 测试。
+这表示运行 `pnpm --filter @trustmo/tm-ui test` 时，会执行 Vitest 测试。
 
 ### 什么是覆盖率
 
@@ -143,7 +143,7 @@ coverage
 一般在运行覆盖率命令之后会看到它，例如：
 
 ```bash
-pnpm --filter @kibus/tm-ui-plus test -- --coverage
+pnpm --filter @trustmo/tm-ui test -- --coverage
 ```
 
 或者直接进入子包运行：
@@ -280,13 +280,13 @@ thresholds: {
 运行 UI 子包测试：
 
 ```bash
-pnpm --filter @kibus/tm-ui-plus test
+pnpm --filter @trustmo/tm-ui test
 ```
 
 运行 UI 子包测试并生成覆盖率：
 
 ```bash
-pnpm --filter @kibus/tm-ui-plus test -- --coverage
+pnpm --filter @trustmo/tm-ui test -- --coverage
 ```
 
 查看 Git 是否会提交 coverage：

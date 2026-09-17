@@ -7,7 +7,7 @@ import { withInstall } from '../../utils/withInstall'
 export const TmDropdown = withInstall(Dropdown, 'TmDropdown')
 export const TmDropdownButton = withInstall(DropdownButton, 'TmDropdownButton')
 
-// 类型透传：业务方可直接 import { DropdownProps, TmDropdownProps, ... } from '@kibus/tm-ui-plus'
+// 类型透传：业务方可直接 import { DropdownProps, TmDropdownProps, ... } from '@trustmo/tm-ui'
 export type { DropdownProps } from 'ant-design-vue'
 export type { TmDropdownProps, TmDropdownButtonProps } from './src/props'
 

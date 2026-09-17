@@ -96,4 +96,4 @@ const inputMacProps = [
 
 ### TmInputMac Types
 
-- `TmInputMacProps`、`TmInputMacSeparator`（`':' | '-'`）可直接从 `@kibus/tm-ui-plus` 导入。
+- `TmInputMacProps`、`TmInputMacSeparator`（`':' | '-'`）可直接从 `@trustmo/tm-ui` 导入。
