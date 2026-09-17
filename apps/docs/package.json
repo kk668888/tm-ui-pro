@@ -9,7 +9,7 @@
     "preview": "vitepress preview"
   },
   "dependencies": {
-    "@ant-design/icons-vue": "7.0.0",
+    "@ant-design/icons-vue": "7.0.1",
     "@kibus/tm-ui-plus": "workspace:*",
     "@types/markdown-it": "14.1.2",
     "@vxe-ui/core": "4.4.18",

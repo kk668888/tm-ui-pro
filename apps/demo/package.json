@@ -21,7 +21,7 @@
     "scaffold:feature": "tsx scripts/scaffold.ts feature"
   },
   "dependencies": {
-    "@ant-design/icons-vue": "7.0.0",
+    "@ant-design/icons-vue": "7.0.1",
     "@kibus/tm-ui-plus": "workspace:*",
     "@vxe-ui/core": "4.4.18",
     "ant-design-vue": "4.2.6",

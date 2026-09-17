@@ -48,8 +48,8 @@ importers:
   apps/demo:
     dependencies:
       '@ant-design/icons-vue':
-        specifier: 7.0.0
-        version: 7.0.0(vue@3.5.40(@typescript/typescript6@6.0.2))
+        specifier: 7.0.1
+        version: 7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       '@kibus/tm-ui-plus':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -187,8 +187,8 @@ importers:
   apps/docs:
     dependencies:
       '@ant-design/icons-vue':
-        specifier: 7.0.0
-        version: 7.0.0(vue@3.5.40(@typescript/typescript6@6.0.2))
+        specifier: 7.0.1
+        version: 7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       '@kibus/tm-ui-plus':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -237,8 +237,8 @@ importers:
         version: 1.11.21
     devDependencies:
       '@ant-design/icons-vue':
-        specifier: 7.0.0
-        version: 7.0.0(vue@3.5.40(@typescript/typescript6@6.0.2))
+        specifier: 7.0.1
+        version: 7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))
       '@types/node':
         specifier: 22.0.0
         version: 22.0.0
@@ -380,11 +380,6 @@ packages:
 
   '@ant-design/icons-svg@4.5.0':
     resolution: {integrity: sha512-1BTUFyKPTBZ53MuTP8s0k5SFEXL7o3VHEOwLgzaoWKwnBeqIcqUtVshc4SKzhI6uACfqhJqBwBUE9FsWR3uULA==}
-
-  '@ant-design/icons-vue@7.0.0':
-    resolution: {integrity: sha512-VEb0r/Jqo2qi9olfBephYlyxbmhQVZ5+tJ3Zw5VaBd5h0wV1zdjGt5mJxSbRRs2mnnOWpsa1s4PeoLwNnkLV/w==}
-    peerDependencies:
-      vue: '>=3.0.3'
 
   '@ant-design/icons-vue@7.0.1':
     resolution: {integrity: sha512-eCqY2unfZK6Fe02AwFlDHLfoyEFreP6rBwAZMIJ1LugmfMiVgwWDYlp1YsRugaPtICYOabV1iWxXdP12u9U43Q==}
@@ -4535,12 +4530,6 @@ snapshots:
       '@ctrl/tinycolor': 3.6.1
 
   '@ant-design/icons-svg@4.5.0': {}
-
-  '@ant-design/icons-vue@7.0.0(vue@3.5.40(@typescript/typescript6@6.0.2))':
-    dependencies:
-      '@ant-design/colors': 6.0.0
-      '@ant-design/icons-svg': 4.5.0
-      vue: 3.5.40(@typescript/typescript6@6.0.2)
 
   '@ant-design/icons-vue@7.0.1(vue@3.5.40(@typescript/typescript6@6.0.2))':
     dependencies:
