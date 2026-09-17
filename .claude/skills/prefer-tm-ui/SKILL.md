@@ -1,6 +1,6 @@
 ---
 name: prefer-tm-ui
-description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-ui-plus 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段校验、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @kibus/tm-ui-plus；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
+description: 在业务项目中编写 UI 代码时自动优先引用 @kibus/tm-ui-plus 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段/单元格校验（含异步校验，如唯一性检查）、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @kibus/tm-ui-plus；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule / registerValidator 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
 ---
 
 # 优先引用 @kibus/tm-ui-plus
@@ -182,7 +182,9 @@ const rules = {
 // columns: [{ field: 'ip', editRender: { name: 'VxeInput' }, rules: toVxeRule({ type: 'ipv4', required: true }) }]
 ```
 
-内置 11 种类型：`ipv4` / `ipv6` / `mac` / `port` / `phone` / `email` / `url` / `range` / `length` / `idCard` / `creditCode`（后两种含国标校验位）；自定义判据用 `registerValidator(name, predicate)`。空值语义由 `required` 驱动：非必填空值直接通过，必填提示 `requiredMessage`。完整类型表、Form 级/FormItem 级两种绑定与 **vxe `edit-rules` 两道门禁** → `references/tm-validation-guide.md`
+内置 11 种类型：`ipv4` / `ipv6` / `mac` / `port` / `phone` / `email` / `url` / `range` / `length` / `idCard` / `creditCode`（后两种含国标校验位）；自定义判据用 `registerValidator(name, predicate)`。空值语义由 `required` 驱动：非必填空值直接通过，必填提示 `requiredMessage`。
+
+**异步校验**：判据依赖外部数据源时（编号/名称唯一性要问服务端等），让自定义判据**返回 Promise** 即可——两个适配器都会等待结果，配置对象不加任何字段。空值在调用判据前短路（不会因用户清空输入框而发远程请求）；判据抛出的异常原样成为校验失败提示（吞掉应自行在判据内 `catch` 并返回 `false`）。完整类型表、Form 级/FormItem 级两种绑定、**vxe `edit-rules` 两道门禁**与异步校验的三条约定 → `references/tm-validation-guide.md`
 
 ### 类型系统
 
@@ -213,3 +215,4 @@ import type {
 6. **类型解析失败**：业务侧必装 peerDependencies（ant-design-vue / vxe-table 等），缺失或版本不符会报类型错误
 7. **组件库能力不足**：Tm 组件透传 ant/vxe 原生 props，缺的默认值可直接显式传入覆盖，不必放弃 Tm 组件
 8. **手写校验规则**：表单/表格校验一律用 `toAntRule` / `toVxeRule`（内置 11 种类型 + `registerValidator` 扩展），不要手写 async-validator / vxe 规则对象；vxe 列级 `rules` 不生效先查 `edit-rules` 门禁
+9. **异步校验挂在编辑即时触发上**：vxe 同单元格多异步规则并发无序、`trigger` 触发的异步校验有竞态（快速改动时旧结果可能后到覆盖新结果）。异步判据优先**提交前** `fullValidate` 统一跑；确需即时校验的，在判据内用闭包序号或 `AbortController` 丢弃过期结果

@@ -21,6 +21,7 @@ registerValidator(name, predicate)   → 注册自定义判据，两个适配器
 - TmForm 表单字段要格式校验（手机号 / 邮箱 / 身份证 / 区间 …）——不要手写 `{ pattern: ..., message: ... }`
 - TmTable 行编辑单元格要校验，提交前要**批量校验**全部行
 - 需要 IP / MAC / 端口 / 身份证（含校验位）/ 统一社会信用代码（含校验码）这类格式判据——组件库已内建，不要自己写正则
+- 判据要问外部数据源（编号 / 名称唯一性等）——让自定义判据返回 Promise，见下方「异步校验」
 
 ## 全部校验类型（11 种）
 
@@ -132,6 +133,43 @@ toVxeRule({ type: 'ticketNo' })
 - 未注册的类型名**直接抛错**（不静默产出无效规则）
 - 判据只写本库内部登记表，**不写 vxe 全局注册表** `VxeUI.validators`，无全局副作用
 
+## 异步校验
+
+判据依赖外部数据源时（最典型：编号 / 名称唯一性必须在提交时问服务端），让自定义判据**返回 Promise** 即可。异步能力**只从 `registerValidator` 进入**——配置对象不加任何字段，同步判据写法完全不变（类型放宽是向后兼容的）。
+
+```ts
+import { registerValidator, toAntRule } from '@kibus/tm-ui-plus'
+
+registerValidator('deviceNoUnique', async (value) => {
+  const { available } = await api.checkDeviceNo({ deviceNo: String(value) })
+  return available // true 通过 / false 不通过（提示用配置里的 message）
+})
+
+const rules = {
+  deviceNo: toAntRule({
+    type: 'deviceNoUnique',
+    required: true,
+    requiredMessage: '请输入设备编号',
+    message: '该编号已被占用，请换一个',
+  }),
+}
+```
+
+vxe 侧同样可用；`fullValidate` 会**等待**异步判据完成再返回结果，批量校验用法不变。
+
+### 三条约定
+
+1. **空值不触发判据**：空值在调用判据**之前**短路，所以不会因用户清空输入框而发一次远程请求。空值拦不拦仍由 `required` 决定
+2. **判据抛出的异常不吞**：异常原样成为校验失败提示（如 `Network Error`），避免把「外部服务挂了」伪装成「格式不正确」。想让失败也算「不通过 + 自己的文案」，就在判据内自行 `catch` 并返回 `false`
+3. **内置类型恒同步**：11 种内置判据都是纯计算（正则 / 校验位算法），产出规则与以前完全一致；异步只作用于自定义判据
+
+### 表格里的异步校验注意（重要）
+
+- **同一单元格内多个异步规则是并发的**（vxe 内部 `Promise.all`），错误先后顺序不确定
+- **`trigger` 即时触发的异步校验有竞态**：快速连续改动时，先发的请求可能后返回并覆盖最新结果
+
+→ 因此异步判据**优先在提交前用 `fullValidate` 统一跑**，别依赖编辑即时触发。确有即时校验需求的，在判据内用闭包序号或 `AbortController` 丢弃过期结果。
+
 ## 常见坑
 
 1. **手写规则**：写 `{ pattern: /1[3-9]\d{9}/ }` 之前先查上表——内置类型一律用 `toAntRule` / `toVxeRule`
@@ -139,3 +177,4 @@ toVxeRule({ type: 'ticketNo' })
 3. **vxe 提示字段**：`toVxeRule` 产出的是 `content`（`message` 已被 vxe 废弃）；计算类失败以返回 `Error` 的 message 为准
 4. **`range` 绑文本框**：range 期望数值型值，配 `TmInputNumber`；绑文本输入框会收到类型不符提示
 5. **必填文案与格式文案混淆**：两条文案独立（`requiredMessage` / `message`），不要指望一条通吃
+6. **异步校验挂在编辑即时触发上**：vxe 异步校验并发无序 + `trigger` 有竞态，异步判据优先提交前 `fullValidate` 统一跑（见上方「表格里的异步校验注意」）
