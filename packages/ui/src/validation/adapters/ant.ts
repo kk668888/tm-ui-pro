@@ -7,6 +7,7 @@
 //   「空串归一 undefined 后短路」，D3 空值语义无需自写分支）
 // - 计算类 → 自定义 validator（两份适配器唯一分叉处：async-validator 的签名是
 //   (rule, value, callback)，本实现用 Promise 风格——失败时 throw Error，异常消息即提示文案）
+// - 自定义判据 → 同上，但走异步求值（判据可返回 Promise，见 add-async-validation D1）
 // - required → 独立成条排在首位，空值拦截完全交给它
 //
 // 类型收窄注意：CustomRuleConfig 的 type 是宽泛 string，结构上与所有内置成员重叠，
@@ -19,7 +20,7 @@ import { DEFAULT_CUSTOM_FORMAT_MESSAGE, DEFAULT_REQUIRED_MESSAGE, resolveFormatM
 import { CHECKSUM_PREDICATES } from '../predicates/checksum'
 import { REGEX_PATTERNS } from '../predicates/regex'
 import { getCustomPredicate, hasBuiltinType } from '../registry'
-import { evaluatePredicate } from './shared'
+import { evaluatePredicate, evaluatePredicateAsync } from './shared'
 
 /**
  * 产出 ant 规则数组
@@ -71,6 +72,9 @@ export function toAntRule(config: AnyValidationRuleConfig): RuleObject[] {
 
   // ③ 自定义判据分支：经上一步收窄，此处 config 已是 CustomRuleConfig
   //    生成期查登记表，把名字解析为函数（D5 不产字符串名、不写 vxe 全局表）
+  //    add-async-validation D1：自定义判据允许异步（远程唯一性等），故产出 async validator——
+  //    async-validator 会 await 返回的 Promise，reject 出的 Error.message 即字段提示文案
+  //    （async-validator dist index.js:1274 `if (res && res.then) res.then(() => cb(), e => cb(e))`）
   const predicate = getCustomPredicate(config.type)
   if (!predicate) {
     throw new Error(
@@ -80,9 +84,9 @@ export function toAntRule(config: AnyValidationRuleConfig): RuleObject[] {
   const message = config.message ?? DEFAULT_CUSTOM_FORMAT_MESSAGE
   rules.push({
     message,
-    validator: (_rule: RuleObject, value: unknown) => {
-      const failure = evaluatePredicate(predicate, value, message)
-      return failure ? Promise.reject(failure) : Promise.resolve()
+    validator: async (_rule: RuleObject, value: unknown) => {
+      const failure = await evaluatePredicateAsync(predicate, value, message)
+      if (failure) throw failure
     },
   })
   return rules

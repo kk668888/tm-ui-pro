@@ -3,4 +3,4 @@
 export { toAntRule } from './ant'
 export { toVxeRule } from './vxe'
 export { isEmptyValue } from './shared'
-export type { ValuePredicate } from './shared'
+export type { ValuePredicate } from '../types'

@@ -22,12 +22,40 @@ async function runAntValidator(rule: RuleObject, value: unknown): Promise<string
   }
 }
 
-/** vxe 自定义 validator 的最小可调用形状（测试只关心 cellValue 入参与 Error 返回） */
+/** vxe 自定义 validator 的同步可调用形状（内置计算类：同步返回 Error） */
 type VxeCellValidator = (params: { cellValue: unknown }) => Error | undefined
 
-/** 触发 vxe 计算类规则的 validator：返回校验失败的 Error；通过返回 undefined */
+/** vxe 自定义判据 validator 的异步可调用形状（自定义判据恒异步，失败即 reject） */
+type VxeAsyncCellValidator = (params: { cellValue: unknown }) => Promise<void>
+
+/** 触发 vxe 计算类（内置）规则的 validator：同步返回失败的 Error；通过返回 undefined */
 function runVxeValidator(rule: unknown, cellValue: unknown): Error | undefined {
   return (rule as VxeCellValidator)({ cellValue })
+}
+
+/** 触发 vxe 自定义判据规则的 validator：等待 Promise，返回失败文案；通过返回 undefined */
+async function runVxeValidatorAsync(rule: unknown, cellValue: unknown): Promise<string | undefined> {
+  try {
+    await (rule as VxeAsyncCellValidator)({ cellValue })
+    return undefined
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+}
+
+/** 可控 deferred：手动兑现判据，用于断言「校验确实在等待 Promise」（不依赖真实计时器） */
+function createDeferred<T>(): {
+  promise: Promise<T>
+  resolve: (value: T) => void
+  reject: (reason?: unknown) => void
+} {
+  let resolve!: (value: T) => void
+  let reject!: (reason?: unknown) => void
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
 }
 
 describe('toAntRule / toVxeRule：正则类产出声明式 pattern', () => {
@@ -158,13 +186,118 @@ describe('适配器：自定义判据', () => {
     expect(await runAntValidator(antRule, 'NO')).toBe('工单号不合法')
 
     const [vxeRule] = toVxeRule({ type: 'ticketNo' })
-    expect(runVxeValidator(vxeRule.validator, 'OK')).toBeUndefined()
-    expect(runVxeValidator(vxeRule.validator, 'NO')?.message).toBe('请输入正确的内容')
+    // 自定义判据的 vxe validator 恒为异步形态（add-async-validation D6），
+    // 但同步判据的判定结论与引入异步能力之前完全一致
+    expect(await runVxeValidatorAsync(vxeRule.validator, 'OK')).toBeUndefined()
+    expect(await runVxeValidatorAsync(vxeRule.validator, 'NO')).toBe('请输入正确的内容')
   })
 
   it('未注册的自定义名抛出明确错误（ant / vxe 行为一致）', () => {
     expect(() => toAntRule({ type: 'never-registered' })).toThrow(/never-registered/)
     expect(() => toVxeRule({ type: 'never-registered' })).toThrow(/never-registered/)
+  })
+})
+
+describe('适配器：异步自定义判据（spec「自定义判据支持异步校验」）', () => {
+  it('ant：等待 Promise 兑现后才给结论，不通过时用配置文案', async () => {
+    const gate = createDeferred<boolean>()
+    registerValidator('gated-ant', () => gate.promise)
+    const [rule] = toAntRule({ type: 'gated-ant', message: '名称已存在' })
+
+    const pending = runAntValidator(rule, 'foo')
+    // 判据尚未兑现 → 校验不应有结论（证明确实在等待，而非把 Promise 当 truthy 放行）
+    let settled = false
+    void pending.then(() => {
+      settled = true
+    })
+    await Promise.resolve()
+    expect(settled).toBe(false)
+
+    gate.resolve(false)
+    expect(await pending).toBe('名称已存在')
+  })
+
+  it('ant：Promise 兑现为 true 时通过', async () => {
+    registerValidator('async-pass-ant', async () => true)
+    const [rule] = toAntRule({ type: 'async-pass-ant', message: '不该出现' })
+    expect(await runAntValidator(rule, 'anything')).toBeUndefined()
+  })
+
+  it('vxe：等待 Promise 兑现，失败以 reject 传递文案', async () => {
+    const gate = createDeferred<boolean>()
+    registerValidator('gated-vxe', () => gate.promise)
+    const [rule] = toVxeRule({ type: 'gated-vxe', message: '名称已存在' })
+
+    const pending = runVxeValidatorAsync(rule.validator, 'foo')
+    let settled = false
+    void pending.then(() => {
+      settled = true
+    })
+    await Promise.resolve()
+    expect(settled).toBe(false)
+
+    gate.reject(new Error('该编号已被占用'))
+    // vxe 侧失败文案以 reject 出的 Error.message 为准（hook.js 488-494）
+    expect(await pending).toBe('该编号已被占用')
+  })
+
+  it('vxe：Promise 兑现为 true 时通过', async () => {
+    registerValidator('async-pass-vxe', async () => true)
+    const [rule] = toVxeRule({ type: 'async-pass-vxe' })
+    expect(await runVxeValidatorAsync(rule.validator, 'anything')).toBeUndefined()
+  })
+
+  it('空值不调用异步判据（不对空值发起外部请求）', async () => {
+    let calls = 0
+    registerValidator('count-calls', async () => {
+      calls += 1
+      return false
+    })
+    const [antRule] = toAntRule({ type: 'count-calls' })
+    const [vxeRule] = toVxeRule({ type: 'count-calls' })
+
+    // 空字符串 / null / undefined 全部短路在调用判据之前
+    expect(await runAntValidator(antRule, '')).toBeUndefined()
+    expect(await runAntValidator(antRule, null)).toBeUndefined()
+    expect(await runAntValidator(antRule, undefined)).toBeUndefined()
+    expect(await runVxeValidatorAsync(vxeRule.validator, '')).toBeUndefined()
+    expect(calls).toBe(0)
+
+    // 非空才真正调用，且判定结论生效
+    expect(await runAntValidator(antRule, 'x')).toBe('请输入正确的内容')
+    expect(await runVxeValidatorAsync(vxeRule.validator, 'x')).toBe('请输入正确的内容')
+    expect(calls).toBe(2)
+  })
+
+  it('判据抛出的异常原样成为校验失败（不吞、不替换为格式文案）', async () => {
+    registerValidator('boom', async () => {
+      throw new Error('外部服务不可用')
+    })
+    const [antRule] = toAntRule({ type: 'boom', message: '名称已存在' })
+    const [vxeRule] = toVxeRule({ type: 'boom', message: '名称已存在' })
+
+    expect(await runAntValidator(antRule, 'x')).toBe('外部服务不可用')
+    expect(await runVxeValidatorAsync(vxeRule.validator, 'x')).toBe('外部服务不可用')
+  })
+
+  it('必填 + 异步判据：空值仍由 required 拦下，异步判据不被调用', async () => {
+    let calls = 0
+    registerValidator('async-required', async () => {
+      calls += 1
+      return true
+    })
+    const rules = toAntRule({ type: 'async-required', required: true, requiredMessage: '请输入' })
+    expect(rules[0]).toEqual({ required: true, message: '请输入' })
+    expect(await runAntValidator(rules[1], '')).toBeUndefined()
+    expect(calls).toBe(0)
+  })
+
+  it('内置类型产出形态不受影响：计算类 vxe validator 仍同步返回 Error', () => {
+    const [rule] = toVxeRule({ type: 'idCard' })
+    // 同步返回（不是 Promise），保持 vxe 原生的 isError 判定路径
+    const result = runVxeValidator(rule.validator, '110105194912310021')
+    expect(result).toBeInstanceOf(Error)
+    expect(result?.message).toBe('请输入正确的身份证号码')
   })
 })
 

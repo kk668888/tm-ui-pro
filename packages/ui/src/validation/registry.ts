@@ -9,13 +9,17 @@
 
 import type {
   AnyValidationRuleConfig,
+  CustomPredicate,
   CustomRuleConfig,
   ValidationRuleConfig,
 } from './types'
 import { CHECKSUM_PREDICATES, REGEX_PATTERNS } from './predicates'
 
-/** 自定义判据：拿到待校验值，返回是否通过 */
-export type CustomPredicate = (value: unknown) => boolean
+/**
+ * 自定义判据类型：允许返回 Promise（异步校验）
+ * 定义归口在 `types.ts`，此处 re-export 维持既有导入路径
+ */
+export type { CustomPredicate } from './types'
 
 /** 自定义判据登记表（模块私有，禁止外部直接读写） */
 const customPredicates = new Map<string, CustomPredicate>()

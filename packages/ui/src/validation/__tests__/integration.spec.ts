@@ -14,6 +14,7 @@ import { TmForm, TmFormItem } from '../../components/form'
 import TmTable from '../../components/table/src/Table.vue'
 import { toAntRule } from '../adapters/ant'
 import { toVxeRule } from '../adapters/vxe'
+import { registerValidator } from '../registry'
 
 /** 等待微任务 + Vue 重新渲染（同 Table.spec.ts 的 flush） */
 const flush = async (): Promise<void> => {
@@ -135,5 +136,82 @@ describe('TmTable 集成：toVxeRule 产出挂列 rules + fullValidate 批量校
     const wrapper = mountEditableTable([{ id: 1, ip: '192.168.1.1' }])
     await flush()
     await expect(fullValidate(wrapper)).resolves.toBeUndefined()
+  })
+})
+
+describe('异步判据端到端：框架侧真实等待 Promise', () => {
+  /** 模拟一次带延迟的远程唯一性查询（真实计时器，让框架的 await 链路完整跑一遍） */
+  const requestUnique = (taken: string[]): ((value: unknown) => Promise<boolean>) => {
+    return (value) =>
+      new Promise((resolve) => {
+        setTimeout(() => resolve(!taken.includes(String(value))), 10)
+      })
+  }
+
+  it('TmForm：异步判据在 validate() 中被等待，不通过时给配置文案', async () => {
+    registerValidator('e2e-form-unique', requestUnique(['DEV-0001']))
+    const formState = reactive<{ deviceNo: string }>({ deviceNo: 'DEV-0001' })
+    const wrapper = mount(TmForm, {
+      props: { model: formState },
+      slots: {
+        default: () =>
+          h(
+            TmFormItem,
+            {
+              name: 'deviceNo',
+              rules: toAntRule({
+                type: 'e2e-form-unique',
+                required: true,
+                requiredMessage: '请输入设备编号',
+                message: '该编号已被占用',
+              }),
+            },
+            { default: () => h('input') },
+          ),
+      },
+    })
+    await nextTick()
+    const validate = (): Promise<{ errorFields: Array<{ errors: string[] }> }> =>
+      (wrapper.vm as unknown as {
+        validate: () => Promise<{ errorFields: Array<{ errors: string[] }> }>
+      }).validate()
+
+    // validate() 内部 await 了异步判据，因此这里拿到的已是最终结论
+    await expect(validate()).rejects.toMatchObject({
+      errorFields: [{ errors: ['该编号已被占用'] }],
+    })
+
+    formState.deviceNo = 'DEV-9999'
+    await nextTick()
+    await expect(validate()).resolves.toBeDefined()
+  })
+
+  it('TmTable：异步判据在 fullValidate(true) 中被等待并标识未通过字段', async () => {
+    registerValidator('e2e-table-unique', requestUnique(['10.0.0.1']))
+    const columns = [
+      { field: 'id', title: 'ID', width: 80 },
+      {
+        field: 'ip',
+        title: 'IP',
+        editRender: { name: 'VxeInput' },
+        rules: toVxeRule({ type: 'e2e-table-unique', message: '该 IP 已被占用' }),
+      },
+    ]
+    const wrapper = mount(TmTable, {
+      props: {
+        data: [{ id: 1, ip: '10.0.0.1' }],
+        columns,
+        editConfig: { trigger: 'click', mode: 'row' },
+        editRules: { ip: [] },
+        validConfig: { autoPos: false },
+      },
+    })
+    await flush()
+    const errMap = await (wrapper.vm as unknown as {
+      fullValidate: (rows: true) => Promise<Record<string, Array<unknown>> | undefined>
+    }).fullValidate(true)
+
+    expect(errMap).toBeDefined()
+    expect(Object.keys(errMap ?? {})).toContain('ip')
   })
 })

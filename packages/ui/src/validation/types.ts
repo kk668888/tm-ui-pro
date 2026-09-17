@@ -67,3 +67,21 @@ export interface CustomRuleConfig extends BaseRuleConfig {
 
 /** 适配器实际接受的入参：内置类型（严格联合）+ 自定义名（开放） */
 export type AnyValidationRuleConfig = ValidationRuleConfig | CustomRuleConfig
+
+/* ---------- 判据函数类型 ---------- */
+
+/**
+ * 同步判据：拿到值直接返回是否通过
+ * 内置判据表（正则 / 校验位算法）均为纯计算，恒同步
+ */
+export type ValuePredicate = (value: unknown) => boolean
+
+/**
+ * 自定义判据：允许返回 Promise，以支持判据依赖外部数据源的场景（如远程唯一性检查）
+ * - 返回 `true` / 兑现为 `true`：通过
+ * - 返回 `false` / 兑现为 `false`：不通过
+ * - 抛出 / 拒绝：判定为不通过，异常原样冒泡（见 spec「判据抛出的异常成为校验失败」）
+ *
+ * 同步判据（返回 boolean）是本类型的子集，因此放宽后**向后兼容**。
+ */
+export type CustomPredicate = (value: unknown) => boolean | Promise<boolean>
