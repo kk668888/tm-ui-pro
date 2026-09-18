@@ -56,3 +56,13 @@
 - [x] 8.6 dayjs 插件依赖复核（实测证据）：未加载 ant 时 `dayjs('09:00','HH:mm')` 解析失败、`format('YYYY-wo')` / `format('YYYY-[Q]Q')` 退化为字面量；仅 `require('ant-design-vue')` 后分别变为有效与 `2026-36th` / `2026-Q3` → 结论写入 `useValueFormat.ts` 注释 + 三页新章节「valueFormat 与 dayjs 插件」，并记录真实边界：绑定串须与 valueFormat **严格匹配**（如 `HH:mm:ss` 的初值不能缺秒）
 - [x] 8.7 单测加固：WeekPicker / QuarterPicker / TimeRangePicker 由「仅断言 `dayjs.isDayjs`」改为断言**真实解析值与回写值**（Invalid Date 同样是 Dayjs 对象，旧断言漏掉插件缺失类问题）
 - [x] 8.8 机械校验：全部文档页 demo import 路径可解析（111 处，0 缺失）；30 页在 sidebar 全覆盖；`pnpm check` EXIT=0（lint + vue-tsc + build:ui + build:docs 全页 SSR 渲染）；文档改动后重建 build:docs 再次通过；单测 **774 通过**（含本轮新增的容错用例）；`openspec validate add-missing-subcomponents` → valid
+
+## 9. 全库子组件演示补齐（2026-09-18 追加；用户要求「每个子组件都需要加上演示案例，而不只是描述」）
+
+- [x] 9.1 盘点口径：以构建产物 `dist/index.cjs` 的权威导出面（139 个 `Tm*`）与**所有 demo 源码**做差集，找出从未被任何演示使用的组件——避免只按「文档里列过的名字」盘点而漏掉未被提及者
+- [x] 9.2 盘点结论：仅 5 个子组件此前只有映射表条目/文字描述——`TmBreadcrumbSeparator`、`TmSubMenu`、`TmMenuItemGroup`、`TmMenuDivider`、`TmMentionsOption`；另 `app.md`（`TmApp`）整页无 demo（纯描述）。其余 4 个「无 demo」为误判：`TmMessage`/`TmNotification` 经 `TmMessage.success()` 方法调用已演示、`TmConfigProvider` 的 demo 位于 `src/config-provider/`、`TmResolver` 是工具非组件
+- [x] 9.3 新增 4 个 demo：`breadcrumb/demos/separator.vue`（容器级 separator / `separator=""` + 显式 Separator 逐段自定义）、`menu/demos/children-mode.vue`（SubMenu 嵌套 / ItemGroup 分组 / Divider 分割线）、`mentions/demos/option-children.vue`（子组件写法 vs `options` 写法对照）、`app/demos/basic.vue`（TmApp 包裹下的命令式提示与确认框）
+- [x] 9.4 四个文档页装配：`breadcrumb.md`（新增「分隔符自定义」节）、`menu.md`（新增「子组件写法」节）、`mentions.md`（新增「子组件写法（TmMentionsOption）」节，标注 ant 4.2.6 已废弃并给出推荐写法）、`app.md`（补 DemoBlock，从纯描述变为可交互）
+- [x] 9.5 实测查明并写入文档的 ant 行为（均配单测锁定，防文档与实现漂移）：① Breadcrumb 的 **Item 级 `separator` 属性会被容器 `cloneVNode` 覆盖**（写 `>` 仍显示 `/`）② 单独放 `BreadcrumbSeparator` 会与子项自带分隔符**重复渲染**，正解是容器 `separator=""` ③ Menu 的 `items` 与模板子组件**二选一**（`itemsNodes || flattenChildren(slots.default)`，传了 items 后子组件静默不渲染）④ `Mentions.Option` 在 ant 4.2.6 已废弃（开发环境打印 deprecation 提示），新代码用 `:options`
+- [x] 9.6 单测加固：breadcrumb 3 例（容器级生效 / Item 级被覆盖 / `separator=""` 不重复）、menu 2 例（子组件族真实渲染 / items 优先于子组件）、mentions 由「挂载不报错」升级为「转发给 ant 的是真实 TmMentionsOption vnode 且 value 透传」
+- [x] 9.7 验证：`pnpm check` EXIT=0（lint + vue-tsc + build:ui + build:docs 全页 SSR 渲染，四个新装配页均渲染通过）；单测 **779 通过**（104 文件）；覆盖差集复核再无「零演示」的子组件

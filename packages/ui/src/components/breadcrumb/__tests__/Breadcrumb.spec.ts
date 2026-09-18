@@ -45,3 +45,46 @@ describe('TmBreadcrumbItem / TmBreadcrumbSeparator', () => {
     expect(wrapper.find('.item-child').exists()).toBe(true)
   })
 })
+
+// 分隔符行为锁定（实测 ant-design-vue 4.2.6）：文档「分隔符自定义」一节据此编写
+describe('TmBreadcrumb 分隔符', () => {
+  const sepsOf = (wrapper: { findAll: (s: string) => { text: () => string }[] }): string[] =>
+    wrapper.findAll('.ant-breadcrumb-separator').map((s) => s.text())
+
+  it('容器级 separator 生效于每个子项', () => {
+    const wrapper = mount({
+      components: { TmBreadcrumb, TmBreadcrumbItem },
+      template: `<TmBreadcrumb separator="→">
+        <TmBreadcrumbItem>首页</TmBreadcrumbItem>
+        <TmBreadcrumbItem>列表</TmBreadcrumbItem>
+      </TmBreadcrumb>`,
+    })
+    expect(sepsOf(wrapper)).toEqual(['→', '→'])
+  })
+
+  it('Item 级 separator 属性被容器覆盖（ant cloneVNode 行为，勿在文档里教错）', () => {
+    const wrapper = mount({
+      components: { TmBreadcrumb, TmBreadcrumbItem },
+      template: `<TmBreadcrumb>
+        <TmBreadcrumbItem separator=">">首页</TmBreadcrumbItem>
+        <TmBreadcrumbItem>列表</TmBreadcrumbItem>
+      </TmBreadcrumb>`,
+    })
+    expect(sepsOf(wrapper)).toEqual(['/', '/'])
+  })
+
+  it('separator="" + 显式 TmBreadcrumbSeparator：只渲染声明的分隔符且不重复', () => {
+    const wrapper = mount({
+      components: { TmBreadcrumb, TmBreadcrumbItem, TmBreadcrumbSeparator },
+      template: `<TmBreadcrumb separator="">
+        <TmBreadcrumbItem>首页</TmBreadcrumbItem>
+        <TmBreadcrumbSeparator>:</TmBreadcrumbSeparator>
+        <TmBreadcrumbItem>列表</TmBreadcrumbItem>
+        <TmBreadcrumbSeparator><span>|</span></TmBreadcrumbSeparator>
+        <TmBreadcrumbItem>详情</TmBreadcrumbItem>
+      </TmBreadcrumb>`,
+    })
+    // 若容器不是空串，子项会各带一个默认 `/`，这里就会变成 ['/', ':', '/', '|', '/']
+    expect(sepsOf(wrapper)).toEqual([':', '|'])
+  })
+})

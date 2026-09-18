@@ -1,7 +1,7 @@
 // packages/ui/src/components/mentions/__tests__/Mentions.spec.ts
-// TmMentions 单测：prefix/options/value 透传
-// 注：ant Mentions 过滤非 Option 子节点，且选项在输入 @ 触发时才懒渲染，
-// jsdom 下不可断言子选项 DOM，聚焦主组件透传与挂载。
+// TmMentions 单测：prefix/options/value 透传 + 子组件选项的转发契约
+// 注：ant Mentions 把 Option 子节点当**数据**消费（不在 DOM 渲染），候选在输入前缀时才出现，
+// 故断言落在「转发给 ant 的 vnode」而非 DOM 上。
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { h } from 'vue'
@@ -25,17 +25,26 @@ describe('TmMentions', () => {
     expect(inner.props('options')).toEqual(options)
   })
 
-  it('default 插槽经 render 函数转发，挂载不报错', () => {
-    // ant Mentions 过滤非 Option 子节点，仅验证转发与挂载
+  it('default 插槽经 render 函数转发真实子组件 vnode（子组件选项写法的前提）', () => {
+    // 关键：转发给 ant 的必须是真实 TmMentionsOption vnode（而非 <slot> 虚拟节点）——
+    // ant 从子节点上读 value 与默认插槽文案来生成候选（同 Tree / Menu 的教训）。
+    // 这条断言即文档「子组件写法」一节可用的依据。
     const wrapper = mount(TmMentions, {
       slots: { default: () => h(TmMentionsOption, { value: 'u1' }, () => '用户一') },
     })
-    expect(wrapper.findComponent({ name: 'AMentions' }).exists()).toBe(true)
+    const inner = wrapper.findComponent({ name: 'AMentions' })
+    expect(inner.exists()).toBe(true)
+    const forwarded = (inner.vm.$slots.default?.() ?? []) as {
+      type?: unknown
+      props?: Record<string, unknown>
+    }[]
+    expect(forwarded).toHaveLength(1)
+    expect(forwarded[0].type).toBe(TmMentionsOption)
+    expect(forwarded[0].props?.value).toBe('u1')
   })
 })
 
 describe('TmMentionsOption', () => {
-  // MentionsOption 需 Mentions 祖先上下文，且选项懒渲染；仅验证在宿主中挂载不报错
   it('在 Mentions 宿主中可挂载', () => {
     const wrapper = mount(TmMentions, {
       slots: { default: () => h(TmMentionsOption, { value: 'u1' }, () => '用户一') },

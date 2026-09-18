@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import TmMenu from '../src/Menu.vue'
 import TmMenuItem from '../src/MenuItem.vue'
+import TmSubMenu from '../src/SubMenu.vue'
 import TmMenuItemGroup from '../src/MenuItemGroup.vue'
 import TmMenuDivider from '../src/MenuDivider.vue'
 
@@ -67,5 +68,38 @@ describe('TmMenu 子组件族', () => {
   it('菜单项插槽透传', () => {
     const w = mount(host(h(TmMenuItem, null, () => h('span', { class: 'mi-child' }, '菜单项'))))
     expect(w.find('.mi-child').exists()).toBe(true)
+  })
+})
+
+// 模板子组件写法（文档「子组件写法」一节的依据）：SubMenu / ItemGroup / Divider 真实渲染
+describe('TmMenu 子组件写法', () => {
+  it('SubMenu 标题与嵌套项、ItemGroup 组标题、Divider 分割线均渲染', () => {
+    const wrapper = mount({
+      components: { TmMenu, TmMenuItem, TmSubMenu, TmMenuItemGroup, TmMenuDivider },
+      template: `<TmMenu mode="inline">
+        <TmMenuItemGroup title="基础数据">
+          <TmMenuItem key="g1">仓库</TmMenuItem>
+        </TmMenuItemGroup>
+        <TmMenuDivider />
+        <TmSubMenu key="sys" title="系统管理">
+          <TmMenuItem key="u1">用户管理</TmMenuItem>
+        </TmSubMenu>
+      </TmMenu>`,
+    })
+    expect(wrapper.find('.ant-menu-item-group-title').text()).toBe('基础数据')
+    expect(wrapper.find('.ant-menu-item-divider').exists()).toBe(true)
+    expect(wrapper.find('.ant-menu-submenu-title').text()).toContain('系统管理')
+    expect(wrapper.text()).toContain('用户管理')
+  })
+
+  it('传了 items 后子组件被整体忽略（ant itemsNodes 优先，文档已注明）', () => {
+    const wrapper = mount({
+      components: { TmMenu, TmMenuItem },
+      template: `<TmMenu mode="inline" :items="[{ key: 'a', label: '来自 items' }]">
+        <TmMenuItem key="b">来自子组件</TmMenuItem>
+      </TmMenu>`,
+    })
+    expect(wrapper.text()).toContain('来自 items')
+    expect(wrapper.text()).not.toContain('来自子组件')
   })
 })
