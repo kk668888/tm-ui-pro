@@ -163,13 +163,32 @@ export type { TmInputProps, TmInputExtProps, InputProps } from './components/inp
 // 注：InputProps 已由上行 input 出口导出，input-password 的 props.ts 虽 re-export 同名类型，
 // 此处不得重复导出（TS2300 Duplicate identifier），只导出密码专属扩展类型
 export type { TmInputPasswordProps, TmInputPasswordExtProps } from './components/input-password'
-export type { TmSelectProps, TmSelectExtProps, SelectProps } from './components/select'
+export type {
+  TmSelectProps,
+  TmSelectExtProps,
+  SelectProps,
+  // 远程/获取数据模式的结构类型：组件文档页（select.md）与 skill 都按「主入口可导入」书写。
+  // 2026-09-18 把数据结构 TmSelectOption 更名为 TmSelectOptionItem（与新增的模板子组件
+  // <TmSelectOption> 撞名）时漏了本行，导致按文档迁移的业务侧 import 报
+  // "has no exported member"；此处补齐三个类型。
+  TmSelectOptionItem,
+  TmSelectRemote,
+  TmSelectApi,
+} from './components/select'
 export type { FormProps, FormInstance, FormItemProps, FormItemInstance } from './components/form'
 export type {
   TmTableProps,
   TmTableExtProps,
   TmTablePageParam,
   TmTableResult,
+  // 扩展键 search / density 的结构类型：文档页与 prefer-tm-ui skill 都按「主入口可导入」书写，
+  // 此前遗漏导致业务侧 `import type { TmTableDensity } from '@trustmo/tm-ui'` 报
+  // "has no exported member"。三个类型（外加 TmTableSearchField 依赖的字段类型别名）在此补齐，
+  // 纯类型导出、无运行时产物，属追加式修正。
+  TmTableSearchConfig,
+  TmTableSearchField,
+  TmTableSearchFieldType,
+  TmTableDensity,
   VxeGridProps,
   VxeGridInstance,
   VxeColumnProps,
