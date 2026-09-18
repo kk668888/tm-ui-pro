@@ -14,6 +14,7 @@
     "test": "pnpm --filter @trustmo/tm-ui test",
     "test:coverage": "pnpm --filter @trustmo/tm-ui exec vitest run --coverage",
     "lint": "eslint .",
+  "lint:kebab": "node scripts/check-template-kebab.mjs --skill",
     "typecheck": "pnpm --filter @trustmo/tm-ui exec vue-tsc --noEmit && pnpm --filter demo exec vue-tsc --noEmit",
     "format": "prettier --write \"packages/**/*.{ts,vue}\"",
     "check": "pnpm lint && pnpm typecheck && pnpm test:coverage && pnpm build:ui && pnpm build:docs",
