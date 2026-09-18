@@ -41,3 +41,19 @@ TmTypography 家族 SHALL 透传 ant Typography 原生 props / slots / events（
 
 - **WHEN** 文本组件传入 `code` 或 `mark`
 - **THEN** 文本呈现 ant 对应内联修饰样式
+
+### Requirement: 本体入口导出
+
+库 SHALL 导出 `TmTypography`，映射 ant `Typography` 本体，可经 TmResolver 按需解析；与既有 `TmTypography*` 子组件导出并存，互不影响。
+
+#### Scenario: 按需解析可用
+- **WHEN** 业务经 TmResolver 解析 `TmTypography`
+- **THEN** 具名导入成功并渲染为 ant Typography 本体
+
+### Requirement: 原生能力透传
+
+TmTypography SHALL 透传 ant Typography 本体的属性与插槽（如 `component` 自定义容器标签、`code` / `mark` 等文本修饰），行为与原生写法一致。
+
+#### Scenario: 容器标签透传
+- **WHEN** 业务传 `component="article"` 并提供插槽内容
+- **THEN** 内容渲染在 `<article>` 容器内，行为与原生 `<a-typography>` 一致
