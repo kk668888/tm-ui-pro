@@ -1,6 +1,6 @@
 ---
 name: prefer-tm-ui
-description: 在业务项目中编写 UI 代码时自动优先引用 @trustmo/tm-ui 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段/单元格校验（含异步校验，如唯一性检查）、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @trustmo/tm-ui；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule / registerValidator 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 tm-ui-plus 且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
+description: 在业务项目中编写 UI 代码时自动优先引用 @trustmo/tm-ui 组件库（Tm 前缀组件），避免直接写 ant-design-vue 原生组件或自定义样式。触发场景：任何涉及按钮、输入框、下拉、表单、表格、字段/单元格校验（含异步校验，如唯一性检查）、弹窗、消息提示、日期选择、主题配置等 UI 的代码编写；识别到项目依赖 @trustmo/tm-ui；用户提到 TmButton / TmTable / TmForm / TmMessage / toAntRule / toVxeRule / registerValidator 等；或要求接入组件库、配置主题、排查 Tm 组件不生效。只要项目装了 `@trustmo/tm-ui`（历史包名 tm-ui-plus）且要写 UI，即用本 skill，即使未明说。本 skill 应复制到所有接入该组件库的业务项目中使用。
 ---
 
 # 优先引用 @trustmo/tm-ui
@@ -55,7 +55,7 @@ app.mount('#app')
 
 - 直接 import：`import { TmButton, TmInput, TmSelect } from '@trustmo/tm-ui'`
 - TmTable 体积大，用子入口隔离 chunk：`import { TmTable } from '@trustmo/tm-ui/table'`
-- 自动导入（vite.config.ts 配 `Components({ resolvers: [TmResolver()] })`，`import { TmResolver } from '@trustmo/tm-ui'`）后，模板里直接写 `<TmButton>`，无需 import
+- 自动导入（vite.config.ts 配 `Components({ resolvers: [TmResolver()] })`，`import { TmResolver } from '@trustmo/tm-ui'`）后，模板里直接写 `<tm-button>`，无需 import
 
 ## §2 组件选择（核心）
 
@@ -63,41 +63,73 @@ app.mount('#app')
 
 | 需求 | 用 Tm 组件 |
 | --- | --- |
-| 按钮 | `TmButton`（默认 primary，支持 debounce/confirm） |
-| 输入框 | `TmInput`（默认 allowClear） |
-| 下拉选择 | `TmSelect`（默认 showSearch + allowClear + 防抖 300ms） |
+| 按钮 / 按钮组 | `TmButton`（默认 primary，支持 debounce/confirm）/ `TmButtonGroup` |
+| 输入框 | `TmInput`（默认 allowClear）/ 密码 `TmInputPassword` / 搜索 `TmInputSearch` / 多行 `TmTextarea`（autosize 自动高度） |
+| IP / MAC 地址 | `TmInputIp` / `TmInputMac`（自研，分段输入 + 内置校验，ant 无对应） |
 | 数字输入 | `TmInputNumber` |
-| 日期 / 时间 | `TmDatePicker` / `TmRangePicker` / `TmTimePicker` |
-| 级联 / 树选择 | `TmCascader` / `TmTreeSelect` / `TmTree` |
-| 单选 / 多选 | `TmRadio`+`TmRadioGroup` / `TmCheckbox`+`TmCheckboxGroup` |
+| 下拉选择 | `TmSelect`（默认 showSearch + allowClear + 防抖 300ms） |
+| 自动完成 / 提及 | `TmAutoComplete` / `TmMentions`（候选用 `:options`） |
+| 日期 / 时间 | `TmDatePicker` / `TmRangePicker` / `TmTimePicker` / 时间段 `TmTimeRangePicker` |
+| 周 / 月 / 季 | `TmWeekPicker` / `TmMonthPicker` / `TmQuarterPicker`（字符串模式配 `value-format`，周用 `YYYY-ww`） |
+| 级联 / 树选择 | `TmCascader` / `TmTreeSelect` / `TmTree`（目录树 `TmDirectoryTree`） |
+| 单选 / 多选 | `TmRadio`+`TmRadioGroup` / `TmCheckbox`+`TmCheckboxGroup`（模板子组件写法受限，改 `options`） |
 | 开关 / 评分 / 滑块 | `TmSwitch` / `TmRate` / `TmSlider` |
-| 上传 | `TmUpload` |
+| 上传 | `TmUpload` / 拖拽区 `TmUploadDragger` |
 | 表单 | `TmForm` + `TmFormItem`（级联 + 脏追踪） |
 | 表格 | `TmTable`（vxe 底座，远程 request + 分页 + 密度） |
 | 弹窗 / 抽屉 | `TmModal` / `TmDrawer` |
 | 消息 / 通知 | `TmMessage` / `TmNotification`（函数式 API） |
-| 标签 / 徽标 / 空态 | `TmTag` / `TmBadge` / `TmEmpty` |
+| 标签 / 可选标签 / 徽标 / 空态 | `TmTag` / `TmCheckableTag`（`v-model:checked`）/ `TmBadge` / `TmEmpty` |
 | 布局 | `TmSpace` / `TmDivider` / `TmFlex` / `TmRow` / `TmCol` |
+| 控件贴合 | `TmCompact`（Space.Compact）/ `TmInputGroup` |
 | 导航 | `TmMenu` / `TmTabs` / `TmBreadcrumb` / `TmPagination` / `TmSteps` |
-| 数据展示 | `TmCard` / `TmAvatar` / `TmTooltip` / `TmDescriptions` / `TmList` 等 |
-| 反馈 | `TmAlert` / `TmSpin` / `TmPopconfirm` / `TmPopover` / `TmResult` 等 |
+| 数据展示 | `TmCard` / `TmAvatar` / `TmTooltip` / `TmDescriptions` / `TmList` / `TmTimeline` 等 |
+| 反馈 | `TmAlert` / `TmSpin` / `TmPopconfirm` / `TmPopover` / `TmResult` / `TmSkeleton` 等 |
 | 主题 / 根组件 | `TmConfigProvider` + `TmApp` |
 
-完整 60+ 组件分类清单与公司默认值 → `references/component-list.md`
+完整组件分类清单与公司默认值 → `references/component-list.md`
 
 ## §3 使用姿势
+
+### 模板写法约定（kebab-case）
+
+**模板里的组件标签、属性与事件一律用连字符写法，不要用驼峰。** Vue 两种都能编译，但 kebab 是本库文档与 demo 的统一风格：
+
+| ✅ 模板里这样写 | ❌ 反例（仅供识别，不要照抄） |
+| --- | --- |
+| `<tm-select v-model="fruit" />` | `<TmSelect v-model="fruit" />` |
+| `<tm-form-item name="phone">` | `<TmFormItem name="phone">` |
+| `<a-radio-group><tm-radio-button value="a">` | `<ARadioGroup><TmRadioButton value="a">` |
+| `:value-format="'YYYY-ww'"` | `:valueFormat="'YYYY-ww'"` |
+| `v-model:checked-keys="keys"` | `v-model:checkedKeys="keys"` |
+| `@press-enter="onSearch"` | `@pressEnter="onSearch"` |
+| `@update:file-list="onChange"` | `@update:fileList="onChange"` |
+| `:max-count="3"` / `:show-count="true"` | `:maxCount="3"` / `:showCount="true"` |
+
+组件标签写 kebab 在三种用法下都成立，可放心统一：
+
+1. **全局注册**（`app.use(TmUI)`）→ Vue 运行时把 `tm-select` camelize + capitalize 回 `TmSelect` 解析
+2. **`<script setup>` 显式 import**（`import { TmSelect } from '@trustmo/tm-ui'`）→ SFC 编译器按同样规则命中本地绑定
+3. **自动导入**（`TmResolver`）→ unplugin-vue-components 在调 resolver **之前**已 `pascalCase(tag)`，传进来就是 `TmSelect`，故 TmResolver 无需改动
+
+例外与边界（别一刀切）：
+
+- **导入与类型仍是驼峰**（那是标识符不是标签）：`import { TmSelect } from '@trustmo/tm-ui'`、`ref<FormInstance>()`、`TmTableProps['search']`
+- **插槽名保持 ant 原样**：`#bodyCell` / `#listItem` / `#dot` 这类改成 kebab 会匹配不到插槽
+- **无前缀组件名要当心撞原生标签**：`<Select>` 写成 `<select>` 会被当原生元素、组件解析直接失效——所以库内组件一律带 `tm-` 前缀，ant 组件一律带 `a-` 前缀，这层前缀就是安全性来源
+- **JS/TS 代码里仍是驼峰**：`options` 对象、`props`、`emit('update:modelValue')`、`onUpdate:fileList` 这类 $attrs 键
 
 ### 主题与根组件
 
 ```vue
-<TmConfigProvider :theme-mode="isDark ? 'dark' : 'light'">
-  <TmApp>
+<tm-config-provider :theme-mode="isDark ? 'dark' : 'light'">
+  <tm-app>
     <router-view />
-  </TmApp>
-</TmConfigProvider>
+  </tm-app>
+</tm-config-provider>
 ```
 
-`TmMessage` / `TmNotification` 在 `<TmApp>` 包裹下自动跟随主题与 locale（默认中文）。
+`TmMessage` / `TmNotification` 在 `<tm-app>` 包裹下自动跟随主题与 locale（默认中文）。
 
 ### 函数式 API
 
@@ -132,8 +164,8 @@ formRef.value?.markInitial?.()          // 提交成功后标记新基准
 静态数据（不传 `request` 自动本地切片分页；默认分页 10/20/50；`pagination: false` 纯展示不翻页）：
 
 ```vue
-<TmTable :data="rows" :columns="columns" />
-<TmTable :data="rows" :columns="columns" :pagination="false" />
+<tm-table :data="rows" :columns="columns" />
+<tm-table :data="rows" :columns="columns" :pagination="false" />
 ```
 
 远程数据（`request` + 声明式 `search` + `density`）：
@@ -154,7 +186,7 @@ async function fetchRemote(
 
 ```vue
 <template>
-  <TmTable
+  <tm-table
     :request="fetchRemote"
     :columns="columns"
     :search="search"
@@ -164,6 +196,27 @@ async function fetchRemote(
 ```
 
 进阶（勾选 / 行编辑 / 实例方法透传）与完整列模型见 `references/tm-table-guide.md`。
+
+### 子组件写法（模板子组件）
+
+`TmSelectOption` / `TmTreeNode` / `TmMenuItem` / `TmTableColumn` / `TmRadioButton` 这类子组件**能用配置驱动就别用模板写法**：
+
+```vue
+<!-- 推荐：配置驱动，类型提示完整，不受陷阱影响 -->
+<tm-select v-model="fruit" :options="[{ label: '苹果', value: 'apple' }]" />
+<tm-tree :tree-data="tree" />
+<tm-table :data="rows" :columns="columns" />
+```
+
+只有选项**静态且数量少**、或需要子项级插槽时才写模板子组件，此时三条硬规则：
+
+1. **配置 prop 与子组件二选一**——`options` / `items` / `columns` 传了（**空数组也算传了**）就会关掉模板写法，表现为下拉回显原始 value、表格渲染空列、菜单子项静默消失
+2. **`TmRadioButton` 必须配原生 `a-radio-group`**（Radio 系靠 provide/inject 识别子按钮，经 Tm 容器转发会断链；要全覆盖 Tm 前缀就用 `TmRadioGroup` 的 `options`）
+3. **`TmTableColumn` 五件套只对原生 `<a-table>` 有效**——`TmTable` 是 vxe 底座，不消费这些列子组件
+
+需容器「发现」的子项（菜单项、树节点）`key` 必须显式唯一，否则出现多项同时高亮。
+
+完整机制四类（父容器 vnode 识别 / provide-inject / 别名复用 / 本地包装件）、8 条实测陷阱与全量子组件对照表 → `references/tm-subcomponent-guide.md`
 
 ### 字段 / 单元格校验
 
@@ -196,6 +249,9 @@ import type {
   TmTableDensity,     // 表格行高档位 'compact' | 'default' | 'loose'
   VxeGridInstance,    // 表格 ref 实例（getCheckboxRecords 等方法透传）
   FormInstance,       // 表单实例（validate / isDirty）
+  TmSelectOptionItem, // 下拉选项结构 { label, value }（remote / api 模式返回值）
+  TmSelectRemote,     // 远程搜索函数 (query) => Promise<TmSelectOptionItem[]>
+  TmSelectApi,        // 获取数据模式函数 (params) => Promise<unknown>
   InputProps,         // ant 原生类型透传
   SelectProps,
 } from '@trustmo/tm-ui'
@@ -209,10 +265,13 @@ import type {
 
 1. **注册顺序**：vxe 是否在 `TmUI` 之前 `app.use`？顺序反了 vxe 相关组件（TmTable 及分页）会异常
 2. **vxe 样式**：`vxe-pc-ui/lib/style.css` + `vxe-table/lib/style.css` 是否引入？缺了表格与分页无样式
-3. **TmMessage 不跟随主题**：业务根是否被 `<TmApp>` 包裹？
+3. **TmMessage 不跟随主题**：业务根是否被 `<tm-app>` 包裹？
 4. **误用 ant 原生组件**：自查模板，`a-button` 等应改为 Tm 前缀（§2 映射）
 5. **函数式 API 误注册**：`TmMessage`/`TmNotification` 是 named export，不是组件，不要 `app.use`
 6. **类型解析失败**：业务侧必装 peerDependencies（ant-design-vue / vxe-table 等），缺失或版本不符会报类型错误
 7. **组件库能力不足**：Tm 组件透传 ant/vxe 原生 props，缺的默认值可直接显式传入覆盖，不必放弃 Tm 组件
 8. **手写校验规则**：表单/表格校验一律用 `toAntRule` / `toVxeRule`（内置 11 种类型 + `registerValidator` 扩展），不要手写 async-validator / vxe 规则对象；vxe 列级 `rules` 不生效先查 `edit-rules` 门禁
 9. **异步校验挂在编辑即时触发上**：vxe 同单元格多异步规则并发无序、`trigger` 触发的异步校验有竞态（快速改动时旧结果可能后到覆盖新结果）。异步判据优先**提交前** `fullValidate` 统一跑；确需即时校验的，在判据内用闭包序号或 `AbortController` 丢弃过期结果
+10. **模板子组件不生效**：查是否同时传了配置 prop（`options` / `items` / `columns`）——**空数组也算传了**，会整体禁用模板写法；宁可彻底不传，切换用 `v-if`
+11. **`TmRadioButton` 不响应选中 / `TmTableColumn` 无列**：宿主容器选错——前者要原生 `a-radio-group`（provide/inject 断链），后者要原生 `a-table`（TmTable 是 vxe 底座）
+12. **密码框可见性图标消失**：`TmInputPassword` 已兜底 `visibilityToggle: true`；若业务显式传了 `visibilityToggle=false` 会关掉它，删掉该显式传参即可

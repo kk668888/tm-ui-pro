@@ -59,17 +59,19 @@ const rules = {
 ```
 
 ```vue
-<TmForm ref="formRef" :model="formState" :rules="rules">
-  <TmFormItem label="手机号" name="phone">  <!-- 只声明 name，按名取用 -->
-    <TmInput v-model="formState.phone" />
-  </TmFormItem>
-</TmForm>
+<tm-form ref="formRef" :model="formState" :rules="rules">
+  <tm-form-item label="手机号" name="phone">  <!-- 只声明 name，按名取用 -->
+    <tm-input v-model="formState.phone" />
+  </tm-form-item>
+</tm-form>
 ```
 
 **绑在 `TmFormItem` 的 `rules`**（字段少、就地可读）：
 
 ```vue
-<TmFormItem label="手机号" name="phone" :rules="toAntRule({ type: 'phone', required: true })">
+<tm-form-item label="手机号" name="phone" :rules="toAntRule({ type: 'phone', required: true })">
+  <tm-input v-model="formState.phone" />
+</tm-form-item>
 ```
 
 ## TmTable 用法（toVxeRule + 批量校验）
@@ -92,7 +94,7 @@ const errMap = await tableRef.value?.fullValidate(true)
 if (errMap) { /* 提示问题字段：Object.keys(errMap) */ }
 ```
 
-模板：`<TmTable ref="tableRef" :data="rows" :columns="columns" :edit-rules="editRules" :edit-config="{ trigger: 'click', mode: 'row' }" />`
+模板：`<tm-table ref="tableRef" :data="rows" :columns="columns" :edit-rules="editRules" :edit-config="{ trigger: 'click', mode: 'row' }" />`
 
 也可不用列级 `rules`，直接把规则写进 `edit-rules` 映射（两者同时存在时列级优先）：
 

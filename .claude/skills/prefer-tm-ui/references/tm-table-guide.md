@@ -109,7 +109,7 @@ const density = ref<TmTableDensity>('default')
 </script>
 
 <template>
-  <TmTable :request="request" :columns="columns" :search="search" :density="density" />
+  <tm-table :request="request" :columns="columns" :search="search" :density="density" />
 </template>
 ```
 
@@ -119,10 +119,10 @@ const density = ref<TmTableDensity>('default')
 
 ```vue
 <!-- 静态分页：total = data.length -->
-<TmTable :data="rows" :columns="columns" />
+<tm-table :data="rows" :columns="columns" />
 
 <!-- 纯展示不翻页（API 属性表等）：pagination: false 全量渲染不切片 -->
-<TmTable :data="rows" :columns="columns" :pagination="false" />
+<tm-table :data="rows" :columns="columns" :pagination="false" />
 ```
 
 ## 进阶透传（vxe 原生能力）
@@ -153,7 +153,7 @@ const showChecked = () => {
 </script>
 
 <template>
-  <TmTable ref="tableRef" :data="rows" :columns="columns" :checkbox-config="{ highlight: true }" />
+  <tm-table ref="tableRef" :data="rows" :columns="columns" :checkbox-config="{ highlight: true }" />
 </template>
 ```
 
