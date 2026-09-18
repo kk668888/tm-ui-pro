@@ -33,7 +33,7 @@ const selectProps = [
   {
     prop: 'remote',
     desc: '远程搜索函数；传入则启用远程模式，输入经 `debounce` / `minLength` 过滤后调用，自动维护 options / loading',
-    type: '(query: string) => Promise<TmSelectOption[]>',
+    type: '(query: string) => Promise<TmSelectOptionItem[]>',
     default: '-',
   },
   {
@@ -63,7 +63,7 @@ const selectProps = [
   {
     prop: 'resultMap',
     desc: '完全自定义响应 → 选项映射，优先级最高；未提供时按常见格式智能识别',
-    type: '(res: unknown) => TmSelectOption[]',
+    type: '(res: unknown) => TmSelectOptionItem[]',
     default: '-',
   },
   {
@@ -87,21 +87,34 @@ const selectProps = [
 
 > `api` 与 `remote` 可共存：`api` 提供常驻初始列表，输入搜索时 `remote` 结果临时覆盖，清空输入回退到初始列表。二者写入互不覆盖，loading 合并。
 
-### TmSelectOption / TmSelectApi
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmSelect` | Select | 选择器本体 |
+| `TmSelectOption` | Select.Option | 模板子组件写法的选项项（与 `options` prop 二选一） |
+| `TmSelectOptGroup` | Select.OptGroup | 模板子组件写法的选项分组 |
+
+> 两种写法产物等价：`options` 数组配置驱动（推荐，类型提示更完整）或模板子组件 `<TmSelectOption>` / `<TmSelectOptGroup>`。**不要给 `TmSelect` 传空的 `:options="[]"`**——ant 以 `!options && children` 判定是否走 children 模式，空数组是 truthy 会禁用模板子组件模式（此时下拉会回显原始 value 而非 label）；不传 `options` 才是正确的 children 模式。详见 [SelectOption](./select-option) 页。
+
+### TmSelectOptionItem / TmSelectRemote / TmSelectApi
 
 ```ts
 /** 远程选项数据结构（label/value 两字段最小契约，业务可按需扩展） */
-export interface TmSelectOption {
+export interface TmSelectOptionItem {
   label: string
   value: string | number
 }
 
 /** 远程搜索函数签名（search 模式） */
-export type TmSelectRemote = (query: string) => Promise<TmSelectOption[]>
+export type TmSelectRemote = (query: string) => Promise<TmSelectOptionItem[]>
 
 /** api 请求函数签名（获取数据模式）：挂载时调用，返回原始响应由组件映射 */
 export type TmSelectApi = (params: Record<string, unknown>) => Promise<unknown>
 ```
+
+> **命名变更（2026-09-18）**：该数据结构原名为 `TmSelectOption`，与本次新增的**模板子组件** `<TmSelectOption>` 撞名——同一模块不允许同名值与类型并列导出（TS2300）。按「组件名对齐 ant 生态」优先，数据结构更名为更贴切的 `TmSelectOptionItem`。
+> 迁移方式：`import type { TmSelectOptionItem as TmSelectOption } from '@trustmo/tm-ui'`，或直接改用新名。
 
 ### TmSelect Events
 
@@ -122,7 +135,7 @@ export type TmSelectApi = (params: Record<string, unknown>) => Promise<unknown>
 import type {
   TmSelectProps,
   TmSelectExtProps,
-  TmSelectOption,
+  TmSelectOptionItem,
   TmSelectRemote,
   TmSelectApi,
   SelectProps,

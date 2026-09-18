@@ -12,7 +12,7 @@
 // 6. 未配置 remote 时直接 return，不副作用 options/loading（支持业务纯本地 options 模式）。
 // 7. 卸载时清理防抖定时器，避免组件销毁后异步回调触发。
 import { onBeforeUnmount, ref, type Ref } from 'vue'
-import type { TmSelectOption, TmSelectRemote } from '../props'
+import type { TmSelectOptionItem, TmSelectRemote } from '../props'
 
 /** useRemoteSearch 可选配置 */
 export interface UseRemoteSearchOptions {
@@ -30,7 +30,7 @@ export interface UseRemoteSearchOptions {
  * @property currentQuery 当前搜索词（即时更新，不经防抖；渲染层据此判定 searchActive）
  */
 export interface UseRemoteSearchReturn {
-  options: Ref<TmSelectOption[]>
+  options: Ref<TmSelectOptionItem[]>
   loading: Ref<boolean>
   currentQuery: Ref<string>
   search: (query: string) => Promise<void>
@@ -52,7 +52,7 @@ export function useRemoteSearch(
   const { debounce = 0, minLength = 0 } = config
 
   // 远程选项、loading 与当前搜索词：由 search 异步维护
-  const options = ref<TmSelectOption[]>([])
+  const options = ref<TmSelectOptionItem[]>([])
   const loading = ref(false)
   const currentQuery = ref('')
 

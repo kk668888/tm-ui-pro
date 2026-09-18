@@ -53,6 +53,13 @@ const spaceProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmSpace` | Space | 间距容器本体 |
+| `TmCompact` | Space.Compact | 紧凑排列：与 Space 的区别是会把相邻控件的边框/圆角合并为一体 |
+
 ### TmSpace Props
 
 <TmPropsTable :data="spaceProps" />

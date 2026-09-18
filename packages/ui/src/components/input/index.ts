@@ -5,6 +5,10 @@ import Input from './src/Input.vue'
 import { withInstall } from '../../utils/withInstall'
 
 export const TmInput = withInstall(Input, 'TmInput')
+// 组合容器：ant 顶层导出 InputGroup 别名复用（design D2）
+import { InputGroup } from 'ant-design-vue'
+
+export const TmInputGroup = withInstall(InputGroup, 'TmInputGroup')
 // 类型再导出：业务方可直接 import { TmInputProps, InputProps } from '@trustmo/tm-ui'
 export * from './src/props'
 export default TmInput

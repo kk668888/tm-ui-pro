@@ -30,6 +30,7 @@ export const install = (app: App): void => {
 // 组件 export：业务方可按需 import { TmButton, TmInput, TmSelect, TmForm, TmFormItem, TmTable } from '@trustmo/tm-ui'
 export { TmButton } from './components/button'
 export { TmInput } from './components/input'
+export { TmInputPassword } from './components/input-password'
 export { TmSelect } from './components/select'
 export { TmForm, TmFormItem } from './components/form'
 export { TmTable } from './components/table'
@@ -113,6 +114,37 @@ export {
   TmFloatButtonGroup,
   TmFloatButtonBackTop,
 } from './components/float-button'
+// ── add-missing-subcomponents 批次：有值通道组件 ──
+export { TmTextarea } from './components/textarea'
+export { TmInputSearch } from './components/input-search'
+export { TmCheckableTag } from './components/checkable-tag'
+export { TmMonthPicker } from './components/month-picker'
+export { TmWeekPicker } from './components/week-picker'
+export { TmQuarterPicker } from './components/quarter-picker'
+export { TmTimeRangePicker } from './components/time-range-picker'
+export { TmUploadDragger } from './components/upload-dragger'
+export { TmRadioButton } from './components/radio-button'
+// ── add-missing-subcomponents 批次：结构子组件（ant 顶层导出别名复用）──
+export { TmSelectOption, TmSelectOptGroup } from './components/select'
+export { TmAutoCompleteOption, TmAutoCompleteOptGroup } from './components/auto-complete'
+export { TmTreeNode } from './components/tree'
+export { TmTreeSelectNode } from './components/tree-select'
+export { TmTimelineItem } from './components/timeline'
+export { TmBadgeRibbon } from './components/badge'
+export { TmCardGrid, TmCardMeta } from './components/card'
+export {
+  TmTableColumn,
+  TmTableColumnGroup,
+  TmTableSummary,
+  TmTableSummaryRow,
+  TmTableSummaryCell,
+} from './components/table-columns'
+export { TmInputGroup } from './components/input'
+export { TmButtonGroup } from './components/button'
+export { TmCompact } from './components/space'
+export { TmFormItemRest } from './components/form'
+export { TmSkeletonTitle } from './components/skeleton'
+export { TmTypography } from './components/typography'
 // 函数式 API（非组件）：全局消息/通知命令式调用
 export { TmMessage } from './components/message'
 export { TmNotification } from './components/notification'
@@ -128,6 +160,9 @@ export {
 // 类型 export：业务方可直接 import type { TmButtonProps, InputProps, SelectProps, FormProps, TmTableProps, ... } from '@trustmo/tm-ui'
 export type { TmButtonProps, TmButtonExtProps } from './components/button'
 export type { TmInputProps, TmInputExtProps, InputProps } from './components/input'
+// 注：InputProps 已由上行 input 出口导出，input-password 的 props.ts 虽 re-export 同名类型，
+// 此处不得重复导出（TS2300 Duplicate identifier），只导出密码专属扩展类型
+export type { TmInputPasswordProps, TmInputPasswordExtProps } from './components/input-password'
 export type { TmSelectProps, TmSelectExtProps, SelectProps } from './components/select'
 export type { FormProps, FormInstance, FormItemProps, FormItemInstance } from './components/form'
 export type {
@@ -290,6 +325,17 @@ export type {
   FloatButtonGroupProps,
   BackTopProps,
 } from './components/float-button'
+// ── add-missing-subcomponents 批次类型导出 ──
+// 注：InputProps / DatePickerProps / RangePickerProps / RadioProps 已由上方既有导出承载，
+// 新模块不重复导出（TS2300 Duplicate identifier 教训，见 input-password 类型导出注释）
+export type { TmTextareaProps, TmTextareaExtProps, TextAreaProps } from './components/textarea'
+export type { TmInputSearchProps, TmInputSearchExtProps } from './components/input-search'
+export type { TmCheckableTagProps } from './components/checkable-tag'
+export type { TmMonthPickerProps, TmMonthPickerExtProps } from './components/month-picker'
+export type { TmWeekPickerProps, TmWeekPickerExtProps } from './components/week-picker'
+export type { TmQuarterPickerProps, TmQuarterPickerExtProps } from './components/quarter-picker'
+export type { TmTimeRangePickerProps, TmTimeRangePickerExtProps } from './components/time-range-picker'
+export type { TmRadioButtonProps } from './components/radio-button'
 // 校验工具类型：校验配置（以 type 判别的联合）与自定义判据签名
 export type {
   AnyValidationRuleConfig,

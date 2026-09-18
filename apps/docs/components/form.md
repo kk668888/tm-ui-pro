@@ -131,6 +131,14 @@ const formItemProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmForm` | Form | 表单本体 |
+| `TmFormItem` | Form.Item | 表单项（标签 / 校验 / 布局） |
+| `TmFormItemRest` | Form.Item 内的不受控容器 | 阻断 FormItem 对子级控件的样式与校验注入——一个表单项里要放多个控件时用它 |
+
 ### TmForm Props
 
 `TmForm` 透传 ant Form 全部 props，另增三个公司扩展键：

@@ -46,6 +46,13 @@ const buttonProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmButton` | Button | 按钮本体 |
+| `TmButtonGroup` | Button.Group | 按钮组：相邻按钮共享边框，仅首尾保留圆角 |
+
 ### TmButton Props
 
 <TmPropsTable :data="buttonProps" />

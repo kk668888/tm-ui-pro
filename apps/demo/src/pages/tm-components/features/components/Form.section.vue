@@ -7,8 +7,19 @@ import {
   type FormInstance,
   TmButton,
   TmInput,
-  TmInputNumber,
+  TmInputPassword,
+  TmTextarea,
+  TmInputSearch,
   TmSelect,
+  TmSelectOption,
+  TmMonthPicker,
+  TmWeekPicker,
+  TmQuarterPicker,
+  TmTimeRangePicker,
+  TmCheckableTag,
+  TmUploadDragger,
+  TmRadioButton,
+  TmInputNumber,
   TmRadioGroup,
   TmCheckboxGroup,
   TmSwitch,
@@ -36,6 +47,7 @@ defineOptions({ name: 'FormSection' });
 
 // ── 基础控件 v-model 回显 ─────────────────────────────
 const name = ref('');
+const password = ref('');
 const age = ref(30);
 const fruit = ref<string>('apple');
 const role = ref('admin');
@@ -108,6 +120,17 @@ const hostIp = ref('192.168.1.1');
 
 // ── TmInputMac：六段式 MAC 输入（segment 系第二位，blur 归一化后 emit 规范大写串）──
 const hostMac = ref('0A:1B:2C:3D:4E:5F');
+
+// ── add-missing-subcomponents 批次演示 ──
+const intro = ref('');
+const searchKw = ref('');
+const monthVal = ref('2026-09');
+const weekVal = ref('');
+const quarterVal = ref('');
+const timeRangeVal = ref(['09:00', '18:00'] as [string, string]);
+const checkableOn = ref(true);
+const draggerList = ref<UploadFile[]>([]);
+const btnRadioVal = ref('a');
 
 // ── 补充控件：AutoComplete/Checkbox/Mentions/Radio/Rate/Slider/Transfer/Tree ──
 const acValue = ref('');
@@ -199,6 +222,10 @@ function onReset() {
           <span class="ml-2 text-secondary">name={{ name || '空' }}</span>
         </a-col>
         <a-col :xs="24" :md="12">
+          <TmInputPassword v-model="password" placeholder="请输入密码" />
+          <span class="ml-2 text-secondary">password={{ password ? '***' : '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
           <TmInputNumber v-model="age" :min="0" :max="100" />
           <span class="ml-2 text-secondary">age={{ age }}</span>
         </a-col>
@@ -251,6 +278,30 @@ function onReset() {
         <a-col :xs="24" :md="12">
           <TmInputMac v-model="hostMac" style="max-width: 260px" />
           <span class="ml-2 text-secondary">hostMac={{ hostMac || "''（未补齐）" }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmTextarea v-model="intro" placeholder="请输入简介" :autosize="{ minRows: 2, maxRows: 4 }" />
+          <span class="ml-2 text-secondary">intro={{ intro || '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmInputSearch v-model="searchKw" placeholder="搜索关键词" enter-button style="max-width: 260px" />
+          <span class="ml-2 text-secondary">kw={{ searchKw || '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmMonthPicker v-model="monthVal" value-format="YYYY-MM" style="width: 200px" />
+          <span class="ml-2 text-secondary">month={{ monthVal || '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmWeekPicker v-model="weekVal" style="width: 200px" />
+          <span class="ml-2 text-secondary">week={{ weekVal || '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmQuarterPicker v-model="quarterVal" style="width: 200px" />
+          <span class="ml-2 text-secondary">quarter={{ quarterVal || '空' }}</span>
+        </a-col>
+        <a-col :xs="24" :md="12">
+          <TmTimeRangePicker v-model="timeRangeVal" value-format="HH:mm" style="width: 240px" />
+          <span class="ml-2 text-secondary">timeRange={{ timeRangeVal?.join('~') || '空' }}</span>
         </a-col>
       </a-row>
 
@@ -340,6 +391,44 @@ function onReset() {
         <p class="mb-2 text-xs text-secondary">TmTree：树（勾选受控 checkedKeys）。</p>
         <TmTree v-model:checked-keys="treeCheckedKeys" :tree-data="treeData" checkable style="max-width: 300px" />
         <span class="ml-2 text-secondary">checked={{ treeCheckedKeys.join('、') }}</span>
+      </a-space>
+
+      <a-space direction="vertical" :size="4">
+        <p class="mb-2 text-xs text-secondary">TmCheckableTag：可选中标签（v-model:checked）。</p>
+        <a-space>
+          <TmCheckableTag v-model:checked="checkableOn">关注中</TmCheckableTag>
+        </a-space>
+        <span class="ml-2 text-secondary">checked={{ checkableOn }}</span>
+      </a-space>
+
+      <a-space direction="vertical" :size="4">
+        <p class="mb-2 text-xs text-secondary">TmUploadDragger：拖拽上传区（v-model:file-list）。</p>
+        <TmUploadDragger v-model:file-list="draggerList" action="/api/upload" style="max-width: 480px">
+          <p>点击或拖拽文件到此区域上传</p>
+        </TmUploadDragger>
+        <span class="ml-2 text-secondary">files={{ draggerList.length }}</span>
+      </a-space>
+
+      <a-space direction="vertical" :size="4">
+        <p class="mb-2 text-xs text-secondary">
+          TmSelectOption：Select 模板子组件写法（与 options prop 等价）。
+        </p>
+        <TmSelect v-model="fruit" style="width: 200px">
+          <TmSelectOption value="apple">苹果</TmSelectOption>
+          <TmSelectOption value="banana">香蕉</TmSelectOption>
+        </TmSelect>
+        <span class="ml-2 text-secondary">fruit={{ fruit }}</span>
+      </a-space>
+
+      <a-space direction="vertical" :size="4">
+        <p class="mb-2 text-xs text-secondary">
+          TmRadioButton：按钮态单选（经 ant 原生 RadioGroup 使用——TmRadioGroup 走上方 options 演示）。
+        </p>
+        <a-radio-group v-model:value="btnRadioVal">
+          <TmRadioButton value="a">按年</TmRadioButton>
+          <TmRadioButton value="b">按季</TmRadioButton>
+        </a-radio-group>
+        <span class="ml-2 text-secondary">value={{ btnRadioVal }}</span>
       </a-space>
 
       <a-divider orientation="left">字段联动 Field Linking</a-divider>

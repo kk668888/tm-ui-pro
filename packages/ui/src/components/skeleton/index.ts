@@ -12,6 +12,10 @@ export const TmSkeletonAvatar = withInstall(SkeletonAvatar, 'TmSkeletonAvatar')
 export const TmSkeletonImage = withInstall(SkeletonImage, 'TmSkeletonImage')
 export const TmSkeletonInput = withInstall(SkeletonInput, 'TmSkeletonInput')
 export const TmSkeletonButton = withInstall(SkeletonButton, 'TmSkeletonButton')
+// 标题条：ant 顶层导出 SkeletonTitle 别名复用（design D2）
+import { SkeletonTitle } from 'ant-design-vue'
+
+export const TmSkeletonTitle = withInstall(SkeletonTitle, 'TmSkeletonTitle')
 
 // 类型再导出：业务方可直接 import { TmSkeletonProps, TmSkeletonAvatarProps, SkeletonProps } from '@trustmo/tm-ui'
 export * from './src/props'

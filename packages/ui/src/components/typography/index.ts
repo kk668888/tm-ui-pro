@@ -14,6 +14,10 @@ export const TmTypographyTitle = withInstall(Title, 'TmTypographyTitle')
 export const TmTypographyParagraph = withInstall(Paragraph, 'TmTypographyParagraph')
 export const TmTypographyText = withInstall(Text, 'TmTypographyText')
 export const TmTypographyLink = withInstall(Link, 'TmTypographyLink')
+// 排版本体：ant 顶层导出 Typography 别名复用（design D3——仅补本体，子组件已有导出）
+import { Typography } from 'ant-design-vue'
+
+export const TmTypography = withInstall(Typography, 'TmTypography')
 
 // 类型透传：业务方可直接 import { TmTypographyTitleProps, TitleProps, ... } from '@trustmo/tm-ui'
 export type {

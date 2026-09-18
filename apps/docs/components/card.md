@@ -27,6 +27,14 @@ const props = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmCard` | Card | 卡片本体 |
+| `TmCardGrid` | Card.Grid | 卡片内栅格块（悬停有反馈，常用于卡片内的网格导航） |
+| `TmCardMeta` | Card.Meta | 卡片元信息（头像 + 标题 + 描述） |
+
 ### TmCard Props
 
 <TmPropsTable :data="props" />

@@ -4,6 +4,20 @@
 // 未配置 valueFormat：modelValue 为 Dayjs（单）/ [Dayjs,Dayjs]（区间），零转换直通。
 // 配置 valueFormat：业务 modelValue 为字符串（单）/ [string,string]（区间），
 // get 用 dayjs(v, valueFormat) 转 Dayjs 交给 ant，set 用 Dayjs.format(valueFormat) 转回字符串 emit。
+//
+// ── 关于 dayjs 插件依赖（2026-09-18 复核记录，勿「顺手删注释」）─────────────
+// 「按格式解析」dayjs(str, format) 与部分 token 的输出依赖 dayjs 插件：
+//   · customParseFormat —— 非 ISO 串的按格式解析（如 '09:00' + HH:mm）
+//   · advancedFormat + weekOfYear —— `Q`（季度）/ `wo`（周序号）等 token 的格式化输出
+// 本文件不自行 extend，依赖的是 ant-design-vue 模块加载时的副作用已完成扩展。
+// 实测（node，packages/ui 内）：未加载 ant 时 dayjs('09:00','HH:mm').isValid() === false、
+// dayjs('2026-09-01').format('YYYY-wo') === '2026-wo'（token 退化为字面量）；仅 require
+// 'ant-design-vue' 后分别变为 true 与 '2026-36th' —— 即 ant 已扩展所需插件。
+// 组件侧安全：Tm 日期组件都从 'ant-design-vue' 导入，其模块体先于任何日期解析执行。
+// 风险边界：在不加载 ant-design-vue 的纯 node 脚本里直接调本 composable 解析/格式化，
+// 插件未扩展会静默降级——那种场景需在入口自行 dayjs.extend(customParseFormat) 等。
+// 回归防线：WeekPicker/QuarterPicker/TimeRangePicker 的 spec 断言**真实往返值**（不能只断言
+// dayjs.isDayjs —— Invalid Date 同样是 Dayjs 对象，那样断言会漏掉本问题）。
 import { computed, type ComputedRef } from 'vue'
 import dayjs, { type Dayjs } from 'dayjs'
 

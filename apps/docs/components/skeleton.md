@@ -33,6 +33,7 @@ const props = [
 - `TmSkeletonImage`：骨架图片占位。
 - `TmSkeletonInput`：骨架输入框占位（`size`）。
 - `TmSkeletonButton`：骨架按钮占位（`size` / `shape` / `block`）。
+- `TmSkeletonTitle`：骨架标题占位（`width` / `class`）——单独使用可在自定义骨架结构里拼装标题条。
 
 ## API
 

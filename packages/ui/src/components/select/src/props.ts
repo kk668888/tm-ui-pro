@@ -9,8 +9,16 @@
 //   两侧类型完全一致，避免单选/多选/labelInValue 模式下的类型摩擦。
 import type { SelectProps } from 'ant-design-vue'
 
-/** 远程选项数据结构（label/value 两字段最小契约，业务可按需扩展） */
-export interface TmSelectOption {
+/**
+ * 远程选项数据结构（label/value 两字段最小契约，业务可按需扩展）
+ *
+ * 命名说明（2026-09-18，add-missing-subcomponents）：原名 TmSelectOption 与新增的
+ * 下拉选项组件 `<TmSelectOption>`（ant SelectOption 别名，见 src/options.ts）撞名——
+ * 同一模块不允许同名值与类型并列导出（TS2300）。按「组件名对齐 ant 生态」优先，本类型更名
+ * 为 TmSelectOptionItem（语义也更准确：它是 options 数组项的数据结构）。
+ * 迁移：`import type { TmSelectOptionItem as TmSelectOption }` 或直接改用新名。
+ */
+export interface TmSelectOptionItem {
   label: string
   value: string | number
 }
@@ -19,7 +27,7 @@ export interface TmSelectOption {
  * 远程搜索函数签名
  * 业务方传入该函数后，TmSelect 启用远程模式：用户输入触发 @search → 调用 remote → 自动填充 options
  */
-export type TmSelectRemote = (query: string) => Promise<TmSelectOption[]>
+export type TmSelectRemote = (query: string) => Promise<TmSelectOptionItem[]>
 
 /**
  * api 请求函数签名（获取数据模式）
@@ -44,7 +52,7 @@ export interface TmSelectExtProps {
   /** 挂载加载函数，传入则挂载时调用一次获取初始列表（获取数据模式，与 remote 搜索语义独立） */
   api?: TmSelectApi
   /** 完全自定义响应 → 选项映射，优先级最高；未提供时按常见格式智能识别 */
-  resultMap?: (res: unknown) => TmSelectOption[]
+  resultMap?: (res: unknown) => TmSelectOptionItem[]
   /** 远程搜索防抖毫秒（仅 remote 模式生效），默认 300 */
   debounce?: number
   /** 远程搜索最小输入长度（仅 remote 模式生效），默认 1 */

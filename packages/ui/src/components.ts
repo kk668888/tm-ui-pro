@@ -8,6 +8,7 @@
 //   杜绝「漏注册无编译错误无测试兜底」的历史隐患。
 import { TmButton } from './components/button'
 import { TmInput } from './components/input'
+import { TmInputPassword } from './components/input-password'
 import { TmSelect } from './components/select'
 import { TmForm, TmFormItem } from './components/form'
 import { TmTable } from './components/table'
@@ -91,6 +92,37 @@ import {
   TmFloatButtonGroup,
   TmFloatButtonBackTop,
 } from './components/float-button'
+// ── add-missing-subcomponents 批次：有值通道组件（完整封装）──
+import { TmTextarea } from './components/textarea'
+import { TmInputSearch } from './components/input-search'
+import { TmCheckableTag } from './components/checkable-tag'
+import { TmMonthPicker } from './components/month-picker'
+import { TmWeekPicker } from './components/week-picker'
+import { TmQuarterPicker } from './components/quarter-picker'
+import { TmTimeRangePicker } from './components/time-range-picker'
+import { TmUploadDragger } from './components/upload-dragger'
+import { TmRadioButton } from './components/radio-button'
+// ── add-missing-subcomponents 批次：结构子组件（ant 顶层导出别名复用）──
+import { TmSelectOption, TmSelectOptGroup } from './components/select'
+import { TmAutoCompleteOption, TmAutoCompleteOptGroup } from './components/auto-complete'
+import { TmTreeNode } from './components/tree'
+import { TmTreeSelectNode } from './components/tree-select'
+import { TmTimelineItem } from './components/timeline'
+import { TmBadgeRibbon } from './components/badge'
+import { TmCardGrid, TmCardMeta } from './components/card'
+import {
+  TmTableColumn,
+  TmTableColumnGroup,
+  TmTableSummary,
+  TmTableSummaryRow,
+  TmTableSummaryCell,
+} from './components/table-columns'
+import { TmInputGroup } from './components/input'
+import { TmButtonGroup } from './components/button'
+import { TmCompact } from './components/space'
+import { TmFormItemRest } from './components/form'
+import { TmSkeletonTitle } from './components/skeleton'
+import { TmTypography } from './components/typography'
 import type { Plugin } from 'vue'
 
 /**
@@ -100,6 +132,7 @@ import type { Plugin } from 'vue'
 export const tmComponents: readonly Plugin[] = [
   TmButton,
   TmInput,
+  TmInputPassword,
   TmSelect,
   TmForm,
   TmFormItem,
@@ -203,4 +236,35 @@ export const tmComponents: readonly Plugin[] = [
   TmFloatButtonBackTop,
   TmInputIp,
   TmInputMac,
+  // ── add-missing-subcomponents 批次（30 项能力，design D1/D2 分类实现）──
+  TmTextarea,
+  TmInputSearch,
+  TmCheckableTag,
+  TmMonthPicker,
+  TmWeekPicker,
+  TmQuarterPicker,
+  TmTimeRangePicker,
+  TmUploadDragger,
+  TmRadioButton,
+  TmSelectOption,
+  TmSelectOptGroup,
+  TmAutoCompleteOption,
+  TmAutoCompleteOptGroup,
+  TmTreeNode,
+  TmTreeSelectNode,
+  TmTimelineItem,
+  TmBadgeRibbon,
+  TmCardGrid,
+  TmCardMeta,
+  TmTableColumn,
+  TmTableColumnGroup,
+  TmTableSummary,
+  TmTableSummaryRow,
+  TmTableSummaryCell,
+  TmInputGroup,
+  TmButtonGroup,
+  TmCompact,
+  TmFormItemRest,
+  TmSkeletonTitle,
+  TmTypography,
 ]

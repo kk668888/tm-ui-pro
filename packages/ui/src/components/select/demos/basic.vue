@@ -2,11 +2,11 @@
 <!-- TmSelect 基础演示：本地 options + v-model，以及 remote 远程搜索两种用法 -->
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TmSelect, type TmSelectOption, type TmSelectRemote } from '../index'
+import { TmSelect, type TmSelectOptionItem, type TmSelectRemote } from '../index'
 
 // 用法一：本地 options + 标准 v-model（业务 modelValue ↔ ant value 自动桥接）
 const local = ref<string | number>('apple')
-const localOptions: TmSelectOption[] = [
+const localOptions: TmSelectOptionItem[] = [
   { label: '苹果', value: 'apple' },
   { label: '香蕉', value: 'banana' },
   { label: '橙子', value: 'orange' },

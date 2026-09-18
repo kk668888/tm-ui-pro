@@ -29,6 +29,13 @@ const props = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmTimeline` | Timeline | 时间轴本体 |
+| `TmTimelineItem` | Timeline.Item | 时间轴节点（模板子组件写法；配置驱动仍推荐 `items` prop） |
+
 ### TmTimeline Props
 
 <TmPropsTable :data="props" />

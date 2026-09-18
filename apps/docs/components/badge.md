@@ -48,6 +48,13 @@ const badgeProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmBadge` | Badge | 徽标本体 |
+| `TmBadgeRibbon` | Badge.Ribbon | 缎带：包裹内容并在右上角斜向展示状态文案 |
+
 ### TmBadge Props
 
 <TmPropsTable :data="badgeProps" />

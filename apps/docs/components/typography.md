@@ -14,6 +14,9 @@
 <script setup>
 import TypographyDemo from '../../../packages/ui/src/components/typography/demos/basic.vue'
 import TypographyDemoCode from '../../../packages/ui/src/components/typography/demos/basic.vue?raw'
+// TmTypography 本体 demo（用于页面末尾「TmTypography 本体」小节）
+import TypographyBaseDemo from '../../../packages/ui/src/components/typography/demos/base-component.vue'
+import TypographyBaseDemoCode from '../../../packages/ui/src/components/typography/demos/base-component.vue?raw'
 
 const titleProps = [
   {
@@ -74,3 +77,22 @@ const textProps = [
 ### Methods
 
 业务侧通过 `ref` 可访问内部 ant Typography 各实例（经 `useForwardRef` 透传）。
+
+## TmTypography 本体
+
+`TmTypography` 是 ant `Typography` 本体的库内别名（2026-09-18 补齐），与上方四个子组件导出并存——可作为容器承载一段混排排版内容，也可用 `component` 改写容器的渲染标签。
+
+<DemoBlock :code="TypographyBaseDemoCode">
+  <TypographyBaseDemo />
+</DemoBlock>
+
+### TmTypography 本体 Props
+
+| 属性 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| `component` | 容器渲染标签（如 `article` / `blockquote`；未传时渲染 `div`） | string | `-` |
+| 其余属性 | 透传 ant Typography 本体全部 props / slots / events | TypographyProps | `-` |
+
+### 其余能力
+
+透传 ant 原生全部 props / slots / events，无公司扩展键、无公司默认值；完整清单见 [ant-design-vue Typography 文档](https://www.antdv.com/components/typography-cn)。

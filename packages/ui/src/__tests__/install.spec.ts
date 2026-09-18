@@ -12,7 +12,9 @@ describe('@trustmo/tm-ui install 全量注册', () => {
   it('tmComponents 数组非空且每个元素都是可 install 的插件', () => {
     expect(tmComponents.length).toBeGreaterThan(50)
     for (const comp of tmComponents) {
-      expect(typeof comp).toBe('object')
+      // object（SFC/defineComponent）或 function（ant 部分子组件是函数式组件，
+      // add-missing-subcomponents 别名复用后原样进入数组）都是合法 Vue 组件
+      expect(['object', 'function']).toContain(typeof comp)
       expect(typeof (comp as { install?: unknown }).install).toBe('function')
     }
   })

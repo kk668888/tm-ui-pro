@@ -43,6 +43,13 @@ const radioProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmRadioGroup` | Radio.Group | 单选组本体（推荐用 `options` prop 驱动） |
+| `TmRadioButton` | Radio.Button | 按钮态单选（值单元）；模板 children 组合请配**原生** `a-radio-group`，原因见 RadioButton 页 |
+
 ### TmRadioGroup Props
 
 <TmPropsTable :data="radioProps" />

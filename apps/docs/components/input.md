@@ -40,6 +40,13 @@ const inputProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmInput` | Input | 输入框本体 |
+| `TmInputGroup` | Input.Group | 紧凑组合：多个控件贴合成一体，去掉中间重复的边框与圆角 |
+
 ### TmInput Props
 
 <TmPropsTable :data="inputProps" />

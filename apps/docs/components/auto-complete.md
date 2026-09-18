@@ -32,6 +32,14 @@ const props = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmAutoComplete` | AutoComplete | 自动完成本体 |
+| `TmAutoCompleteOption` | AutoComplete.Option | 模板子组件写法的选项项 |
+| `TmAutoCompleteOptGroup` | AutoComplete.OptGroup | 模板子组件写法的选项分组 |
+
 ### TmAutoComplete Props
 
 <TmPropsTable :data="props" />

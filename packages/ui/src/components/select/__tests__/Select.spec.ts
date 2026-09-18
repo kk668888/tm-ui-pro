@@ -17,7 +17,7 @@ import { mount } from '@vue/test-utils'
 import { h, nextTick, reactive } from 'vue'
 import TmSelect from '../src/Select.vue'
 import { TmForm, TmFormItem } from '../../form/index'
-import type { TmSelectOption } from '../src/props'
+import type { TmSelectOptionItem } from '../src/props'
 
 /**
  * 等待微任务 + Vue 重新渲染。
@@ -145,8 +145,9 @@ describe('TmSelect', () => {
     // debounce: 0 关闭防抖，保持即时取数语义（防抖合并单独在专属用例中覆盖）
     const wrapper = mount(TmSelect, { props: { remote, debounce: 0 } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
-    // 初始：远程未取数，options 为空
-    expect(inner.props('options')).toEqual([])
+    // 初始：远程未取数且业务未传 options → 下发 undefined（不下发空数组：
+    // 空数组是 truthy 会让 ant 判定 options 模式、禁用 <TmSelectOption> children 模式）
+    expect(inner.props('options')).toBeUndefined()
 
     // 模拟用户输入触发 ant Select 的 search 事件（真实 UX 链路）
     ;(inner.vm as unknown as { $emit: (e: string, ...a: unknown[]) => void }).$emit(
@@ -168,10 +169,10 @@ describe('TmSelect', () => {
     // 避免用户快速连续输入时旧响应覆盖新响应（A 先发、A 后到 → 旧结果污染）。
     //
     // 设计：用可控 promise 手动决定 resolve 顺序，模拟「B 先到、A 后到」的乱序场景。
-    let resolveA!: (v: TmSelectOption[]) => void
-    let resolveB!: (v: TmSelectOption[]) => void
-    const promiseA = new Promise<TmSelectOption[]>((r) => (resolveA = r))
-    const promiseB = new Promise<TmSelectOption[]>((r) => (resolveB = r))
+    let resolveA!: (v: TmSelectOptionItem[]) => void
+    let resolveB!: (v: TmSelectOptionItem[]) => void
+    const promiseA = new Promise<TmSelectOptionItem[]>((r) => (resolveA = r))
+    const promiseB = new Promise<TmSelectOptionItem[]>((r) => (resolveB = r))
     // remote 第 1 次（query='A'）→ promiseA；第 2 次（query='B'）→ promiseB
     const remote = vi
       .fn()
@@ -237,10 +238,10 @@ describe('TmSelect', () => {
     // 锁定 Select.vue 的 loading 合并逻辑：Boolean(props.loading) || loadingState.value
     // 业务侧通过 loading prop 显式置 true 时，即便远程请求 in flight / 完成，
     // 合并后始终为 true（业务 loading 不被远程 loading 复位覆盖）。
-    let resolveRemote!: (v: TmSelectOption[]) => void
+    let resolveRemote!: (v: TmSelectOptionItem[]) => void
     const remote = vi
       .fn()
-      .mockReturnValue(new Promise<TmSelectOption[]>((r) => (resolveRemote = r)))
+      .mockReturnValue(new Promise<TmSelectOptionItem[]>((r) => (resolveRemote = r)))
     const wrapper = mount(TmSelect, { props: { remote, loading: true, debounce: 0 } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
 
@@ -338,8 +339,8 @@ describe('TmSelect', () => {
     )
     await flush()
     expect(remote).not.toHaveBeenCalled()
-    // options 回退基础列表（未配置 api/本地 options → 空数组兜底）
-    expect(inner.props('options')).toEqual([])
+    // options 回退基础列表（未配置 api/本地 options → undefined 下发，同上：保留 children 模式）
+    expect(inner.props('options')).toBeUndefined()
   })
 
   it('防抖合并：快速连续输入只发一次请求、使用最终完整词', async () => {
@@ -391,10 +392,10 @@ describe('TmSelect', () => {
   })
 
   it('loading 合并：api 加载期间 loading 为 true、完成后复位', async () => {
-    let resolveApi!: (v: TmSelectOption[]) => void
+    let resolveApi!: (v: TmSelectOptionItem[]) => void
     const api = vi
       .fn()
-      .mockReturnValue(new Promise<TmSelectOption[]>((r) => (resolveApi = r)))
+      .mockReturnValue(new Promise<TmSelectOptionItem[]>((r) => (resolveApi = r)))
     const wrapper = mount(TmSelect, { props: { api } })
     const inner = wrapper.findComponent({ name: 'ASelect' })
     await nextTick()

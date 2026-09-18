@@ -1,8 +1,12 @@
 # Tree 树形控件
 
-基于 [ant-design-vue](https://www.antdv.com/components/tree-cn) Tree 的薄封装。导出 `TmTree` / `TmDirectoryTree`，节点一律用 `treeData` 配置驱动。
+基于 [ant-design-vue](https://www.antdv.com/components/tree-cn) Tree 的薄封装。导出 `TmTree` / `TmDirectoryTree`，另有模板子组件 `TmTreeNode`。
 
-> ⚠️ **节点用 `treeData` 配置**：ant 的遗留子组件 API（`<Tree><TreeNode/></Tree>`）经薄封装会被 ant `treeUtil` 递归处理破坏，故不导出 `TmTreeNode`。业务用 `:tree-data` 数组配置节点。
+> **节点两种写法都支持**：
+> 1. `treeData` 配置驱动（推荐，见下方 demo）——动态加载、大数据量、接口数据场景。
+> 2. `<TmTreeNode>` 模板子组件（见 [TreeNode](./tree-node.md)）——层级固定的枚举树。
+>
+> 历史上曾因薄封装 `wrapper` 破坏 ant `treeUtil` 递归识别而**不导出** `TmTreeNode`；本次改为 ant 顶层导出**别名复用**（`vnode.type` 全等、内部标记不丢），识别不再经过包裹层，该写法已由集成测试锁定。
 
 ## 何时使用
 
@@ -36,6 +40,7 @@ const props = [
 | --- | --- |
 | `TmTree` | Tree |
 | `TmDirectoryTree` | DirectoryTree（目录树） |
+| `TmTreeNode` | TreeNode（模板子组件，见 [TreeNode](./tree-node.md)） |
 
 ### TmTree Props
 

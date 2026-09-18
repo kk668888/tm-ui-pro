@@ -1,11 +1,11 @@
 // packages/ui/src/components/select/src/utils/mapApiResponse.ts
-// 响应 → options 纯函数映射：把 api 返回的任意结构规整为 TmSelectOption[]
+// 响应 → options 纯函数映射：把 api 返回的任意结构规整为 TmSelectOptionItem[]
 //
 // 设计要点：
 // 1. 纯函数、无副作用、无组件依赖，便于独立单测。
 // 2. 映射优先级：resultMap（完全自定义）> fieldNames（字段名映射）> 常见格式智能识别。
 // 3. 智能识别仅匹配「数组直接位于常见 key」的形态，不做深度递归，避免误判嵌套业务数据。
-import type { TmSelectFieldNames, TmSelectOption } from '../props'
+import type { TmSelectFieldNames, TmSelectOptionItem } from '../props'
 
 /** 智能识别的候选路径（从响应顶层逐级取数组） */
 const DATA_PATHS: ReadonlyArray<ReadonlyArray<string>> = [
@@ -44,12 +44,12 @@ function extractArray(res: unknown): unknown[] | undefined {
  * @param options     映射配置
  * @param options.resultMap  完全自定义映射，提供后直接以其返回值作为选项（最高优先）
  * @param options.fieldNames 响应元素字段名映射，默认 label/value
- * @returns TmSelectOption[]，无法识别时返回空数组
+ * @returns TmSelectOptionItem[]，无法识别时返回空数组
  */
 export function mapApiResponse(
   res: unknown,
-  options: { resultMap?: (res: unknown) => TmSelectOption[]; fieldNames?: TmSelectFieldNames },
-): TmSelectOption[] {
+  options: { resultMap?: (res: unknown) => TmSelectOptionItem[]; fieldNames?: TmSelectFieldNames },
+): TmSelectOptionItem[] {
   const { resultMap, fieldNames } = options
 
   // 1) resultMap 完全自定义：优先级最高

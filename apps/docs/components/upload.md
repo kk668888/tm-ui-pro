@@ -30,6 +30,13 @@ const uploadProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmUpload` | Upload | 上传本体 |
+| `TmUploadDragger` | Upload.Dragger | 拖拽上传区（独立组件目录，同一套 `v-model:file-list` 契约） |
+
 ### TmUpload Props
 
 <TmPropsTable :data="uploadProps" />

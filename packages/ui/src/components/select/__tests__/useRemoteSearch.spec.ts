@@ -9,16 +9,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { defineComponent, h, onMounted } from 'vue'
 import { mount } from '@vue/test-utils'
 import { useRemoteSearch } from '../src/composables/useRemoteSearch'
-import type { TmSelectOption } from '../src/props'
+import type { TmSelectOptionItem } from '../src/props'
 
 /** 受控延迟的 remote 函数：手动 resolve，模拟乱序响应 */
 function createDeferredRemote() {
   const pending: Array<{
     query: string
-    resolve: (opts: TmSelectOption[]) => void
+    resolve: (opts: TmSelectOptionItem[]) => void
   }> = []
   const remote = vi.fn((query: string) => {
-    return new Promise<TmSelectOption[]>((resolve) => {
+    return new Promise<TmSelectOptionItem[]>((resolve) => {
       pending.push({ query, resolve })
     })
   })

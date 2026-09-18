@@ -123,6 +123,13 @@ vxe 原生行编辑经薄封装直接透传：`edit-config` + 列 `editRender`�
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmTable` | 基于 **vxe-table** 封装 | 业务表格（即本页） |
+| `TmTableColumn` / `TmTableColumnGroup` / `TmTableSummary` / `TmTableSummaryRow` / `TmTableSummaryCell` | ant Table 模板列五件套 | **仅对原生 `<a-table>` 有效**——`TmTable` 基于 vxe，不消费这些子组件，两者不要混用；详见 TableColumn 页 |
+
 ### TmTable Props
 
 <TmPropsTable :data="tableProps" />

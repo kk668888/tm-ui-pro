@@ -132,10 +132,12 @@ const searchActive = computed(
   () => props.remote !== undefined && currentQuery.value.length >= props.minLength,
 )
 
-// baseOptions：api 模式用 api 挂载结果，否则本地业务 options（搜索未激活时的常驻列表）
-// 兜底为空数组，保证传给 ant 的 options 恒为数组（避免 undefined 下发）
+// baseOptions：api 模式用 api 挂载结果，否则本地业务 options
+// 未传 options 时保持 undefined（不下发空数组）：ant 以 `!options && children` 判定
+// childrenAsData——空数组是 truthy 会禁用 <TmSelectOption> 模板子组件模式（回显原始值）；
+// undefined 下发无副作用（vc-select 合法状态），api 模式不受影响（apiOptions 恒为数组）
 const baseOptions = computed(() =>
-  props.api !== undefined ? apiOptions.value : (props.options ?? []),
+  props.api !== undefined ? apiOptions.value : props.options,
 )
 
 /**

@@ -14,6 +14,11 @@ import { withInstall } from '../../utils/withInstall'
 export const TmForm = withInstall(Form, 'TmForm')
 export const TmFormItem = withInstall(FormItem, 'TmFormItem')
 
+// 表单采集豁免区：ant 顶层导出 FormItemRest 别名复用（design D2）
+import { FormItemRest } from 'ant-design-vue'
+
+export const TmFormItemRest = withInstall(FormItemRest, 'TmFormItemRest')
+
 // 类型透传：业务方可直接 import { FormProps, FormInstance, FormItemProps, TmFormProps } from '@trustmo/tm-ui'
 export type { FormProps, FormInstance, FormItemProps, FormItemInstance } from 'ant-design-vue'
 export type { TmFormProps, TmFormExtProps } from './src/props'

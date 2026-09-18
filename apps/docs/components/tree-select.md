@@ -42,6 +42,13 @@ const treeSelectProps = [
 
 ## API
 
+### 子组件映射
+
+| Tm 组件 | 对应 ant | 说明 |
+| --- | --- | --- |
+| `TmTreeSelect` | TreeSelect | 树选择本体 |
+| `TmTreeSelectNode` | TreeSelect.TreeNode | 模板子组件写法的节点（复杂树仍推荐配置驱动的 `tree-data`） |
+
 ### TmTreeSelect Props
 
 <TmPropsTable :data="treeSelectProps" />
