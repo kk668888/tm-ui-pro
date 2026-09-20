@@ -28,3 +28,9 @@ coverage
 publish-to-nexus.sh
 demo2
 Todo.md
+
+# 内外网同步发布包（Export-GitBundle.ps1 的输出目录）。
+# 内含 bundle（体积大）+ manifest.json，属于「可再生产物」：只要提交历史还在，
+# 任何时候都能重新导出，没必要入库；而且 bundle 是二进制，每次发布都会让仓库膨胀。
+# 前导斜杠表示只匹配仓库根目录，避免误伤子包中同名的 release 目录。
+/release/
