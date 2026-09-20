@@ -37,7 +37,7 @@
 ```powershell
 # 解法 1：用 Bypass 启动一个新 PowerShell 来跑（一次性，最安全）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Export-GitBundle.ps1 `
-    -RepositoryPath . -OutputPath ..\release -Initial
+    -RepositoryPath . -Initial
 
 # 解法 2：只把当前窗口放宽（关掉窗口就恢复）
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
@@ -48,13 +48,13 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ## 02 参数表
 
 ```powershell
-.\scripts\Export-GitBundle.ps1 -RepositoryPath <路径> -OutputPath <路径> [-Branch 分支] [-Initial] [-ReleaseName 文件名]
+.\scripts\Export-GitBundle.ps1 -RepositoryPath <路径> [-OutputPath <目录>] [-Branch 分支] [-Initial] [-ReleaseName 文件名]
 ```
 
 | 参数 | 必填 | 默认 | 说明 |
 | --- | --- | --- | --- |
 | `-RepositoryPath` | ✅ | — | 要发布哪个仓库（就是你的工作目录，通常写 `.`） |
-| `-OutputPath` | ✅ | — | 包放哪。**目录不存在会自动建**；已存在则必须**是空的** |
+| `-OutputPath` | | `<仓库>\release\<时间戳>` | 包放哪。省略时自动生成到仓库内的 `release\<时间戳>\`（该目录已 gitignore）。**目录不存在会自动建**；已存在则必须**是空的** |
 | `-Branch` | | `trust` | 发布哪个分支。本仓库工作分支就是 `trust` |
 | `-Initial` | | 不加 | **只在第一次发布时加**。作用：把锚点 `sync/extranet-anchor` 定在当前提交 |
 | `-ReleaseName` | | `bundle` | bundle 的文件名。想一眼看懂可以写 `-ReleaseName 'tm-ui-2026-09-20.bundle'` |
@@ -84,11 +84,11 @@ d3f166c chore(scripts): Git bundle 同步脚本对齐本仓库并补三处防护
 确认无误后发首包：
 
 ```powershell
-.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release-initial -Initial
+.\scripts\Export-GitBundle.ps1 -RepositoryPath . -Initial
 ```
 
 ```text
-Release created: E:\Project\2026_my_project\release-initial
+Release created: E:\Project\2026_my_project\tm-ui-new\release\2026-09-20-152509
 Source commit: 693453a97d6c6d48de3ca74f95538a879234b6ac
 ```
 
@@ -134,11 +134,11 @@ sync/extranet-anchor
 ```powershell
 git status                                   # ① 干净吗
 git log --oneline -3                         # ② 发了些什么
-.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release-2   # ③ 打包
+.\scripts\Export-GitBundle.ps1 -RepositoryPath .                           # ③ 打包
 ```
 
 ```text
-Release created: E:\Project\2026_my_project\release-2
+Release created: E:\Project\2026_my_project\tm-ui-new\release\2026-09-27-101530
 Source commit: c94dc1ff703f1f7228b15cb60894f9d14c9e43da
 ```
 
@@ -278,10 +278,16 @@ git log --oneline -3          # 确认有没有新提交
 
 输出目录里已经有东西了（大概率是上一次的包）。**这是防你传错版本。**
 
-换个目录：
+**用默认路径时不会遇到这条** —— 默认目录自带时间戳，每次都是全新的。只有你显式传了 `-OutputPath`、而它正好非空时才会报。
+
+两个解法：
 
 ```powershell
-.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release-3
+# 解法 1：省略 -OutputPath，让脚本自己建带时间戳的新目录
+.\scripts\Export-GitBundle.ps1 -RepositoryPath .
+
+# 解法 2：换一个明确的新目录
+.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath .\release-demo
 ```
 
 或者确认旧包已经没用了，手动清空再重跑（**别删错别的目录**）。
@@ -320,6 +326,6 @@ git fetch tm-ui-pro sync/extranet-anchor:sync/extranet-anchor
 - [ ] `git log --oneline -3` 里的提交确实是这次要发的
 - [ ] `git branch --show-current` 是我要发的分支（`trust`）
 - [ ] **第一次**发 → 加 `-Initial`；**之后**发 → 不加
-- [ ] `-OutputPath` 是个**新目录**（或空目录），没混着旧包
+- [ ] 省略 `-OutputPath`（脚本自动建带时间戳的新目录）；若手动指定，确认那是空目录
 - [ ] 发布后 `git rev-parse HEAD` 与输出的 `Source commit` 一致
 - [ ] 拷给内网时，`bundle` + `manifest.json` **一起**

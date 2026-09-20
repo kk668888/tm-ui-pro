@@ -114,13 +114,17 @@ git bundle create bundle trust ^<锚点提交>   # 注意这个 ^
 | 步骤 | 在哪台机器 | 做什么 | 命令 |
 | --- | --- | --- | --- |
 | 1 | 外网 | 确认工作区干净、提交完毕 | `git status` |
-| 2 | 外网 | **首包**：导出基准 | `.\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release -Initial` |
-| 3 | 外网 | **增量包**（以后每次） | `.\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release-2` |
+| 2 | 外网 | **首包**：导出基准 | `.\Export-GitBundle.ps1 -RepositoryPath . -Initial` |
+| 3 | 外网 | **增量包**（以后每次） | `.\Export-GitBundle.ps1 -RepositoryPath .` |
 | 4 | — | 把输出目录里的**两个文件**一起拷进内网 | U 盘 / 摆渡 |
 | 5 | 内网 | **第一次**：用首包克隆出仓库 | `git clone -b trust <首包目录>\bundle my-project` |
-| 6 | 内网 | **以后每次**：导入增量包 | `.\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath ..\release-2` |
+| 6 | 内网 | **以后每次**：导入增量包 | `.\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath <拿到的包目录>` |
 
 首次之后，日常就只有 **2 → 4 → 6** 这三步了。
+
+> **外网的包会自动落在 `<仓库>\release\<时间戳>\`**
+> 省略 `-OutputPath` 时，脚本每次发布都自动建一个带时间戳的新目录 —— 所以永远不用手工换名，也不会覆盖上一个包。
+> 该目录已在 `.gitignore` 里排除（`/release/`），不会被误提交。想写到别处，显式传 `-OutputPath` 即可。
 
 > **脚本自己怎么进内网？**
 > 第一个包（首包）用 `--all` 打包，包含仓库里的全部分支和文件 —— **包括 `scripts/` 目录**。
@@ -142,21 +146,20 @@ git config user.name  "Your Name"
 "hello" | Set-Content a.txt
 git add -A ; git commit -m "feat: first"
 
-# 2) 首包导出（-Initial 只在第一次用）
-& E:\Project\2026_my_project\tm-ui-new\scripts\Export-GitBundle.ps1 `
-    -RepositoryPath . -OutputPath E:\tmp\demo-release -Initial
+# 2) 首包导出（-Initial 只在第一次用；不用指定 -OutputPath）
+& E:\Project\2026_my_project\tm-ui-new\scripts\Export-GitBundle.ps1 -RepositoryPath . -Initial
 ```
 
 ```text
-Release created: E:\tmp\demo-release
+Release created: E:\tmp\demo-extranet\release\2026-09-20-154500
 Source commit: 693453a97d6c6d48de3ca74f95538a879234b6ac
 ```
 
-看到这两行就成了。`E:\tmp\demo-release` 里有 `bundle` + `manifest.json` 两个文件。
+看到这两行就成了。包里是 `bundle` + `manifest.json` 两个文件。
 
 ```powershell
 # 3) 模拟"拷进内网"：直接用本机另一个目录克隆
-git clone -b trust E:\tmp\demo-release\bundle E:\tmp\demo-intranet
+git clone -b trust E:\tmp\demo-extranet\release\2026-09-20-154500\bundle E:\tmp\demo-intranet
 ```
 
 进去看一眼，文件和历史都在，这一步就验证完了。**详细的两侧手册见后面两篇。**
@@ -208,7 +211,7 @@ SHA-256 verification failed. The release bundle was damaged or altered.
 
 ```powershell
 Start-Transcript -Path .\export.log    # 开始记录
-& .\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release
+& .\Export-GitBundle.ps1 -RepositoryPath .
 Stop-Transcript                        # 结束记录
 ```
 
@@ -223,8 +226,10 @@ Stop-Transcript                        # 结束记录
 
 | 场景 | 命令 |
 | --- | --- |
-| 首包（**只做一次**） | `.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release -Initial` |
-| 日常增量 | `.\scripts\Export-GitBundle.ps1 -RepositoryPath . -OutputPath ..\release-2` |
+| 首包（**只做一次**） | `.\scripts\Export-GitBundle.ps1 -RepositoryPath . -Initial` |
+| 日常增量 | `.\scripts\Export-GitBundle.ps1 -RepositoryPath .` |
+| 包落在哪 | 自动生成到 `<仓库>\release\<时间戳>\`（已 gitignore，不会误提交） |
+| 想写到别处 | 追加 `-OutputPath D:\somewhere` |
 | 指定分支 | 追加 `-Branch master`（默认 `trust`） |
 | 起个看得懂的文件名 | 追加 `-ReleaseName 'tm-ui-2026-09-20.bundle'`（默认 `bundle`） |
 | 预览（**没有** `-WhatIf`） | 脚本未实现，加了会报"找不到参数"。发布前请自己先跑 `git status` + `git log --oneline -3` |
@@ -234,7 +239,7 @@ Stop-Transcript                        # 结束记录
 | 场景 | 命令 |
 | --- | --- |
 | 首次：克隆出仓库 | `git clone -b trust <首包目录>\bundle my-project` |
-| 日常导入 | `.\scripts\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath ..\release-2` |
+| 日常导入 | `.\scripts\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath <拿到的包目录>` |
 | 内网没配远端、只更新本地 | 追加 `-SkipPush` |
 | 指定分支 / 远端 | 追加 `-Branch master -Remote origin` |
 

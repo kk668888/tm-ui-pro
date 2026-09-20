@@ -32,7 +32,7 @@
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\Import-GitBundle.ps1 `
-    -RepositoryPath . -ReleasePath ..\release-2
+    -RepositoryPath . -ReleasePath D:\incoming\2026-09-27-101530
 ```
 
 ---
@@ -134,7 +134,7 @@ nothing to commit, working tree clean
 确认干净后导入：
 
 ```powershell
-.\scripts\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath ..\release-2 -SkipPush
+.\scripts\Import-GitBundle.ps1 -RepositoryPath . -ReleasePath D:\incoming\2026-09-27-101530 -SkipPush
 ```
 
 ```text
@@ -252,8 +252,8 @@ git push <Remote> <Branch>:<Branch>
 `-ReleasePath` 要填**包所在的目录**，不是 bundle 文件本身：
 
 ```powershell
-# ❌ -ReleasePath '..\release-2\bundle'
-# ✅ -ReleasePath '..\release-2'
+# ❌ -ReleasePath 'D:\incoming\2026-09-27-101530\bundle'
+# ✅ -ReleasePath 'D:\incoming\2026-09-27-101530'
 ```
 
 ### `manifest.json is missing from the release folder.`
