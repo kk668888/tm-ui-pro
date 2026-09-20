@@ -2,8 +2,9 @@
 param(
     [Parameter(Mandatory)]
     [string]$RepositoryPath,
-    # 发布包的输出目录。省略时默认写到 <RepositoryPath>\release —— 放在仓库里方便查找，
-    # 同时 .gitignore 已排除 /release/，不会误入库。需要写到别处时显式传本参数。
+    # 发布包的输出目录。省略时默认写到 <RepositoryPath>\release\<时间戳> —— 放在仓库里方便查找，
+    # 且 /release/ 已被 .gitignore 排除，不会误入库；时间戳保证每次发布的目录唯一，互不覆盖。
+    # 需要固定目录名或写到别处时，显式传本参数。
     [string]$OutputPath,
     # 默认值对齐本仓库（tm-ui-new）：工作分支 trust。脚本被复制到别的仓库使用时请显式传参。
     [string]$Branch = 'trust',
@@ -59,11 +60,13 @@ if ([System.IO.Path]::GetFileName($ReleaseName) -ne $ReleaseName) {
 
 $RepositoryPath = (Resolve-Path -LiteralPath $RepositoryPath).Path
 
-# 未指定输出目录时，默认写到仓库内的 release 目录。
-# 放在仓库里方便查找；该目录已被 .gitignore 排除（/release/），不会误入版本库。
-# 注意：这里基于已解析的 $RepositoryPath 拼路径，避免受调用者当前目录的影响。
+# 未指定输出目录时，默认写到仓库内的 release\<时间戳> 目录。
+# · 放在仓库里方便查找；/release/ 已被 .gitignore 排除，不会误入版本库。
+# · 带时间戳是因为本脚本要求「输出目录必须为空」：若用固定的 release\ 做默认值，
+#   第二次发布（增量包）必然因目录非空而失败。时间戳让每次发布的目录天然唯一。
+# · 基于已解析的 $RepositoryPath 拼路径，避免受调用者当前工作目录的影响。
 if (-not $OutputPath) {
-    $OutputPath = Join-Path $RepositoryPath 'release'
+    $OutputPath = Join-Path (Join-Path $RepositoryPath 'release') (Get-Date -Format 'yyyy-MM-dd-HHmmss')
 }
 
 Assert-CleanWorkingTree
