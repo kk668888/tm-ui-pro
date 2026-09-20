@@ -7,8 +7,13 @@ import { applyPreset, findPreset, DEFAULT_PRESET_KEY } from '../presets';
 /** 主题持久化 localStorage 键 */
 export const THEME_STORAGE_KEY = 'app-theme';
 
-/** 默认模式：亮色 */
-const DEFAULT_MODE: ThemeMode = 'light';
+/**
+ * 默认模式：暗色。
+ *
+ * 管理系统外壳（顶栏 / 侧栏 / 工作区）采用大屏深青风，内容区必须同为暗色，
+ * 否则会出现「深色壳 + 白色表格」的割裂感。用户仍可用主题切换器改回亮色。
+ */
+const DEFAULT_MODE: ThemeMode = 'dark';
 
 /** 持久化结构（只存「状态」，不存派生数据，避免存冗余） */
 interface PersistedTheme {
@@ -33,7 +38,10 @@ export function readPersistedTheme(): PersistedTheme {
     if (!raw) return fallback;
 
     const parsed = JSON.parse(raw) as Partial<PersistedTheme>;
-    const mode: ThemeMode = parsed.mode === 'dark' ? 'dark' : 'light';
+    // 只接受 dark / light 两个合法值；其余（含手改 localStorage）一律回退 DEFAULT_MODE。
+    // 注意不能硬编码回退到 'light'：默认模式一旦变更，损坏数据会静默切到另一套主题。
+    const mode: ThemeMode =
+      parsed.mode === 'dark' || parsed.mode === 'light' ? parsed.mode : DEFAULT_MODE;
     const presetKey =
       parsed.presetKey && findPreset(parsed.presetKey) ? parsed.presetKey : DEFAULT_PRESET_KEY;
     return { mode, presetKey };

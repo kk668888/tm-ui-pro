@@ -2,6 +2,38 @@ import type { ColorScale, CustomThemeTokens, ThemePreset, ThemeTokens } from './
 
 export const THEME_PRESETS: readonly ThemePreset[] = [
   {
+    // 大屏深青：整套深色科技风（提炼自 release/index.html 的设计稿）。
+    // 与其他预设只覆盖主色不同，这套同时覆盖 bg / border / text ——
+    // 深青底 + 浅青文字是一体的，只换主色会得到「深青底 + 深色文字」这种不可读的组合。
+    key: 'screen',
+    label: '大屏深青',
+    primary: { DEFAULT: '#00acd8', hover: '#00c4e8', active: '#0089ab', disabled: '#0d4a5c' },
+    success: { DEFAULT: '#54bd17', hover: '#6ed12f', active: '#3f9310', disabled: '#264d12' },
+    warning: { DEFAULT: '#d89614', hover: '#f0ad2e', active: '#b07a0d', disabled: '#4d3a0e' },
+    danger: { DEFAULT: '#e26c62', hover: '#f0837a', active: '#c4524a', disabled: '#5a2a26' },
+    info: { DEFAULT: '#00acd8', hover: '#00c4e8', active: '#0089ab', disabled: '#0d4a5c' },
+    bg: {
+      page: '#031f28',
+      container: '#07313d',
+      elevated: '#082f3a',
+      white: '#07313d',
+      subtle: '#03232c',
+    },
+    border: {
+      base: '#28515d',
+      light: '#174756',
+      lighter: '#103f4b',
+      extraLight: '#0a3441',
+    },
+    text: {
+      title: 'rgba(208, 226, 230, 0.92)',
+      body: 'rgba(120, 154, 165, 1)',
+      secondary: 'rgba(102, 138, 150, 1)',
+      disabled: 'rgba(102, 138, 150, 0.45)',
+      inverse: 'rgba(3, 31, 40, 0.92)',
+    },
+  },
+  {
     key: 'blue',
     label: '拂晓蓝',
     primary: { DEFAULT: '#1890ff', hover: '#40a9ff', active: '#096dd9', disabled: '#91d5ff' },
@@ -28,7 +60,7 @@ export const THEME_PRESETS: readonly ThemePreset[] = [
   },
 ] as const;
 
-export const DEFAULT_PRESET_KEY = 'blue';
+export const DEFAULT_PRESET_KEY = 'screen';
 
 export function findPreset(key: string): ThemePreset | undefined {
   return THEME_PRESETS.find((preset) => preset.key === key);
@@ -39,7 +71,6 @@ const OPTIONAL_COLOR_KEYS = ['success', 'warning', 'danger', 'info'] as const;
 function overridePart<T extends object>(basePart: T, override?: Partial<T>): T {
   return override ? { ...basePart, ...override } : basePart;
 }
-
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -63,7 +94,10 @@ function mergeCustomTokens(
   for (const [key, value] of Object.entries(override)) {
     const baseValue = base?.[key];
     if (isPlainRecord(baseValue) && isPlainRecord(value)) {
-      next[key] = mergeCustomTokens(baseValue as CustomThemeTokens, value as ThemePreset['custom'])!;
+      next[key] = mergeCustomTokens(
+        baseValue as CustomThemeTokens,
+        value as ThemePreset['custom'],
+      )!;
     } else {
       next[key] = value as CustomThemeTokens[string];
     }

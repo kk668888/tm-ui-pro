@@ -1,0 +1,59 @@
+/**
+ * 大屏框架主题 token
+ * ---------------------------------------------------------------------------
+ * 来源：release/index.html 的设计稿（天懋主动安全监测与审计系统）提炼而来。
+ *
+ * 【为什么是独立一套，而不是复用 demo 主站 token】
+ * 本框架是「深色科技风」的独立视觉体系（深青底 + 亮青高亮 + 发光描边），
+ * 与 demo 主站的 ant 语义色（--color-primary 等，跟随明暗主题切换）是两套语言。
+ *   · 硬套主站 token  → 丢掉原设计，且深色大屏在浅色主题下会崩坏；
+ *   · 塞进 theme.tokens.json → 污染全局语义层，且会触发 tokens:check 契约校验。
+ * 因此收敛为**作用域变量**：只在 .screen-frame 子树内生效，不污染外部。
+ *
+ * 【收敛了什么】
+ * 原稿样式是 14 轮迭代层叠覆盖出来的，同一个「青」散落着 10+ 个肉眼难辨的近似值
+ * （#00b9e7 / #00b8e7 / #00b7e8 / #00aede / #00afe1 / #00aee0 / #00acd8 / #00acd9 /
+ *  #00a7d2 / #00a6d2 …）。这里按「角色」归并成单一来源，改色只改本文件。
+ */
+
+.screen-frame {
+  /* ── 主色：三档，覆盖原稿全部近似青 ───────────────────────────── */
+  --screen-primary: #00acd8; /* 主色：边框、图标、激活态 */
+  --screen-primary-strong: #00b9e7; /* 强调：发光、焦点环 */
+  --screen-primary-bright: #66d7f0; /* 高亮：只读值、数字、等宽内容 */
+
+  /* ── 背景：由深到浅四层（原稿的层次全靠这四个值） ─────────────── */
+  --screen-bg-deep: #031f28; /* 最底层画布 */
+  --screen-bg-sider: #03232c; /* 侧栏 */
+  --screen-bg-panel: #07313d; /* 工作区面板 */
+  --screen-bg-card: #082f3a; /* 卡片 / 输入控件 */
+
+  /* ── 边框：两档 ──────────────────────────────────────────────── */
+  --screen-border: #174756; /* 分割线、弱边框 */
+  --screen-border-strong: #28515d; /* 控件边框 */
+
+  /* ── 文字：三档 ──────────────────────────────────────────────── */
+  --screen-text: #789aa5; /* 正文 */
+  --screen-text-muted: #668a96; /* 次要、标签 */
+  --screen-text-strong: #d0e2e6; /* 标题 */
+
+  /* ── 语义色与点缀 ────────────────────────────────────────────── */
+  --screen-success: #54bd17; /* 开关「开」、正常状态点 */
+  --screen-danger: #e26c62; /* 必填星号 */
+  --screen-accent: #c9d817; /* 导航激活的黄色菱形 */
+
+  /* ── 尺寸：原稿实测值，改布局只改这里 ─────────────────────────── */
+  --screen-width: 2048px; /* 设计稿画布宽 */
+  --screen-height: 1088px; /* 设计稿画布高 */
+  --screen-topbar-h: 62px; /* 顶栏 */
+  --screen-subbar-h: 50px; /* 副栏 */
+  --screen-sider-w: 186px; /* 侧栏 */
+  --screen-panel-head-h: 42px; /* 面板标题栏 */
+  --screen-field-h: 50px; /* 表单字段行高 */
+  --screen-control-h: 36px; /* 输入控件高 */
+  --screen-label-w: 160px; /* 表单标签列宽 */
+
+  /* ── 字体：大屏用中文字体优先，数字/标识用等宽 ─────────────────── */
+  --screen-font: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+  --screen-font-mono: Consolas, 'Microsoft YaHei', monospace;
+}
